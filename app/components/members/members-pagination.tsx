@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-export const TransactionsPagination = () => {
+export const MembersPagination = () => {
   return (
     <div className="flex items-center justify-between p-4 w-full bg-greyscale-0 rounded-xl border border-solid border-[#dfe1e6]">
       <div className="inline-flex justify-center gap-2 items-center">

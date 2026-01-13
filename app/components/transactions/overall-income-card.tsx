@@ -13,16 +13,16 @@ export const OverallIncomeCard = () => {
       <CardContent className="flex flex-col items-start justify-center w-full rounded-xl overflow-hidden p-0">
         <div className="flex justify-between items-center p-4 border-b border-solid border-[#dfe1e6] w-full">
           <div className="flex flex-col items-start justify-end gap-2 flex-1">
-            <div className="font-body-small-semibold font-[number:var(--body-small-semibold-font-weight)] text-greyscale-500 text-[length:var(--body-small-semibold-font-size)] tracking-[var(--body-small-semibold-letter-spacing)] leading-[var(--body-small-semibold-line-height)] [font-style:var(--body-small-semibold-font-style)]">
+            <div className="font-semibold text-gray-500 text-xs uppercase tracking-wide">
               OVERALL INCOME
             </div>
             <div className="flex items-center gap-2 w-full">
-              <div className="font-heading-h4 text-black">
+              <div className="font-semibold text-gray-900 text-2xl">
                 $83,125
               </div>
-              <Badge className="inline-flex items-center gap-1 px-1 py-0.5 rounded-[100px] border border-solid bg-alertssuccess-0 border-[#c6ede5]">
-                <ArrowUp className="h-4 w-4 text-alertssuccess-100" />
-                <span className="font-body-small-semibold font-[number:var(--body-small-semibold-font-weight)] text-alertssuccess-100 text-[length:var(--body-small-semibold-font-size)] tracking-[var(--body-small-semibold-letter-spacing)] leading-[var(--body-small-semibold-line-height)] [font-style:var(--body-small-semibold-font-style)]">
+              <Badge className="inline-flex items-center gap-1 px-1 py-0.5 rounded-full border border-solid bg-green-50 border-green-200">
+                <ArrowUp className="h-4 w-4 text-green-600" />
+                <span className="font-semibold text-green-600 text-xs">
                   7.7%
                 </span>
               </Badge>
@@ -36,7 +36,7 @@ export const OverallIncomeCard = () => {
                 className="h-auto inline-flex h-10 items-center justify-center gap-2 px-3 py-2 bg-greyscale-0 rounded-[10px] border border-solid border-[#dfe1e6] shadow-shadow-xsmall"
               >
                 <Calendar className="h-4 w-4" />
-                <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-900 text-[length:var(--body-medium-semibold-font-size)] text-center tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+                <span className="font-semibold text-gray-900 text-sm">
                   Monthly
                 </span>
                 <ChevronDown className="h-4 w-4" />

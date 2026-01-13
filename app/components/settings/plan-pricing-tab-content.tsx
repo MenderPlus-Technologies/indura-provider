@@ -1,0 +1,119 @@
+import React from 'react';
+import { Check } from 'lucide-react';
+
+export default function PlanPricingTabContent() {
+  const plans = [
+    {
+      name: 'Basic Plan',
+      price: 29,
+      description: 'All the basics for starting a new business',
+      features: [
+        'Up to 2 staff members',
+        'Up to 4 locations',
+        'Fraud analysis',
+        'Professional reports'
+      ],
+      badge: 'Downgrade',
+      badgeStyle: 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+    },
+    {
+      name: 'Pro Plan',
+      price: 79,
+      description: 'Everything you need for a growing business',
+      features: [
+        'Up to 5 staff members',
+        'Up to 5 locations',
+        'Fraud analysis',
+        'Professional reports'
+      ],
+      badge: 'Current Plan',
+      badgeStyle: 'bg-gray-100 text-gray-700',
+      isCurrent: true
+    },
+    {
+      name: 'Advanced Plan',
+      price: 299,
+      description: 'Advanced features for scaling your business',
+      features: [
+        'Up to 15 staff members',
+        'Up to 10 locations',
+        'Fraud analysis',
+        'Professional reports'
+      ],
+      badge: 'Free Trial - 30 Days',
+      badgeStyle: 'bg-teal-600 text-white hover:bg-teal-700'
+    }
+  ];
+
+  return (
+    <div className="w-full bg-white pb-8">
+      <div className="max-w-4xl mx-auto p-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Left Section */}
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900 mb-3">
+              Plan & Pricing
+            </h1>
+            <p className="text-sm text-gray-600">
+              Manage your subscription plans. Choose a plan that best suits your needs, compare features, and adjust your subscription as needed
+            </p>
+          </div>
+
+          <div className="space-y-4">
+          {plans.map((plan, index) => (
+            <div
+              key={index}
+              className={`bg-white rounded-lg border-2 transition-all ${
+                plan.isCurrent ? 'border-teal-600' : 'border-gray-200'
+              }`}
+            >
+              <div className="p-6">
+                {/* Header */}
+                <div className="flex items-start justify-between mb-6">
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    {plan.name}
+                  </h2>
+                  <button
+                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${plan.badgeStyle}`}
+                    disabled={plan.isCurrent}
+                  >
+                    {plan.badge}
+                  </button>
+                </div>
+
+                {/* Price */}
+                <div className="mb-3">
+                  <span className="text-4xl font-bold text-gray-900">
+                    ${plan.price}
+                  </span>
+                  <span className="text-sm text-gray-600"> / month</span>
+                </div>
+
+                {/* Description */}
+                <p className="text-sm text-gray-600 mb-6">
+                  {plan.description}
+                </p>
+
+                {/* Features */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {plan.features.map((feature, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-teal-100 flex items-center justify-center">
+                        <Check className="w-3 h-3 text-teal-600" strokeWidth={3} />
+                      </div>
+                      <span className="text-sm text-gray-700">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        </div>
+
+        {/* Plans */}
+      
+      </div>
+    </div>
+  );
+}

@@ -1,7 +1,7 @@
 export interface MenuItem {
   icon: any;
   label: string;
-  screen: string;
+  href: string;
 }
 
 export interface MetricCard {
@@ -26,10 +26,5 @@ export interface TableRow {
 export interface SidebarProps {
   isCollapsed: boolean;
   setIsCollapsed: (value: boolean) => void;
-  activeScreen: string;
-  setActiveScreen: (screen: string) => void;
 }
 
-export interface HeaderProps {
-  title?: string;
-}

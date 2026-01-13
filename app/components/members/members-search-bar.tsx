@@ -1,9 +1,10 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { Search, RefreshCw, ArrowUpDown, Filter } from "lucide-react";
+import { Search, RefreshCw, ArrowUpDown, Filter, ChevronDown } from "lucide-react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
 
-export const TransactionsSearchBar = () => {
+export const MembersSearchBar = () => {
   return (
     <div className="flex items-center my-2 justify-between px-2 w-full">
       <div className="relative ">
@@ -15,6 +16,24 @@ export const TransactionsSearchBar = () => {
         />
       </div>
       <div className="flex items-center gap-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              className="h-auto inline-flex h-10 items-center justify-center gap-2 px-4 py-2 bg-greyscale-0 rounded-[10px] border border-solid border-[#dfe1e6]"
+            >
+              <span className="font-semibold text-gray-900 text-sm">
+                All Customers
+              </span>
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem>All Customers</DropdownMenuItem>
+            <DropdownMenuItem>Active Customers</DropdownMenuItem>
+            <DropdownMenuItem>Inactive Customers</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <Button
           variant="outline"
           size="icon"

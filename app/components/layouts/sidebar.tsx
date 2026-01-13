@@ -5,14 +5,16 @@ import { SidebarProps } from "@/app/types";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 
 export const Sidebar = ({
   isCollapsed,
   setIsCollapsed,
-  activeScreen,
-  setActiveScreen,
 }: SidebarProps) => {
+  const pathname = usePathname();
+
   return (
     <aside
       className={`flex flex-col ${
@@ -74,11 +76,11 @@ export const Sidebar = ({
           <div className="flex flex-col items-start flex-[0_0_auto] w-full">
             {mainMenuItems.map((item, index) => {
               const Icon = item.icon;
-              const isActive = activeScreen === item.screen;
+              const isActive = pathname === item.href;
               return (
-                <button
+                <Link
                   key={index}
-                  onClick={() => setActiveScreen(item.screen)}
+                  href={item.href}
                   className={`flex items-center ${
                     isCollapsed ? "justify-center" : "gap-2"
                   } px-3 py-2 flex-[0_0_auto] rounded-lg w-full transition-colors ${
@@ -102,7 +104,7 @@ export const Sidebar = ({
                       {item.label}
                     </span>
                   )}
-                </button>
+                </Link>
               );
             })}
           </div>
@@ -113,21 +115,29 @@ export const Sidebar = ({
         <div className="flex flex-col items-start w-full">
           {bottomMenuItems.map((item, index) => {
             const Icon = item.icon;
+            const isActive = pathname === item.href;
             return (
-              <button
+              <Link
                 key={index}
+                href={item.href}
                 className={`flex items-center cursor-pointer ${
                   isCollapsed ? "justify-center" : "gap-2"
-                } px-3 py-2 flex-[0_0_auto] rounded-lg w-full hover:bg-gray-50 transition-colors`}
+                } px-3 py-2 flex-[0_0_auto] rounded-lg w-full hover:bg-gray-50 transition-colors ${
+                  isActive
+                    ? "bg-gray-50 border border-gray-200"
+                    : ""
+                }`}
                 title={isCollapsed ? item.label : undefined}
               >
-                <Icon className="w-5 h-5 text-gray-600" />
+                <Icon className={`w-5 h-5 ${isActive ? "text-[#009688]" : "text-gray-600"}`} />
                 {!isCollapsed && (
-                  <span className="flex-1 -mt-px font-medium text-base text-gray-600 text-left">
+                  <span className={`flex-1 -mt-px font-medium text-base text-left ${
+                    isActive ? "text-[#009688]" : "text-gray-600"
+                  }`}>
                     {item.label}
                   </span>
                 )}
-              </button>
+              </Link>
             );
           })}
         </div>

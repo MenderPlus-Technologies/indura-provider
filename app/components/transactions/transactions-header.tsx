@@ -33,7 +33,7 @@ export const TransactionsHeader = () => {
               className="h-auto inline-flex h-10 items-center justify-center gap-2 px-3 py-2 bg-greyscale-0 rounded-[10px] border border-solid border-[#dfe1e6] shadow-shadow-xsmall"
             >
               <Calendar className="h-4 w-4" />
-              <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-900 text-[length:var(--body-medium-semibold-font-size)] text-center tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+              <span className="font-semibold text-gray-900 text-sm">
                 Monthly
               </span>
               <ChevronDown className="h-4 w-4" />
@@ -49,7 +49,7 @@ export const TransactionsHeader = () => {
 
         <Button className="h-auto inline-flex h-10 items-center justify-center gap-2 px-3 py-2 bg-[#009688] rounded-[10px] shadow-shadow-xsmall">
           <Plus className="h-4 w-4 text-greyscale-0" />
-          <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-0 text-[length:var(--body-medium-semibold-font-size)] text-center tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+          <span className="font-semibold text-white text-sm">
             New Request
           </span>
         </Button>

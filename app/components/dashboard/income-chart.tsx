@@ -66,28 +66,28 @@ const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div className="flex flex-col w-40 items-start gap-2 px-3 py-2.5 bg-greyscale-0 rounded-lg overflow-hidden border border-solid border-[#dfe1e6] shadow-[0px_16px_32px_-12px_#0d0d121a]">
-        <div className="flex items-center justify-center font-body-small-semibold font-[number:var(--body-small-semibold-font-weight)] text-greyscale-900 text-[length:var(--body-small-semibold-font-size)] tracking-[var(--body-small-semibold-letter-spacing)] leading-[var(--body-small-semibold-line-height)] [font-style:var(--body-small-semibold-font-style)]">
+      <div className="flex flex-col w-40 items-start gap-2 px-3 py-2.5 bg-white rounded-lg overflow-hidden border border-solid border-gray-200 shadow-lg">
+        <div className="flex items-center justify-center font-semibold text-gray-900 text-xs uppercase tracking-wide">
           NET INCOME
         </div>
 
         <div className="flex flex-col items-start gap-1 w-full">
           <div className="flex justify-between w-full items-center">
-            <div className="flex items-center justify-center font-body-small-semibold font-[number:var(--body-small-semibold-font-weight)] text-[#009688] text-[length:var(--body-small-semibold-font-size)] tracking-[var(--body-small-semibold-letter-spacing)] leading-[var(--body-small-semibold-line-height)] [font-style:var(--body-small-semibold-font-style)]">
+            <div className="flex items-center justify-center font-semibold text-[#009688] text-xs">
               ${(data.thisPeriod / 1000).toFixed(1)}K
             </div>
 
-            <div className="flex items-center justify-center font-body-small-regular font-[number:var(--body-small-regular-font-weight)] text-greyscale-500 text-[length:var(--body-small-regular-font-size)] tracking-[var(--body-small-regular-letter-spacing)] leading-[var(--body-small-regular-line-height)] [font-style:var(--body-small-regular-font-style)]">
+            <div className="flex items-center justify-center font-normal text-gray-500 text-xs">
               {data.date}
             </div>
           </div>
 
           <div className="flex justify-between w-full items-center">
-            <div className="flex items-center justify-center font-body-small-semibold font-[number:var(--body-small-semibold-font-weight)] text-alertswarning-100 text-[length:var(--body-small-semibold-font-size)] tracking-[var(--body-small-semibold-letter-spacing)] leading-[var(--body-small-semibold-line-height)] [font-style:var(--body-small-semibold-font-style)]">
+            <div className="flex items-center justify-center font-semibold text-yellow-500 text-xs">
               ${(data.lastPeriod / 1000).toFixed(1)}K
             </div>
 
-            <div className="flex items-center justify-center font-body-small-regular font-[number:var(--body-small-regular-font-weight)] text-greyscale-500 text-[length:var(--body-small-regular-font-size)] tracking-[var(--body-small-regular-letter-spacing)] leading-[var(--body-small-regular-line-height)] [font-style:var(--body-small-regular-font-style)]">
+            <div className="flex items-center justify-center font-normal text-gray-500 text-xs">
               {data.date}
             </div>
           </div>
@@ -107,7 +107,7 @@ export const IncomeChart = () => {
         {["$25K", "$20K", "$15K", "$10K"].map((label, index) => (
           <div
             key={index}
-            className="flex items-center justify-center font-body-medium-regular font-[number:var(--body-medium-regular-font-weight)] text-greyscale-500 text-[length:var(--body-medium-regular-font-size)] tracking-[var(--body-medium-regular-letter-spacing)] leading-[var(--body-medium-regular-line-height)] [font-style:var(--body-medium-regular-font-style)]"
+            className="flex items-center justify-center font-normal text-gray-500 text-sm"
           >
             {label}
           </div>

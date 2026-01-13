@@ -1,10 +1,32 @@
 'use client';
 
-import { HeaderProps } from "@/app/types";
 import { Button } from "@/components/ui/button";
 import { Mail, Bell, ChevronDown, MoreHorizontal } from "lucide-react";
+import { usePathname } from "next/navigation";
 
-export const Header = ({ title = "Dashboard" }: HeaderProps) => {
+const getPageTitle = (pathname: string): string => {
+  if (pathname === '/dashboard') {
+    return 'Dashboard';
+  }
+  if (pathname === '/dashboard/members') {
+    return 'Customers';
+  }
+  if (pathname === '/dashboard/transactions') {
+    return 'Transactions';
+  }
+  if (pathname === '/dashboard/settings') {
+    return 'Settings';
+  }
+  if (pathname === '/dashboard/help') {
+    return 'Help Center';
+  }
+  return 'Dashboard';
+};
+
+export const Header = () => {
+  const pathname = usePathname();
+  const title = getPageTitle(pathname);
+
   return (
     <header className="h-18 flex items-center justify-between px-6 py-4 bg-white border-b border-solid border-gray-200 w-full shrink-0">
       <h1 className="font-semibold text-gray-900 text-2xl">{title}</h1>
