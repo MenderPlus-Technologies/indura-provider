@@ -25,6 +25,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { IncomeChart } from "../dashboard/income-chart";
 
 const metricCards = [
   {
@@ -64,8 +65,6 @@ const metricCards = [
     footerText: "from last month",
   },
 ];
-
-const chartYAxisLabels = ["$25K", "$20K", "$15K", "$10K"];
 
 const tableData = [
   {
@@ -445,95 +444,7 @@ export const DashboardMainSection = (): JSX.Element => {
           </CardContent>
 
           <div className="flex flex-col items-start gap-4 p-4 w-full bg-greyscale-0 rounded-xl border border-solid border-[#dfe1e6]">
-            <div className="flex items-start gap-6 w-full">
-              <div className="inline-flex flex-col h-[180px] items-start justify-between">
-                {chartYAxisLabels.map((label, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-center font-body-medium-regular font-[number:var(--body-medium-regular-font-weight)] text-greyscale-500 text-[length:var(--body-medium-regular-font-size)] tracking-[var(--body-medium-regular-letter-spacing)] leading-[var(--body-medium-regular-line-height)] [font-style:var(--body-medium-regular-font-style)]"
-                  >
-                    {label}
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex h-[180px] items-start justify-between flex-1 relative">
-                <div className="absolute left-[calc(50.00%_-_146px)] bottom-0 w-11 h-[145px] rounded-[8px_8px_0px_0px] bg-[linear-gradient(180deg,rgba(217,220,249,1)_0%,rgba(255,255,255,1)_100%)]" />
-
-                {Array.from({ length: 15 }).map((_, index) => (
-                  <img
-                    key={index}
-                    className="self-stretch w-px object-cover"
-                    alt="Divider"
-                    src={
-                      index === 2 || index === 3
-                        ? "https://c.animaapp.com/mk5v1ugq7dubXj/img/divider-6.svg"
-                        : index === 0 || index === 1
-                          ? "https://c.animaapp.com/mk5v1ugq7dubXj/img/divider-1.svg"
-                          : "https://c.animaapp.com/mk5v1ugq7dubXj/img/divider-2.svg"
-                    }
-                  />
-                ))}
-
-                <div className="absolute top-4 left-[419px] w-[646px] h-[146px]">
-                  <img
-                    className="h-[141px] absolute right-0 bottom-0 w-[641px]"
-                    alt="Shadow"
-                    src="https://c.animaapp.com/mk5v1ugq7dubXj/img/shadow-1.svg"
-                  />
-
-                  <img
-                    className="absolute right-[5px] bottom-[69px] w-[651px] h-[89px]"
-                    alt="Line chart"
-                    src="https://c.animaapp.com/mk5v1ugq7dubXj/img/line-chart-1.svg"
-                  />
-
-                  <img
-                    className="h-11 absolute right-0 bottom-0 w-[641px]"
-                    alt="Shadow"
-                    src="https://c.animaapp.com/mk5v1ugq7dubXj/img/shadow.svg"
-                  />
-
-                  <img
-                    className="absolute right-[5px] bottom-[19px] w-[651px] h-[42px]"
-                    alt="Line chart"
-                    src="https://c.animaapp.com/mk5v1ugq7dubXj/img/line-chart.svg"
-                  />
-
-                  <div className="top-[73px] bg-[#009688] absolute left-0 w-2.5 h-2.5 rounded-[5px] border-2 border-solid border-white" />
-
-                  <div className="top-[104px] bg-alertswarning-100 absolute left-0 w-2.5 h-2.5 rounded-[5px] border-2 border-solid border-white" />
-
-                  <div className="flex flex-col w-40 items-start gap-2 px-3 py-2.5 absolute top-0 left-[35px] bg-greyscale-0 rounded-lg overflow-hidden border border-solid border-[#dfe1e6] shadow-[0px_16px_32px_-12px_#0d0d121a]">
-                    <div className="flex items-center justify-center font-body-small-semibold font-[number:var(--body-small-semibold-font-weight)] text-greyscale-900 text-[length:var(--body-small-semibold-font-size)] tracking-[var(--body-small-semibold-letter-spacing)] leading-[var(--body-small-semibold-line-height)] [font-style:var(--body-small-semibold-font-style)]">
-                      NET INCOME
-                    </div>
-
-                    <div className="flex flex-col items-start gap-1 w-full">
-                      <div className="flex justify-between w-full items-center">
-                        <div className="flex items-center justify-center font-body-small-semibold font-[number:var(--body-small-semibold-font-weight)] text-[#009688] text-[length:var(--body-small-semibold-font-size)] tracking-[var(--body-small-semibold-letter-spacing)] leading-[var(--body-small-semibold-line-height)] [font-style:var(--body-small-semibold-font-style)]">
-                          $22.3K
-                        </div>
-
-                        <div className="flex items-center justify-center font-body-small-regular font-[number:var(--body-small-regular-font-weight)] text-greyscale-500 text-[length:var(--body-small-regular-font-size)] tracking-[var(--body-small-regular-letter-spacing)] leading-[var(--body-small-regular-line-height)] [font-style:var(--body-small-regular-font-style)]">
-                          Dec 12, 2025
-                        </div>
-                      </div>
-
-                      <div className="flex justify-between w-full items-center">
-                        <div className="flex items-center justify-center font-body-small-semibold font-[number:var(--body-small-semibold-font-weight)] text-alertswarning-100 text-[length:var(--body-small-semibold-font-size)] tracking-[var(--body-small-semibold-letter-spacing)] leading-[var(--body-small-semibold-line-height)] [font-style:var(--body-small-semibold-font-style)]">
-                          $14.9K
-                        </div>
-
-                        <div className="flex items-center justify-center font-body-small-regular font-[number:var(--body-small-regular-font-weight)] text-greyscale-500 text-[length:var(--body-small-regular-font-size)] tracking-[var(--body-small-regular-letter-spacing)] leading-[var(--body-small-regular-line-height)] [font-style:var(--body-small-regular-font-style)]">
-                          Dec 12, 2025
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <IncomeChart />
 
             <div className="flex items-center justify-between pl-[58px] pr-0 py-0 w-full">
               <div className="flex items-center justify-center font-body-medium-regular font-[number:var(--body-medium-regular-font-weight)] text-greyscale-500 text-[length:var(--body-medium-regular-font-size)] tracking-[var(--body-medium-regular-letter-spacing)] leading-[var(--body-medium-regular-line-height)] [font-style:var(--body-medium-regular-font-style)]">
