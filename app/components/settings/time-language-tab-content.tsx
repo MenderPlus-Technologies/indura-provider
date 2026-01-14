@@ -23,7 +23,7 @@ export default function TimeLanguageTabContent() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Section */}
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+              <h1 className="text-lg font-semibold text-gray-900 mb-2">
                 Time
               </h1>
               <p className="text-sm text-gray-600">
@@ -61,7 +61,7 @@ export default function TimeLanguageTabContent() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Section */}
             <div>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">
                 Set your language
               </h2>
               <p className="text-sm text-gray-600">
@@ -96,13 +96,13 @@ export default function TimeLanguageTabContent() {
         <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
           <button
             onClick={handleCancel}
-            className="px-6 py-2.5 text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
+            className="px-6 py-2.5 text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="px-6 py-2.5 bg-teal-600 text-white font-medium rounded-lg hover:bg-teal-700 transition-colors"
+            className="px-6 py-2.5 bg-teal-600 text-white font-medium rounded-lg hover:bg-teal-700 transition-colors cursor-pointer"
           >
             Save Change
           </button>

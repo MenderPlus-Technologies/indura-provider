@@ -73,7 +73,7 @@ export const Sidebar = ({
               </span>
             </div>
           )}
-          <div className="flex flex-col items-start flex-[0_0_auto] w-full">
+          <div className="flex flex-col gap-2 items-start flex-[0_0_auto] w-full">
             {mainMenuItems.map((item, index) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;

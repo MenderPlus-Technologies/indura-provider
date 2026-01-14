@@ -24,7 +24,7 @@ export default function PaymentBillingTabContent() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Section */}
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+              <h1 className="text-lg font-semibold text-gray-900 mb-2">
                 Payment
               </h1>
               <p className="text-sm text-gray-600">
@@ -41,7 +41,7 @@ export default function PaymentBillingTabContent() {
                 >
                   <button
                     onClick={() => setSelectedCard(index)}
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center cursor-pointer ${
                       selectedCard === index
                         ? 'border-teal-600 bg-teal-600'
                         : 'border-gray-300'
@@ -74,13 +74,13 @@ export default function PaymentBillingTabContent() {
                     </div>
                   </div>
 
-                  <button className="p-2 hover:bg-gray-100 rounded transition-colors">
+                  <button className="p-2 hover:bg-gray-100 rounded transition-colors cursor-pointer">
                     <MoreVertical className="h-5 w-5 text-gray-400" />
                   </button>
                 </div>
               ))}
 
-              <button className="flex items-center gap-2 text-teal-600 font-medium hover:text-teal-700 transition-colors">
+              <button className="flex items-center gap-2 text-teal-600 font-medium hover:text-teal-700 transition-colors cursor-pointer">
                 <Plus className="h-5 w-5" />
                 New Payment Method
               </button>
@@ -93,7 +93,7 @@ export default function PaymentBillingTabContent() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Section */}
             <div>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">
                 Billing
               </h2>
               <p className="text-sm text-gray-600">
@@ -114,10 +114,10 @@ export default function PaymentBillingTabContent() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                  <button className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
                     Change Billing Period
                   </button>
-                  <button className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                  <button className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
                     <Bell className="h-5 w-5 text-gray-600" />
                   </button>
                 </div>
@@ -139,7 +139,7 @@ export default function PaymentBillingTabContent() {
                   Everything you need for a growing business
                 </p>
                 <div className="flex gap-3">
-                  <button className="text-sm font-medium text-red-600 hover:text-red-700 transition-colors">
+                  <button className="text-sm font-medium text-red-600 hover:text-red-700 transition-colors cursor-pointer">
                     Cancel Plan
                   </button>
                   <button className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
@@ -184,7 +184,7 @@ export default function PaymentBillingTabContent() {
                           {bill.amount}
                         </td>
                         <td className="px-4 py-4 text-right">
-                          <button className="p-2 hover:bg-gray-100 rounded transition-colors">
+                          <button className="p-2 hover:bg-gray-100 rounded transition-colors cursor-pointer">
                             <Download className="h-4 w-4 text-gray-600" />
                           </button>
                         </td>
@@ -202,7 +202,7 @@ export default function PaymentBillingTabContent() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Section */}
             <div>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">
                 Email address
               </h2>
               <p className="text-sm text-gray-600">
@@ -232,10 +232,10 @@ export default function PaymentBillingTabContent() {
 
         {/* Action Buttons */}
         <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
-          <button className="px-6 py-2.5 text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors">
+          <button className="px-6 py-2.5 text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer">
             Cancel
           </button>
-          <button className="px-6 py-2.5 bg-teal-600 text-white font-medium rounded-lg hover:bg-teal-700 transition-colors">
+          <button className="px-6 py-2.5 bg-teal-600 text-white font-medium rounded-lg hover:bg-teal-700 transition-colors cursor-pointer">
             Save Change
           </button>
         </div>

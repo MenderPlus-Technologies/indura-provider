@@ -1,5 +1,4 @@
-import React from 'react';
-import { Check } from 'lucide-react';
+import { FaCheck } from 'react-icons/fa';
 
 export default function PlanPricingTabContent() {
   const plans = [
@@ -51,7 +50,7 @@ export default function PlanPricingTabContent() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Left Section */}
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900 mb-3">
+            <h1 className="text-lg font-semibold text-gray-900 mb-3">
               Plan & Pricing
             </h1>
             <p className="text-sm text-gray-600">
@@ -63,47 +62,51 @@ export default function PlanPricingTabContent() {
           {plans.map((plan, index) => (
             <div
               key={index}
-              className={`bg-white rounded-lg border-2 transition-all ${
-                plan.isCurrent ? 'border-teal-600' : 'border-gray-200'
+              className={`bg-white rounded-lg border transition-all ${
+                plan.isCurrent ? 'border-2 border-teal-600' : 'border border-gray-200'
               }`}
             >
-              <div className="p-6">
+              <div className="">
                 {/* Header */}
-                <div className="flex items-start justify-between mb-6">
-                  <h2 className="text-xl font-semibold text-gray-900">
+                <div className={`flex bg-[#F9F9FB] p-4 items-start justify-between mb-4 rounded-t-lg transition-all`}>
+                  <h2 className="text-lg font-bold text-gray-900">
                     {plan.name}
                   </h2>
                   <button
-                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${plan.badgeStyle}`}
+                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer ${plan.badgeStyle}`}
                     disabled={plan.isCurrent}
                   >
                     {plan.badge}
                   </button>
                 </div>
 
-                {/* Price */}
-                <div className="mb-3">
-                  <span className="text-4xl font-bold text-gray-900">
-                    ${plan.price}
-                  </span>
-                  <span className="text-sm text-gray-600"> / month</span>
-                </div>
-
-                {/* Description */}
-                <p className="text-sm text-gray-600 mb-6">
-                  {plan.description}
-                </p>
-
-                {/* Features */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {plan.features.map((feature, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-teal-100 flex items-center justify-center">
-                        <Check className="w-3 h-3 text-teal-600" strokeWidth={3} />
+                {/* Divider */}
+                <div className='p-4'>
+                  <div className="border-t border-gray-200 mb-4"></div>
+                  {/* Price */}
+                  <div className="mb-4">
+                    <span className="text-2xl font-bold text-gray-900">
+                      ${plan.price}
+                    </span>
+                    <span className="text-sm text-gray-500"> / month</span>
+                  </div>
+                  {/* Description */}
+                  <p className="text-sm text-gray-500 mb-4">
+                    {plan.description}
+                  </p>
+                  {/* Divider */}
+                  <div className="border-t border-gray-200 mb-4"></div>
+                  {/* Features */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {plan.features.map((feature, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <div className="shrink-0 w-5 h-5 border-2 border-[#009688] rounded-full  flex items-center justify-center">
+                          <FaCheck className="w-3 h-3  text-teal-600"  />
+                        </div>
+                        <span className="text-sm text-gray-700">{feature}</span>
                       </div>
-                      <span className="text-sm text-gray-700">{feature}</span>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

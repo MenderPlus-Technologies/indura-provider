@@ -55,7 +55,7 @@ export default function GeneralTabContent() {
           <div className="border-b border-gray-200 px-8 py-8">
             <div className="flex gap-12">
               <div className="w-[220px] flex-shrink-0">
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-lg font-semibold text-gray-900">
                   Provider details
                 </h2>
                 <p className="mt-1 text-sm text-gray-500">Name</p>
@@ -67,7 +67,7 @@ export default function GeneralTabContent() {
                     Facility name
                   </Label>
                   <div className="relative mt-2">
-                    <Store className="absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-400" />
+                    <Store className="absolute left-4 top-1/2 h-[18px] w-[18px]  -translate-y-1/2 text-gray-400" />
                     <Input
                       id="facilityName"
                       value={formData.facilityName}
@@ -112,7 +112,8 @@ export default function GeneralTabContent() {
           <div className="border-b border-gray-200 px-8 py-8">
             <div className="flex gap-12">
               <div className="w-[220px] flex-shrink-0">
-                <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-lg font-semibold text-gray-900">
+
                   Provider address
                 </h2>
                 <p className="mt-1 text-sm text-gray-500">
@@ -192,7 +193,8 @@ export default function GeneralTabContent() {
           <div className="border-b border-gray-200 px-8 py-8">
             <div className="flex gap-12">
               <div className="w-[220px] flex-shrink-0">
-                <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-lg font-semibold text-gray-900">
+
                   Provider services
                 </h2>
                 <p className="mt-1 text-sm text-gray-500">
@@ -227,7 +229,7 @@ export default function GeneralTabContent() {
                       {service}
                       <button
                         onClick={() => handleRemoveService(service)}
-                        className="ml-2 hover:text-gray-900"
+                        className="ml-2 hover:text-gray-900 cursor-pointer"
                       >
                         <X className="h-[14px] w-[14px]" />
                       </button>
