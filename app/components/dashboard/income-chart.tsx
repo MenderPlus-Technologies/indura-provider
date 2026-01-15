@@ -66,28 +66,28 @@ const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div className="flex flex-col w-40 items-start gap-2 px-3 py-2.5 bg-white rounded-lg overflow-hidden border border-solid border-gray-200 shadow-lg">
-        <div className="flex items-center justify-center font-semibold text-gray-900 text-xs uppercase tracking-wide">
+      <div className="flex flex-col w-40 items-start gap-2 px-3 py-2.5 bg-white dark:bg-gray-800 rounded-lg overflow-hidden border border-solid border-gray-200 dark:border-gray-700 shadow-lg">
+        <div className="flex items-center justify-center font-semibold text-gray-900 dark:text-white text-xs uppercase tracking-wide">
           NET INCOME
         </div>
 
         <div className="flex flex-col items-start gap-1 w-full">
           <div className="flex justify-between w-full items-center">
-            <div className="flex items-center justify-center font-semibold text-[#009688] text-xs">
+            <div className="flex items-center justify-center font-semibold text-[#009688] dark:text-teal-400 text-xs">
               ${(data.thisPeriod / 1000).toFixed(1)}K
             </div>
 
-            <div className="flex items-center justify-center font-normal text-gray-500 text-xs">
+            <div className="flex items-center justify-center font-normal text-gray-500 dark:text-gray-400 text-xs">
               {data.date}
             </div>
           </div>
 
           <div className="flex justify-between w-full items-center">
-            <div className="flex items-center justify-center font-semibold text-yellow-500 text-xs">
+            <div className="flex items-center justify-center font-semibold text-yellow-500 dark:text-yellow-400 text-xs">
               ${(data.lastPeriod / 1000).toFixed(1)}K
             </div>
 
-            <div className="flex items-center justify-center font-normal text-gray-500 text-xs">
+            <div className="flex items-center justify-center font-normal text-gray-500 dark:text-gray-400 text-xs">
               {data.date}
             </div>
           </div>
@@ -102,12 +102,12 @@ export const IncomeChart = () => {
   const data = generateChartData();
 
   return (
-    <div className="flex items-start gap-6 w-full">
-      <div className="inline-flex flex-col h-[180px] items-start justify-between">
+    <div className="flex items-start gap-2 sm:gap-6 w-full">
+      <div className="hidden sm:inline-flex flex-col h-[180px] items-start justify-between">
         {["$25K", "$20K", "$15K", "$10K"].map((label, index) => (
           <div
             key={index}
-            className="flex items-center justify-center font-normal text-gray-500 text-sm"
+            className="flex items-center justify-center font-normal text-gray-500 dark:text-gray-400 text-sm"
           >
             {label}
           </div>
@@ -133,6 +133,7 @@ export const IncomeChart = () => {
             <CartesianGrid
               strokeDasharray="3 3"
               stroke="#dfe1e6"
+              className="dark:stroke-gray-700"
               vertical={true}
               horizontal={false}
             />

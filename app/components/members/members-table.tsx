@@ -17,37 +17,37 @@ export const MembersTable = () => {
   return (
     <Table>
       <TableHeader>
-        <TableRow className="border-b border-solid border-[#dfe1e6]">
+        <TableRow className="border-b border-solid border-[#dfe1e6] dark:border-gray-700">
           <TableHead className="w-12 h-10 px-4 py-0">
-            <Checkbox className="w-4 h-4 bg-greyscale-0 rounded-[4.8px] border border-solid border-[#dfe1e6]" />
+            <Checkbox className="w-4 h-4 bg-greyscale-0 dark:bg-gray-800 rounded-[4.8px] border border-solid border-[#dfe1e6] dark:border-gray-700" />
           </TableHead>
           <TableHead className="w-[246px] h-10 px-4 py-0">
-            <span className="font-medium text-gray-500 text-xs">
+            <span className="font-medium text-gray-500 dark:text-gray-400 text-xs">
               Customer
             </span>
           </TableHead>
           <TableHead className="w-60 h-10 px-4 py-0">
-            <span className="font-medium text-gray-500 text-xs">
+            <span className="font-medium text-gray-500 dark:text-gray-400 text-xs">
               Email
             </span>
           </TableHead>
           <TableHead className="w-[178px] h-10 px-4 py-0">
-            <span className="font-medium text-gray-500 text-xs">
+            <span className="font-medium text-gray-500 dark:text-gray-400 text-xs">
               Phone number
             </span>
           </TableHead>
           <TableHead className="w-[114px] h-10 px-4 py-0">
-            <span className="font-medium text-gray-500 text-xs">
+            <span className="font-medium text-gray-500 dark:text-gray-400 text-xs">
               Location
             </span>
           </TableHead>
           <TableHead className="w-[130px] h-10 px-4 py-0">
-            <span className="font-medium text-gray-500 text-xs">
+            <span className="font-medium text-gray-500 dark:text-gray-400 text-xs">
               Total orders
             </span>
           </TableHead>
           <TableHead className="w-[130px] h-10 px-4 py-0">
-            <span className="font-medium text-gray-500 text-xs">
+            <span className="font-medium text-gray-500 dark:text-gray-400 text-xs">
               Total spent
             </span>
           </TableHead>
@@ -59,45 +59,45 @@ export const MembersTable = () => {
             key={index}
             className={
               index < membersData.length - 1
-                ? "border-b border-solid border-[#dfe1e6]"
+                ? "border-b border-solid border-[#dfe1e6] dark:border-gray-700"
                 : ""
             }
           >
             <TableCell className="h-12 px-4 py-0">
-              <Checkbox className="w-4 h-4 bg-greyscale-0 rounded-[4.8px] border border-solid border-[#dfe1e6]" />
+              <Checkbox className="w-4 h-4 bg-greyscale-0 dark:bg-gray-800 rounded-[4.8px] border border-solid border-[#dfe1e6] dark:border-gray-700" />
             </TableCell>
             <TableCell className="h-12 px-4 py-0">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-[#009688] flex items-center justify-center text-white text-xs font-semibold">
                   {getInitials(member.name)}
                 </div>
-                <span className="font-semibold text-gray-900 text-sm">
+                <span className="font-semibold text-gray-900 dark:text-white text-sm">
                   {member.name}
                 </span>
               </div>
             </TableCell>
             <TableCell className="h-12 px-4 py-0">
-              <span className="font-semibold text-[#009688] text-sm">
+              <span className="font-semibold text-[#009688] dark:text-teal-400 text-sm">
                 {member.email}
               </span>
             </TableCell>
             <TableCell className="h-12 px-4 py-0">
-              <span className="font-semibold text-gray-900 text-sm">
+              <span className="font-semibold text-gray-900 dark:text-white text-sm">
                 {member.phone}
               </span>
             </TableCell>
             <TableCell className="h-12 px-4 py-0">
-              <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-900 text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+              <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-900 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
                 {member.location}
               </span>
             </TableCell>
             <TableCell className="h-12 px-4 py-0">
-              <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-900 text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+              <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-900 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
                 {member.totalOrders}
               </span>
             </TableCell>
             <TableCell className="h-12 px-4 py-0">
-              <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-900 text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+              <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-900 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
                 {member.totalSpent}
               </span>
             </TableCell>

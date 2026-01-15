@@ -35,7 +35,7 @@ export const SettingsScreen = () => {
   };
 
   return (
-    <div className="flex h-full w-full bg-white">
+    <div className="flex flex-col lg:flex-row h-full w-full bg-white dark:bg-gray-950">
       <SettingsTabs activeTab={activeTab} onTabChange={setActiveTab} />
       <div className="flex-1 flex flex-col overflow-y-auto">
         {renderTabContent()}

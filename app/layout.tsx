@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import {  Inter_Tight } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "./contexts/theme-context";
 
 const inter = Inter_Tight({
   variable: "--font-inter",
@@ -20,9 +21,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body className="font-sans">
-        {children}
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
