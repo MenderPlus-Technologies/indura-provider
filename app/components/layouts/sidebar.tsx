@@ -1,12 +1,13 @@
 'use client';
 
-import { mainMenuItems, bottomMenuItems } from "@/app/constants/navigation";
+import { getMainMenuItems, bottomMenuItems } from "@/app/constants/navigation";
 import { SidebarProps } from "@/app/types";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useProvider } from "@/app/contexts/provider-context";
 
 
 export const Sidebar = ({
@@ -16,6 +17,8 @@ export const Sidebar = ({
   setIsMobileMenuOpen,
 }: SidebarProps & { isMobileMenuOpen?: boolean; setIsMobileMenuOpen?: (value: boolean) => void }) => {
   const pathname = usePathname();
+  const { supportsSubscriptions } = useProvider();
+  const mainMenuItems = getMainMenuItems(supportsSubscriptions);
 
   return (
     <>

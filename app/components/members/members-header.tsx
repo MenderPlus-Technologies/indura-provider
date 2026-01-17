@@ -1,9 +1,14 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { Upload, Mail, UserPlus, PanelLeft } from "lucide-react";
+import { Upload, Mail, UserPlus, PanelLeft, Bell } from "lucide-react";
 
-export const MembersHeader = () => {
+interface MembersHeaderProps {
+  onSendNotification?: (type: 'all' | 'selected') => void;
+  hasSelectedMembers?: boolean;
+}
+
+export const MembersHeader = ({ onSendNotification, hasSelectedMembers = false }: MembersHeaderProps) => {
   return (
     <header className="h-auto sm:h-[72px] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 px-4 sm:px-6 py-4 bg-greyscale-0 dark:bg-gray-900 border-b border-solid border-[#dfe1e6] dark:border-gray-800 w-full">
       <Button
@@ -32,6 +37,17 @@ export const MembersHeader = () => {
           <Mail className="h-4 w-4 text-gray-700 dark:text-gray-300" />
           <span className="font-semibold text-gray-900 dark:text-white text-xs sm:text-sm">
             Email Segment
+          </span>
+        </Button>
+
+        <Button
+          variant="outline"
+          onClick={() => onSendNotification?.(hasSelectedMembers ? 'selected' : 'all')}
+          className="h-auto inline-flex h-10 items-center justify-center gap-2 px-2 sm:px-3 py-2 bg-greyscale-0 dark:bg-gray-800 rounded-[10px] border border-solid border-[#dfe1e6] dark:border-gray-700 shadow-shadow-xsmall cursor-pointer flex-1 sm:flex-initial"
+        >
+          <Bell className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+          <span className="font-semibold text-gray-900 dark:text-white text-xs sm:text-sm">
+            {hasSelectedMembers ? 'Notify Selected' : 'Notify All'}
           </span>
         </Button>
 

@@ -2,6 +2,8 @@
 
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Bell } from "lucide-react";
 import { membersData, type Member } from "./member-utils";
 
 const getInitials = (name: string) => {
@@ -13,13 +15,55 @@ const getInitials = (name: string) => {
     .slice(0, 2);
 };
 
-export const MembersTable = () => {
+interface MembersTableProps {
+  onIndividualNotification?: (member: Member) => void;
+  selectedMembers?: Member[];
+  onSelectionChange?: (members: Member[]) => void;
+}
+
+export const MembersTable = ({ onIndividualNotification, selectedMembers = [], onSelectionChange }: MembersTableProps) => {
+  const getSelectedIndices = () => {
+    return membersData
+      .map((member, idx) => ({ member, idx }))
+      .filter(({ member }) => selectedMembers.some(selected => selected.email === member.email))
+      .map(({ idx }) => idx);
+  };
+
+  const handleSelectAll = (checked: boolean | 'indeterminate') => {
+    if (checked === true) {
+      onSelectionChange?.(membersData);
+    } else {
+      onSelectionChange?.([]);
+    }
+  };
+
+  const handleSelectRow = (index: number, checked: boolean | 'indeterminate') => {
+    const member = membersData[index];
+    const isChecked = checked === true;
+    
+    if (isChecked) {
+      if (!selectedMembers.some(selected => selected.email === member.email)) {
+        onSelectionChange?.([...selectedMembers, member]);
+      }
+    } else {
+      onSelectionChange?.(selectedMembers.filter(selected => selected.email !== member.email));
+    }
+  };
+
+  const selectedIndices = getSelectedIndices();
+  const isAllSelected = selectedIndices.length === membersData.length && membersData.length > 0;
+  const isIndeterminate = selectedIndices.length > 0 && selectedIndices.length < membersData.length;
+
   return (
     <Table>
       <TableHeader>
         <TableRow className="border-b border-solid border-[#dfe1e6] dark:border-gray-700">
           <TableHead className="w-12 h-10 px-4 py-0">
-            <Checkbox className="w-4 h-4 bg-greyscale-0 dark:bg-gray-800 rounded-[4.8px] border border-solid border-[#dfe1e6] dark:border-gray-700" />
+            <Checkbox 
+              checked={isAllSelected}
+              onCheckedChange={handleSelectAll}
+              className="w-4 h-4 bg-greyscale-0 dark:bg-gray-800 rounded-[4.8px] border border-solid border-[#dfe1e6] dark:border-gray-700" 
+            />
           </TableHead>
           <TableHead className="w-[246px] h-10 px-4 py-0">
             <span className="font-medium text-gray-500 dark:text-gray-400 text-xs">
@@ -51,6 +95,11 @@ export const MembersTable = () => {
               Total spent
             </span>
           </TableHead>
+          <TableHead className="w-[100px] h-10 px-4 py-0">
+            <span className="font-medium text-gray-500 dark:text-gray-400 text-xs">
+              Actions
+            </span>
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -64,7 +113,11 @@ export const MembersTable = () => {
             }
           >
             <TableCell className="h-12 px-4 py-0">
-              <Checkbox className="w-4 h-4 bg-greyscale-0 dark:bg-gray-800 rounded-[4.8px] border border-solid border-[#dfe1e6] dark:border-gray-700" />
+              <Checkbox 
+                checked={selectedIndices.includes(index)}
+                onCheckedChange={(checked) => handleSelectRow(index, checked)}
+                className="w-4 h-4 bg-greyscale-0 dark:bg-gray-800 rounded-[4.8px] border border-solid border-[#dfe1e6] dark:border-gray-700" 
+              />
             </TableCell>
             <TableCell className="h-12 px-4 py-0">
               <div className="flex items-center gap-2">
@@ -100,6 +153,17 @@ export const MembersTable = () => {
               <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-900 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
                 {member.totalSpent}
               </span>
+            </TableCell>
+            <TableCell className="h-12 px-4 py-0">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onIndividualNotification?.(member)}
+                className="h-8 w-8 cursor-pointer text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                title="Send notification to this customer"
+              >
+                <Bell className="h-4 w-4" />
+              </Button>
             </TableCell>
           </TableRow>
         ))}
