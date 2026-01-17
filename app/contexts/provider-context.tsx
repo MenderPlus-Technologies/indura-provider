@@ -8,6 +8,7 @@ export interface ProviderCapabilities {
   supportsSubscriptions: boolean;
   supportsAppointments?: boolean;
   supportsInventory?: boolean;
+  supportsTeamManagement?: boolean;
   // Add more capabilities as needed
 }
 
@@ -22,6 +23,7 @@ interface ProviderContextType {
   provider: ProviderInfo;
   hasCapability: (capability: keyof ProviderCapabilities) => boolean;
   supportsSubscriptions: boolean;
+  supportsTeamManagement: boolean;
 }
 
 const ProviderContext = createContext<ProviderContextType | undefined>(undefined);
@@ -45,31 +47,37 @@ const getMockProvider = (): ProviderInfo => {
       supportsSubscriptions: true,
       supportsAppointments: true,
       supportsInventory: false,
+      supportsTeamManagement: true,
     },
     'Fitness': {
       supportsSubscriptions: true,
       supportsAppointments: true,
       supportsInventory: false,
+      supportsTeamManagement: true,
     },
     'Wellness': {
       supportsSubscriptions: true,
       supportsAppointments: true,
       supportsInventory: false,
+      supportsTeamManagement: true,
     },
     'Clinic': {
       supportsSubscriptions: false,
       supportsAppointments: true,
       supportsInventory: true,
+      supportsTeamManagement: true,
     },
     'Hospital': {
       supportsSubscriptions: false,
       supportsAppointments: true,
       supportsInventory: true,
+      supportsTeamManagement: true,
     },
     'Other': {
       supportsSubscriptions: false,
       supportsAppointments: false,
       supportsInventory: false,
+      supportsTeamManagement: false,
     },
   };
 
@@ -93,6 +101,7 @@ export function ProviderProvider({ children }: { children: React.ReactNode }) {
           supportsSubscriptions: true,
           supportsAppointments: true,
           supportsInventory: false,
+          supportsTeamManagement: true,
         },
       };
     }
@@ -113,9 +122,10 @@ export function ProviderProvider({ children }: { children: React.ReactNode }) {
   };
 
   const supportsSubscriptions = provider.capabilities.supportsSubscriptions;
+  const supportsTeamManagement = provider.capabilities.supportsTeamManagement || false;
 
   return (
-    <ProviderContext.Provider value={{ provider, hasCapability, supportsSubscriptions }}>
+    <ProviderContext.Provider value={{ provider, hasCapability, supportsSubscriptions, supportsTeamManagement }}>
       {children}
     </ProviderContext.Provider>
   );

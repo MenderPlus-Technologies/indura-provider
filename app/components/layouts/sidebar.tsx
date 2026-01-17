@@ -17,8 +17,8 @@ export const Sidebar = ({
   setIsMobileMenuOpen,
 }: SidebarProps & { isMobileMenuOpen?: boolean; setIsMobileMenuOpen?: (value: boolean) => void }) => {
   const pathname = usePathname();
-  const { supportsSubscriptions } = useProvider();
-  const mainMenuItems = getMainMenuItems(supportsSubscriptions);
+  const { supportsSubscriptions, supportsTeamManagement } = useProvider();
+  const mainMenuItems = getMainMenuItems(supportsSubscriptions, supportsTeamManagement);
 
   return (
     <>

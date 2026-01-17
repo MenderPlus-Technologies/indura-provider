@@ -5,11 +5,12 @@ import { useProvider } from "@/app/contexts/provider-context";
  * Centralized utility for capability checks across the app
  */
 export function useProviderCapability() {
-  const { hasCapability, supportsSubscriptions } = useProvider();
+  const { hasCapability, supportsSubscriptions, supportsTeamManagement } = useProvider();
 
   return {
     hasCapability,
     supportsSubscriptions,
+    supportsTeamManagement,
     // Add more convenience methods as needed
     supportsAppointments: hasCapability('supportsAppointments'),
     supportsInventory: hasCapability('supportsInventory'),

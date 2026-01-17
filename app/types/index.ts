@@ -2,7 +2,7 @@ export interface MenuItem {
   icon: any;
   label: string;
   href: string;
-  requiresCapability?: 'supportsSubscriptions' | 'supportsAppointments' | 'supportsInventory';
+  requiresCapability?: 'supportsSubscriptions' | 'supportsAppointments' | 'supportsInventory' | 'supportsTeamManagement';
 }
 
 export interface MetricCard {
