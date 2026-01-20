@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, ChevronDown, ArrowUp } from "lucide-react";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { TransactionsSearchBar } from "./transactions-search-bar";
 
 export const OverallIncomeCard = () => {
@@ -42,11 +42,11 @@ export const OverallIncomeCard = () => {
                 <ChevronDown className="h-4 w-4 text-gray-700 dark:text-gray-300" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-              <DropdownMenuItem className="text-gray-900 dark:text-white">Daily</DropdownMenuItem>
-              <DropdownMenuItem className="text-gray-900 dark:text-white">Weekly</DropdownMenuItem>
-              <DropdownMenuItem className="text-gray-900 dark:text-white">Monthly</DropdownMenuItem>
-              <DropdownMenuItem className="text-gray-900 dark:text-white">Yearly</DropdownMenuItem>
+            <DropdownMenuContent>
+              <DropdownMenuItem>Daily</DropdownMenuItem>
+              <DropdownMenuItem>Weekly</DropdownMenuItem>
+              <DropdownMenuItem>Monthly</DropdownMenuItem>
+              <DropdownMenuItem>Yearly</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

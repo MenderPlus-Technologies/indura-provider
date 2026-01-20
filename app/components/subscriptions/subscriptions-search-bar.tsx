@@ -47,9 +47,8 @@ export const SubscriptionsSearchBar = ({
               <ChevronDown className="h-4 w-4 text-gray-700 dark:text-gray-300" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+          <DropdownMenuContent>
             <DropdownMenuItem
-              className="text-gray-900 dark:text-white cursor-pointer"
               onClick={() => onPlanChange('')}
             >
               All Plans
@@ -57,7 +56,6 @@ export const SubscriptionsSearchBar = ({
             {subscriptionPlans.map((plan) => (
               <DropdownMenuItem
                 key={plan}
-                className="text-gray-900 dark:text-white cursor-pointer"
                 onClick={() => onPlanChange(plan)}
               >
                 {plan}

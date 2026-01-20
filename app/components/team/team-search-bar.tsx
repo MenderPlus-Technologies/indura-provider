@@ -51,9 +51,8 @@ export const TeamSearchBar = ({
               <ChevronDown className="h-4 w-4 text-gray-700 dark:text-gray-300" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+          <DropdownMenuContent>
             <DropdownMenuItem
-              className="text-gray-900 dark:text-white cursor-pointer"
               onClick={() => onRoleChange('All')}
             >
               All Roles
@@ -61,7 +60,6 @@ export const TeamSearchBar = ({
             {userRoles.map((role) => (
               <DropdownMenuItem
                 key={role}
-                className="text-gray-900 dark:text-white cursor-pointer"
                 onClick={() => onRoleChange(role)}
               >
                 {role}
@@ -81,27 +79,23 @@ export const TeamSearchBar = ({
               <ChevronDown className="h-4 w-4 text-gray-700 dark:text-gray-300" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+          <DropdownMenuContent>
             <DropdownMenuItem
-              className="text-gray-900 dark:text-white cursor-pointer"
               onClick={() => onStatusChange('All')}
             >
               All Status
             </DropdownMenuItem>
             <DropdownMenuItem
-              className="text-gray-900 dark:text-white cursor-pointer"
               onClick={() => onStatusChange('Active')}
             >
               Active
             </DropdownMenuItem>
             <DropdownMenuItem
-              className="text-gray-900 dark:text-white cursor-pointer"
               onClick={() => onStatusChange('Invited')}
             >
               Invited
             </DropdownMenuItem>
             <DropdownMenuItem
-              className="text-gray-900 dark:text-white cursor-pointer"
               onClick={() => onStatusChange('Pending')}
             >
               Pending

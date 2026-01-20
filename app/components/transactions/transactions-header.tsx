@@ -43,11 +43,11 @@ export const TransactionsHeader = ({ onNewRequest }: TransactionsHeaderProps) =>
               <ChevronDown className="h-4 w-4 text-gray-700 dark:text-gray-300" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-            <DropdownMenuItem className="text-gray-900 dark:text-white">Daily</DropdownMenuItem>
-            <DropdownMenuItem className="text-gray-900 dark:text-white">Weekly</DropdownMenuItem>
-            <DropdownMenuItem className="text-gray-900 dark:text-white">Monthly</DropdownMenuItem>
-            <DropdownMenuItem className="text-gray-900 dark:text-white">Yearly</DropdownMenuItem>
+          <DropdownMenuContent>
+            <DropdownMenuItem>Daily</DropdownMenuItem>
+            <DropdownMenuItem>Weekly</DropdownMenuItem>
+            <DropdownMenuItem>Monthly</DropdownMenuItem>
+            <DropdownMenuItem>Yearly</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 

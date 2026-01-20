@@ -14,7 +14,7 @@ import { RecentActivities } from "./recentActivities";
 import { IncomeChart } from "./income-chart";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 
 export const DashboardScreen = () => {
@@ -92,11 +92,11 @@ export const DashboardScreen = () => {
                     <ChevronDown className="h-4 w-4 text-gray-700 dark:text-gray-300" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                  <DropdownMenuItem className="text-gray-900 dark:text-white">Daily</DropdownMenuItem>
-                  <DropdownMenuItem className="text-gray-900 dark:text-white">Weekly</DropdownMenuItem>
-                  <DropdownMenuItem className="text-gray-900 dark:text-white">Monthly</DropdownMenuItem>
-                  <DropdownMenuItem className="text-gray-900 dark:text-white">Yearly</DropdownMenuItem>
+                <DropdownMenuContent>
+                  <DropdownMenuItem>Daily</DropdownMenuItem>
+                  <DropdownMenuItem>Weekly</DropdownMenuItem>
+                  <DropdownMenuItem>Monthly</DropdownMenuItem>
+                  <DropdownMenuItem>Yearly</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -114,10 +114,10 @@ export const DashboardScreen = () => {
                     <ChevronDown className="h-4 w-4 text-gray-700 dark:text-gray-300" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                  <DropdownMenuItem className="text-gray-900 dark:text-white">All Service</DropdownMenuItem>
-                  <DropdownMenuItem className="text-gray-900 dark:text-white">Service 1</DropdownMenuItem>
-                  <DropdownMenuItem className="text-gray-900 dark:text-white">Service 2</DropdownMenuItem>
+                <DropdownMenuContent>
+                  <DropdownMenuItem>All Service</DropdownMenuItem>
+                  <DropdownMenuItem>Service 1</DropdownMenuItem>
+                  <DropdownMenuItem>Service 2</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
 

@@ -30,15 +30,7 @@ export const MembersHeader = ({ onSendNotification, hasSelectedMembers = false }
           <Upload className="h-4 w-4 text-gray-700 dark:text-gray-300" />
         </Button>
 
-        <Button
-          variant="outline"
-          className="h-auto inline-flex h-10 items-center justify-center gap-2 px-2 sm:px-3 py-2 bg-greyscale-0 dark:bg-gray-800 rounded-[10px] border border-solid border-[#dfe1e6] dark:border-gray-700 shadow-shadow-xsmall cursor-pointer flex-1 sm:flex-initial"
-        >
-          <Mail className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-          <span className="font-semibold text-gray-900 dark:text-white text-xs sm:text-sm">
-            Email Segment
-          </span>
-        </Button>
+       
 
         <Button
           variant="outline"
@@ -51,12 +43,12 @@ export const MembersHeader = ({ onSendNotification, hasSelectedMembers = false }
           </span>
         </Button>
 
-        <Button className="h-auto inline-flex h-10 items-center justify-center gap-2 px-2 sm:px-3 py-2 bg-[#009688] hover:bg-[#008577] rounded-[10px] shadow-shadow-xsmall cursor-pointer flex-1 sm:flex-initial">
+        {/* <Button className="h-auto inline-flex h-10 items-center justify-center gap-2 px-2 sm:px-3 py-2 bg-[#009688] hover:bg-[#008577] rounded-[10px] shadow-shadow-xsmall cursor-pointer flex-1 sm:flex-initial">
           <UserPlus className="h-4 w-4 text-greyscale-0" />
           <span className="font-semibold text-white text-xs sm:text-sm">
             Add Customers
           </span>
-        </Button>
+        </Button> */}
       </div>
     </header>
   );

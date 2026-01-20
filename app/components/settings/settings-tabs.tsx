@@ -23,7 +23,7 @@ const tabs = [
   { id: 'account' as SettingsTab, label: 'Account', icon: User },
   { id: 'payouts' as SettingsTab, label: 'Payouts', icon: Wallet },
   { id: 'payment-billing' as SettingsTab, label: 'Payment & Billing', icon: CreditCard },
-  { id: 'plan-pricing' as SettingsTab, label: 'Plan & Pricing', icon: Package },
+  // { id: 'plan-pricing' as SettingsTab, label: 'Plan & Pricing', icon: Package },
   { id: 'time-language' as SettingsTab, label: 'Time & Language', icon: Globe },
   { id: 'password' as SettingsTab, label: 'Password', icon: Lock },
 ];

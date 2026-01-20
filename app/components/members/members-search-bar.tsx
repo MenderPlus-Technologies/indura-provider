@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Search, RefreshCw, ArrowUpDown, Filter, ChevronDown } from "lucide-react";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 export const MembersSearchBar = () => {
   return (
@@ -28,10 +28,10 @@ export const MembersSearchBar = () => {
               <ChevronDown className="h-4 w-4 text-gray-700 dark:text-gray-300" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-            <DropdownMenuItem className="text-gray-900 dark:text-white">All Customers</DropdownMenuItem>
-            <DropdownMenuItem className="text-gray-900 dark:text-white">Active Customers</DropdownMenuItem>
-            <DropdownMenuItem className="text-gray-900 dark:text-white">Inactive Customers</DropdownMenuItem>
+          <DropdownMenuContent>
+            <DropdownMenuItem>All Customers</DropdownMenuItem>
+            <DropdownMenuItem>Active Customers</DropdownMenuItem>
+            <DropdownMenuItem>Inactive Customers</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         <Button

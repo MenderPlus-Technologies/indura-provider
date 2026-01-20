@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Header } from "../components/layouts/header";
 import { Sidebar } from "../components/layouts/sidebar";
 
@@ -9,8 +10,19 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    // Check if user is logged in
+    if (typeof window !== 'undefined') {
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      if (isLoggedIn !== 'true') {
+        router.replace('/');
+      }
+    }
+  }, [router]);
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-white dark:bg-gray-950">

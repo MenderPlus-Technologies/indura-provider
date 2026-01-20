@@ -3,10 +3,10 @@
 import { getMainMenuItems, bottomMenuItems } from "@/app/constants/navigation";
 import { SidebarProps } from "@/app/types";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, LogOut } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useProvider } from "@/app/contexts/provider-context";
 
 
@@ -17,8 +17,16 @@ export const Sidebar = ({
   setIsMobileMenuOpen,
 }: SidebarProps & { isMobileMenuOpen?: boolean; setIsMobileMenuOpen?: (value: boolean) => void }) => {
   const pathname = usePathname();
+  const router = useRouter();
   const { supportsSubscriptions, supportsTeamManagement } = useProvider();
   const mainMenuItems = getMainMenuItems(supportsSubscriptions, supportsTeamManagement);
+
+  const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('isLoggedIn');
+    }
+    router.push('/');
+  };
 
   return (
     <>
@@ -170,6 +178,22 @@ export const Sidebar = ({
               </Link>
             );
           })}
+          
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            className={`flex items-center cursor-pointer ${
+              isCollapsed ? "justify-center" : "gap-2"
+            } px-3 py-2 flex-[0_0_auto] rounded-lg w-full hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors mt-2`}
+            title={isCollapsed ? "Logout" : undefined}
+          >
+            <LogOut className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            {!isCollapsed && (
+              <span className="flex-1 -mt-px font-medium text-base text-left text-gray-600 dark:text-gray-400">
+                Logout
+              </span>
+            )}
+          </button>
         </div>
       </nav>
     </aside>

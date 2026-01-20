@@ -23,8 +23,8 @@ export const SettingsScreen = () => {
         return <PayoutsTabContent />;
       case 'payment-billing':
         return <PaymentBillingTabContent />;
-      case 'plan-pricing':
-        return <PlanPricingTabContent />;
+      // case 'plan-pricing':
+      //   return <PlanPricingTabContent />;
       case 'time-language':
         return <TimeLanguageTabContent />;
       case 'password':

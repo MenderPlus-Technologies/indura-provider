@@ -127,9 +127,8 @@ export const TeamTable = ({ users, onEditRole, onResendInvite, onRemoveUser }: T
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                  <DropdownMenuContent>
                     <DropdownMenuItem
-                      className="text-gray-900 dark:text-white cursor-pointer"
                       onClick={() => onEditRole?.(user)}
                     >
                       <Edit className="h-4 w-4 mr-2" />
@@ -137,7 +136,6 @@ export const TeamTable = ({ users, onEditRole, onResendInvite, onRemoveUser }: T
                     </DropdownMenuItem>
                     {(user.status === 'Invited' || user.status === 'Pending') && (
                       <DropdownMenuItem
-                        className="text-gray-900 dark:text-white cursor-pointer"
                         onClick={() => onResendInvite?.(user)}
                       >
                         <Mail className="h-4 w-4 mr-2" />
@@ -145,7 +143,7 @@ export const TeamTable = ({ users, onEditRole, onResendInvite, onRemoveUser }: T
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem
-                      className="text-red-600 dark:text-red-400 cursor-pointer"
+                      variant="destructive"
                       onClick={() => onRemoveUser?.(user)}
                     >
                       <Trash2 className="h-4 w-4 mr-2" />
