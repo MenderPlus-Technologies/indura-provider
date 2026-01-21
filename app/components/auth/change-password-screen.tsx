@@ -11,7 +11,7 @@ import { useAuth } from '@/app/contexts/auth-context';
 
 export const ChangePasswordScreen = () => {
   const router = useRouter();
-  const { changePassword, requiresPasswordChange, isAuthenticated, isChangingPassword } = useAuth();
+  const { changePassword, requiresPasswordChange, isAuthenticated, isChangingPassword, user } = useAuth();
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -83,9 +83,30 @@ export const ChangePasswordScreen = () => {
     setNewPassword('');
     setConfirmPassword('');
 
-    // Redirect to dashboard after a short delay
+    // Get user role for role-based redirect
+    let userRole: string | undefined;
+    if (user?.role) {
+      userRole = user.role;
+    } else {
+      // Fallback: read from localStorage
+      const userStr = localStorage.getItem('authUser');
+      if (userStr) {
+        try {
+          const parsedUser = JSON.parse(userStr);
+          userRole = parsedUser?.role;
+        } catch (error) {
+          console.error('Failed to parse user data:', error);
+        }
+      }
+    }
+
+    // Redirect based on user role after a short delay
     setTimeout(() => {
-      router.push('/dashboard');
+      if (userRole === 'admin') {
+        router.push('/admin-dashboard');
+      } else {
+        router.push('/dashboard');
+      }
     }, 2000);
   };
 

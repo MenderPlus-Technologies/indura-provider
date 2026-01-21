@@ -7,7 +7,7 @@ import { useAuth } from './contexts/auth-context';
 
 export default function HomePage() {
   const router = useRouter();
-  const { isAuthenticated, requiresPasswordChange } = useAuth();
+  const { isAuthenticated, requiresPasswordChange, user } = useAuth();
 
   useEffect(() => {
     // Check if user is already logged in
@@ -20,7 +20,29 @@ export default function HomePage() {
         if (requiresChange || requiresPasswordChange) {
           router.replace('/auth/change-password');
         } else {
-          router.replace('/dashboard');
+          // Get user role for role-based redirect
+          let userRole: string | undefined;
+          if (user?.role) {
+            userRole = user.role;
+          } else {
+            // Fallback: read from localStorage
+            const userStr = localStorage.getItem('authUser');
+            if (userStr) {
+              try {
+                const parsedUser = JSON.parse(userStr);
+                userRole = parsedUser?.role;
+              } catch (error) {
+                console.error('Failed to parse user data:', error);
+              }
+            }
+          }
+
+          // Role-based redirect
+          if (userRole === 'admin') {
+            router.replace('/admin-dashboard');
+          } else {
+            router.replace('/dashboard');
+          }
         }
       } else {
         // Legacy check for backward compatibility
@@ -30,7 +52,7 @@ export default function HomePage() {
         }
       }
     }
-  }, [router, isAuthenticated, requiresPasswordChange]);
+  }, [router, isAuthenticated, requiresPasswordChange, user]);
 
   return <SignInScreen />;
 }

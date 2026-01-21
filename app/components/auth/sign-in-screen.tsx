@@ -40,14 +40,53 @@ export const SignInScreen = () => {
       localStorage.setItem('isLoggedIn', 'true');
     }
 
+    // Get user data for role-based redirect
+    const user = result.user;
+    if (!user) {
+      // Fallback: read from localStorage if user not in result
+      const userStr = localStorage.getItem('authUser');
+      if (userStr) {
+        try {
+          const parsedUser = JSON.parse(userStr);
+          if (parsedUser) {
+            // Use parsed user for redirect logic
+            const userRole = parsedUser.role;
+            
+            // Check if password change is required
+            const requiresPasswordChange = localStorage.getItem('requiresPasswordChange') === 'true';
+            
+            if (requiresPasswordChange) {
+              // Redirect to change password screen
+              router.push('/auth/change-password');
+            } else if (userRole === 'admin') {
+              // Admin users → redirect to admin dashboard
+              router.push('/admin-dashboard');
+            } else {
+              // Provider admins and all others → redirect to dashboard (existing behavior)
+              router.push('/dashboard');
+            }
+            return;
+          }
+        } catch (error) {
+          console.error('Failed to parse user data:', error);
+        }
+      }
+      // Fallback: redirect to dashboard if user data unavailable
+      router.push('/dashboard');
+      return;
+    }
+
     // Check if password change is required
     const requiresPasswordChange = localStorage.getItem('requiresPasswordChange') === 'true';
     
     if (requiresPasswordChange) {
       // Redirect to change password screen
       router.push('/auth/change-password');
+    } else if (user.role === 'admin') {
+      // Admin users → redirect to admin dashboard
+      router.push('/admin-dashboard');
     } else {
-      // Navigate to dashboard
+      // Provider admins and all others → redirect to dashboard (existing behavior)
       router.push('/dashboard');
     }
   };

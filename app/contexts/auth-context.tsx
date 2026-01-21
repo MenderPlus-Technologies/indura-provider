@@ -19,7 +19,7 @@ export interface AuthState {
 }
 
 interface AuthContextType extends AuthState {
-  signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string; user?: User }>;
   signOut: () => void;
   changePassword: (oldPassword: string, newPassword: string) => Promise<{ success: boolean; error?: string }>;
   clearPasswordChangeRequirement: () => void;
@@ -133,7 +133,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         requiresPasswordChange,
       });
 
-      return { success: true };
+      return { success: true, user };
     } catch (error: unknown) {
       // RTK Query error handling
       const errorMessage = 
