@@ -2,50 +2,54 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Mail, Key, Eye, EyeOff, HelpCircle } from 'lucide-react';
+import { Mail, Key, Eye, EyeOff, HelpCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import Image from 'next/image';
+import { useAuth } from '@/app/contexts/auth-context';
 
 export const SignInScreen = () => {
   const router = useRouter();
+  const { signIn, isSigningIn } = useAuth();
   const [email, setEmail] = useState('devonlane@mail.com');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [keepLoggedIn, setKeepLoggedIn] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     
     if (!email.trim() || !password.trim()) {
-      console.log('Please fill in email and password');
+      setError('Please fill in email and password');
       return;
     }
 
-    setIsLoading(true);
+    const result = await signIn(email.trim(), password);
 
-    // Mock API call - simulate network delay
-    setTimeout(() => {
-      const success = Math.random() > 0.1; // 90% success rate for demo
+    if (!result.success) {
+      setError(result.error || 'Sign in failed. Please try again.');
+      return;
+    }
 
-      if (success) {
-        console.log('Sign in successful', { email, keepLoggedIn });
-        
-        // Store login state if "Keep me logged in" is checked
-        if (keepLoggedIn && typeof window !== 'undefined') {
-          localStorage.setItem('isLoggedIn', 'true');
-        }
-        
-        // Navigate to dashboard
-        router.push('/dashboard');
-      } else {
-        console.log('Sign in failed. Please check your credentials.');
-        setIsLoading(false);
-      }
-    }, 1500);
+    // Store legacy login state if "Keep me logged in" is checked
+    if (keepLoggedIn && typeof window !== 'undefined') {
+      localStorage.setItem('isLoggedIn', 'true');
+    }
+
+    // Check if password change is required
+    const requiresPasswordChange = localStorage.getItem('requiresPasswordChange') === 'true';
+    
+    if (requiresPasswordChange) {
+      // Redirect to change password screen
+      router.push('/auth/change-password');
+    } else {
+      // Navigate to dashboard
+      router.push('/dashboard');
+    }
   };
 
   return (
@@ -79,6 +83,14 @@ export const SignInScreen = () => {
 
           {/* Form */}
           <form onSubmit={handleSignIn} className="space-y-6">
+            {/* Error Message */}
+            {error && (
+              <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0" />
+                <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+              </div>
+            )}
+
             {/* Email Field */}
             <div>
               <Label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
@@ -95,7 +107,7 @@ export const SignInScreen = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-12 pr-4 h-12 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
                   placeholder="Enter your email"
-                  disabled={isLoading}
+                  disabled={isSigningIn}
                   required
                 />
               </div>
@@ -117,14 +129,14 @@ export const SignInScreen = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-12 pr-12 h-12 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
                   placeholder="Enter your password"
-                  disabled={isLoading}
+                  disabled={isSigningIn}
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer"
-                  disabled={isLoading}
+                  disabled={isSigningIn}
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5" />
@@ -166,10 +178,10 @@ export const SignInScreen = () => {
             {/* Sign In Button */}
             <Button
               type="submit"
-              disabled={isLoading || !email.trim() || !password.trim()}
+              disabled={isSigningIn || !email.trim() || !password.trim()}
               className="w-full h-12 bg-[#009688] hover:bg-[#008577] text-white font-semibold rounded-lg cursor-pointer"
             >
-              {isLoading ? (
+              {isSigningIn ? (
                 <>
                   <span className="animate-spin mr-2">⏳</span>
                   Signing in...

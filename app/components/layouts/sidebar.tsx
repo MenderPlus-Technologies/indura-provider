@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useProvider } from "@/app/contexts/provider-context";
+import { useAuth } from "@/app/contexts/auth-context";
 
 
 export const Sidebar = ({
@@ -19,12 +20,11 @@ export const Sidebar = ({
   const pathname = usePathname();
   const router = useRouter();
   const { supportsSubscriptions, supportsTeamManagement } = useProvider();
+  const { signOut } = useAuth();
   const mainMenuItems = getMainMenuItems(supportsSubscriptions, supportsTeamManagement);
 
   const handleLogout = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('isLoggedIn');
-    }
+    signOut();
     router.push('/');
   };
 

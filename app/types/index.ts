@@ -29,3 +29,5 @@ export interface SidebarProps {
   setIsCollapsed: (value: boolean) => void;
 }
 
+// Auth-related types (also exported from auth-context for convenience)
+export type { User, AuthState } from '../contexts/auth-context';

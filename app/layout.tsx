@@ -3,6 +3,8 @@ import {  Inter_Tight } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./contexts/theme-context";
 import { ProviderProvider } from "./contexts/provider-context";
+import { AuthProvider } from "./contexts/auth-context";
+import { ReduxProvider } from "./store/provider";
 
 const inter = Inter_Tight({
   variable: "--font-inter",
@@ -36,11 +38,15 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body className="font-sans">
-        <ThemeProvider>
-          <ProviderProvider>
-            {children}
-          </ProviderProvider>
-        </ThemeProvider>
+        <ReduxProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <ProviderProvider>
+                {children}
+              </ProviderProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </ReduxProvider>
       </body>
     </html>
   );

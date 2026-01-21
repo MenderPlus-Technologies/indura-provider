@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Header } from "../components/layouts/header";
 import { Sidebar } from "../components/layouts/sidebar";
+import { useAuth } from "../contexts/auth-context";
 
 export default function DashboardLayout({
   children,
@@ -11,18 +12,35 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const { isAuthenticated, requiresPasswordChange } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    // Check if user is logged in
+    // Check authentication and password change requirement
     if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('authToken');
+      const requiresChange = localStorage.getItem('requiresPasswordChange') === 'true';
+      
+      // Redirect to sign-in if not authenticated
+      if (!token || !isAuthenticated) {
+        router.replace('/');
+        return;
+      }
+
+      // Redirect to change password if required
+      if (requiresChange || requiresPasswordChange) {
+        router.replace('/auth/change-password');
+        return;
+      }
+
+      // Legacy check for backward compatibility
       const isLoggedIn = localStorage.getItem('isLoggedIn');
-      if (isLoggedIn !== 'true') {
+      if (isLoggedIn !== 'true' && !token) {
         router.replace('/');
       }
     }
-  }, [router]);
+  }, [router, isAuthenticated, requiresPasswordChange]);
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-white dark:bg-gray-950">
