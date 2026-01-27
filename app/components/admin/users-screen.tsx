@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import {
   useGetUsersQuery,
+  useGetUserQuery,
   useUpdateUserStatusMutation,
   useUpdateUserRoleMutation,
   useSoftDeleteUserMutation,
@@ -13,11 +14,418 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/components/ui/toast';
-import { Loader2, Search, MoreVertical, Trash2, UserX, Shield, ChevronLeft, ChevronRight, RefreshCw, Users, Building2, UserCheck } from 'lucide-react';
+import { Loader2, Search, MoreVertical, Trash2, UserX, Shield, ChevronLeft, ChevronRight, RefreshCw, Users, Building2, UserCheck, Eye, X, Mail, Phone, Calendar, CheckCircle, XCircle, Building, CreditCard, Globe, Bell, User as UserIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 type UserRoleTab = 'all' | 'user' | 'provider_staff' | 'admin';
+
+interface ViewUserModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  userId: string | null;
+}
+
+const ViewUserModal = ({ isOpen, onClose, userId }: ViewUserModalProps) => {
+  const { data: user, isLoading, error } = useGetUserQuery(userId || '', {
+    skip: !isOpen || !userId,
+  });
+
+  if (!isOpen || !userId) return null;
+
+  const userAny = user as any;
+  const userName = typeof userAny?.name === 'string' ? userAny.name : 'N/A';
+  const userEmail = typeof userAny?.email === 'string' ? userAny.email : 'N/A';
+  const userPhone = typeof userAny?.phone === 'string' ? userAny.phone : 'N/A';
+  const userRole = typeof userAny?.role === 'string' ? userAny.role : 'user';
+  const userStatus = typeof userAny?.status === 'string' ? userAny.status : 'active';
+  const isVerified = userAny?.isVerified === true;
+  const isProviderAdmin = userAny?.isProviderAdmin === true;
+  const mustChangePassword = userAny?.mustChangePassword === true;
+  const createdAt = userAny?.createdAt;
+  const updatedAt = userAny?.updatedAt;
+  const providerId = userAny?.providerId;
+  const providerRole = userAny?.providerRole;
+  const preferences = userAny?.preferences || {};
+  const nin = userAny?.nin || {};
+  const bvn = userAny?.bvn || {};
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'active':
+        return (
+          <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-alertssuccess-0 border-[#c6ede5] text-alertssuccess-100">
+            <div className="w-1 h-1 rounded-sm bg-alertssuccess-100" />
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+              Active
+            </span>
+          </Badge>
+        );
+      case 'suspended':
+        return (
+          <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-alertswarning-0 border-[#fff1db] text-alertswarning-100">
+            <div className="w-1 h-1 rounded-sm bg-alertswarning-100" />
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+              Suspended
+            </span>
+          </Badge>
+        );
+      case 'deleted':
+        return (
+          <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-alertserror-0 border-[#f9d2d9] text-alertserror-100">
+            <div className="w-1 h-1 rounded-sm bg-alertserror-100" />
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+              Deleted
+            </span>
+          </Badge>
+        );
+      default:
+        return <Badge>{status}</Badge>;
+    }
+  };
+
+  const getRoleBadge = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return (
+          <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-purple-100 border-purple-200 text-purple-800 dark:bg-purple-900/30 dark:border-purple-800 dark:text-purple-300">
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+              Admin
+            </span>
+          </Badge>
+        );
+      case 'provider_staff':
+        return (
+          <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-blue-100 border-blue-200 text-blue-800 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300">
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+              Provider Staff
+            </span>
+          </Badge>
+        );
+      case 'user':
+        return (
+          <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-gray-100 border-gray-200 text-gray-800 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+              User
+            </span>
+          </Badge>
+        );
+      default:
+        return <Badge>{role}</Badge>;
+    }
+  };
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-black/50 z-40 transition-opacity"
+        onClick={onClose}
+      />
+
+      {/* Modal */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              User Details
+            </h2>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="h-8 w-8 cursor-pointer text-gray-700 dark:text-gray-300"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 p-6 overflow-y-auto">
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-[#009688]" />
+              </div>
+            ) : error ? (
+              <div className="text-center py-12">
+                <p className="text-red-600 dark:text-red-400">Failed to load user details</p>
+              </div>
+            ) : user ? (
+              <div className="space-y-6">
+                {/* Core Information */}
+                <div className="space-y-4">
+                  <h3 className="text-base font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
+                    Core Information
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        Full Name
+                      </label>
+                      <div className="mt-1 flex items-center gap-2">
+                        <UserIcon className="h-4 w-4 text-gray-400" />
+                        <p className="text-base text-gray-900 dark:text-white">
+                          {userName}
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        Email
+                      </label>
+                      <div className="mt-1 flex items-center gap-2">
+                        <Mail className="h-4 w-4 text-gray-400" />
+                        <p className="text-base text-[#009688] dark:text-teal-400">
+                          {userEmail}
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        Phone Number
+                      </label>
+                      <div className="mt-1 flex items-center gap-2">
+                        <Phone className="h-4 w-4 text-gray-400" />
+                        <p className="text-base text-gray-900 dark:text-white">
+                          {userPhone}
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        Role
+                      </label>
+                      <div className="mt-1">
+                        {getRoleBadge(userRole)}
+                        {isProviderAdmin && (
+                          <Badge className="ml-2 px-1.5 py-0 text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                            Provider Admin
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        Status
+                      </label>
+                      <div className="mt-1">
+                        {getStatusBadge(userStatus)}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        Verification Status
+                      </label>
+                      <div className="mt-1 flex items-center gap-2">
+                        {isVerified ? (
+                          <>
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                            <span className="text-sm text-green-600 dark:text-green-400">Verified</span>
+                          </>
+                        ) : (
+                          <>
+                            <XCircle className="h-4 w-4 text-gray-400" />
+                            <span className="text-sm text-gray-500 dark:text-gray-400">Not Verified</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        Created Date
+                      </label>
+                      <div className="mt-1 flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-gray-400" />
+                        <p className="text-sm text-gray-900 dark:text-white">
+                          {createdAt ? new Date(createdAt).toLocaleString() : 'N/A'}
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        Last Updated
+                      </label>
+                      <div className="mt-1 flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-gray-400" />
+                        <p className="text-sm text-gray-900 dark:text-white">
+                          {updatedAt ? new Date(updatedAt).toLocaleString() : 'N/A'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  {mustChangePassword && (
+                    <div className="mt-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                      <p className="text-sm text-yellow-800 dark:text-yellow-300">
+                        ⚠️ User must change password on next login
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Provider Information (if applicable) */}
+                {providerId && (
+                  <div className="space-y-4 border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
+                      Provider Information
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                          Provider ID
+                        </label>
+                        <div className="mt-1 flex items-center gap-2">
+                          <Building className="h-4 w-4 text-gray-400" />
+                          <p className="text-base text-gray-900 dark:text-white font-mono text-sm">
+                            {providerId}
+                          </p>
+                        </div>
+                      </div>
+                      {providerRole && (
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                            Provider Role
+                          </label>
+                          <div className="mt-1">
+                            <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                              {providerRole}
+                            </Badge>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Preferences */}
+                {preferences && Object.keys(preferences).length > 0 && (
+                  <div className="space-y-4 border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
+                      Preferences
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {preferences.currency && (
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                            Currency
+                          </label>
+                          <div className="mt-1 flex items-center gap-2">
+                            <CreditCard className="h-4 w-4 text-gray-400" />
+                            <p className="text-base text-gray-900 dark:text-white">
+                              {preferences.currency}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      {preferences.language && (
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                            Language
+                          </label>
+                          <div className="mt-1 flex items-center gap-2">
+                            <Globe className="h-4 w-4 text-gray-400" />
+                            <p className="text-base text-gray-900 dark:text-white">
+                              {preferences.language.toUpperCase()}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      {preferences.notifications && (
+                        <div className="md:col-span-2">
+                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                            Notification Settings
+                          </label>
+                          <div className="mt-1 flex flex-wrap gap-4">
+                            <div className="flex items-center gap-2">
+                              <Bell className="h-4 w-4 text-gray-400" />
+                              <span className="text-sm text-gray-700 dark:text-gray-300">
+                                Email: {preferences.notifications.email ? 'Enabled' : 'Disabled'}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Bell className="h-4 w-4 text-gray-400" />
+                              <span className="text-sm text-gray-700 dark:text-gray-300">
+                                SMS: {preferences.notifications.sms ? 'Enabled' : 'Disabled'}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Bell className="h-4 w-4 text-gray-400" />
+                              <span className="text-sm text-gray-700 dark:text-gray-300">
+                                Push: {preferences.notifications.push ? 'Enabled' : 'Disabled'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* KYC Status */}
+                {(nin?.status || bvn?.status) && (
+                  <div className="space-y-4 border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
+                      KYC Status
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {nin?.status && (
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                            NIN Status
+                          </label>
+                          <div className="mt-1">
+                            <Badge className={
+                              nin.status === 'verified'
+                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                                : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                            }>
+                              {nin.status === 'verified' ? 'Verified' : nin.status === 'pending' ? 'Pending' : 'None'}
+                            </Badge>
+                          </div>
+                        </div>
+                      )}
+                      {bvn?.status && (
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                            BVN Status
+                          </label>
+                          <div className="mt-1">
+                            <Badge className={
+                              bvn.status === 'verified'
+                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                                : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                            }>
+                              {bvn.status === 'verified' ? 'Verified' : bvn.status === 'pending' ? 'Pending' : 'None'}
+                            </Badge>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-gray-500 dark:text-gray-400">No data available</p>
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="flex justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-800">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="cursor-pointer"
+            >
+              Close
+            </Button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
 
 export const UsersScreen = () => {
   const [page, setPage] = useState(1);
@@ -37,6 +445,13 @@ export const UsersScreen = () => {
   const [hardDelete, { isLoading: isHardDeleting }] = useHardDeleteUserMutation();
   const { showToast } = useToast();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [viewModalState, setViewModalState] = useState<{
+    isOpen: boolean;
+    userId: string | null;
+  }>({
+    isOpen: false,
+    userId: null,
+  });
 
   const allUsers = data?.users || [];
   
@@ -414,6 +829,13 @@ export const UsersScreen = () => {
                                     </Button>
                                   </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="bg-white dark:bg-gray-800 border-[#dfe1e6] dark:border-gray-700">
+                              <DropdownMenuItem
+                                onClick={() => setViewModalState({ isOpen: true, userId })}
+                                className="cursor-pointer"
+                              >
+                                <Eye className="h-4 w-4 mr-2" />
+                                View Details
+                              </DropdownMenuItem>
                               {userStatus !== 'active' && (
                                 <DropdownMenuItem
                                   onClick={() => handleUpdateStatus(userId, 'active')}
@@ -537,6 +959,13 @@ export const UsersScreen = () => {
           </Card>
         </div>
       </div>
+
+      {/* View User Modal */}
+      <ViewUserModal
+        isOpen={viewModalState.isOpen}
+        onClose={() => setViewModalState({ isOpen: false, userId: null })}
+        userId={viewModalState.userId}
+      />
     </div>
   );
 };

@@ -265,6 +265,55 @@ export const apiSlice = createApi({
     }),
 
     /**
+     * Get all forum posts
+     * GET /forum
+     */
+    getForumPosts: builder.query<ForumPost[], void>({
+      query: () => '/forum',
+      transformResponse: (response: { posts?: ForumPost[]; data?: ForumPost[] } | ForumPost[]) => {
+        // Handle different response structures
+        if (Array.isArray(response)) {
+          return response;
+        }
+        if (response && typeof response === 'object') {
+          if (Array.isArray(response.posts)) {
+            return response.posts;
+          }
+          if (Array.isArray(response.data)) {
+            return response.data;
+          }
+        }
+        return [];
+      },
+      providesTags: ['Forum'],
+    }),
+
+    /**
+     * Get forum post by ID
+     * GET /forum/:id
+     */
+    getForumPost: builder.query<ForumPostDetail, string>({
+      query: (id) => `/forum/${id}`,
+      transformResponse: (response: { post?: ForumPost; comments?: ForumComment[] } | ForumPostDetail) => {
+        // Handle different response structures
+        if (response && typeof response === 'object') {
+          if ('post' in response && 'comments' in response) {
+            return response as ForumPostDetail;
+          }
+          // If response is just the post object, wrap it
+          if ('title' in response || '_id' in response || 'id' in response) {
+            return {
+              post: response as ForumPost,
+              comments: [],
+            };
+          }
+        }
+        return { post: {} as ForumPost, comments: [] };
+      },
+      providesTags: (_result, _error, id) => [{ type: 'Forum', id }],
+    }),
+
+    /**
      * Forum moderation actions
      * POST /forum/:id/mod
      */
@@ -398,14 +447,46 @@ export interface User {
 }
 
 export interface ForumPost {
-  id: string;
+  _id?: string;
+  id?: string;
   title: string;
   content: string;
-  author: string;
+  author: string | {
+    _id: string;
+    name: string;
+    role: string;
+    email?: string;
+  };
+  category?: string;
+  likes?: string[];
   isPinned: boolean;
   isLocked: boolean;
+  viewCount?: number;
   createdAt: string;
+  updatedAt?: string;
   [key: string]: unknown;
+}
+
+export interface ForumComment {
+  _id: string;
+  content: string;
+  author: {
+    _id: string;
+    name: string;
+    role: string;
+    email?: string;
+  };
+  post: string;
+  parentComment?: string | null;
+  likes?: string[];
+  createdAt: string;
+  updatedAt?: string;
+  [key: string]: unknown;
+}
+
+export interface ForumPostDetail {
+  post: ForumPost;
+  comments: ForumComment[];
 }
 
 export interface Campaign {
@@ -463,5 +544,7 @@ export const {
   useGetCampaignQuery,
   useSearchProvidersQuery,
   useGetProviderQuery,
+  useGetForumPostsQuery,
+  useGetForumPostQuery,
   useWalletWebhookMutation,
 } = apiSlice;
