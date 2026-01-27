@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/components/ui/toast';
-import { Loader2, Search, MoreVertical, Trash2, UserX, Shield, ChevronLeft, ChevronRight, RefreshCw, Users, Building2, UserCheck, Eye, X, Mail, Phone, Calendar, CheckCircle, XCircle, Building, CreditCard, Globe, Bell, User as UserIcon } from 'lucide-react';
+import { Loader2, Search, MoreVertical, Trash2, UserX, Shield, ChevronLeft, ChevronRight, RefreshCw, Users, Building2, UserCheck, Eye, X, Mail, Phone, Calendar, CheckCircle, XCircle, Building, CreditCard, Globe, Bell, User as UserIcon, AlertTriangle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
@@ -24,6 +24,16 @@ interface ViewUserModalProps {
   isOpen: boolean;
   onClose: () => void;
   userId: string | null;
+}
+
+interface ConfirmationModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  type: 'updateRole' | 'softDelete' | 'hardDelete';
+  userName: string;
+  role?: string;
+  isLoading?: boolean;
 }
 
 const ViewUserModal = ({ isOpen, onClose, userId }: ViewUserModalProps) => {
@@ -427,6 +437,138 @@ const ViewUserModal = ({ isOpen, onClose, userId }: ViewUserModalProps) => {
   );
 };
 
+const ConfirmationModal = ({ isOpen, onClose, onConfirm, type, userName, role, isLoading = false }: ConfirmationModalProps) => {
+  if (!isOpen) return null;
+
+  const getModalContent = () => {
+    switch (type) {
+      case 'updateRole':
+        return {
+          title: 'Change User Role',
+          message: `Are you sure you want to change ${userName}'s role to ${role}?`,
+          confirmText: 'Change Role',
+          iconBgColor: 'bg-blue-100 dark:bg-blue-900/30',
+          iconColor: 'text-blue-600 dark:text-blue-400',
+          buttonColor: 'bg-blue-600 hover:bg-blue-700 text-white',
+          icon: Shield,
+        };
+      case 'softDelete':
+        return {
+          title: 'Soft Delete User',
+          message: `Are you sure you want to soft delete ${userName}?`,
+          confirmText: 'Soft Delete',
+          iconBgColor: 'bg-orange-100 dark:bg-orange-900/30',
+          iconColor: 'text-orange-600 dark:text-orange-400',
+          buttonColor: 'bg-orange-600 hover:bg-orange-700 text-white',
+          icon: Trash2,
+          warning: 'The user will be marked as deleted but can be restored.',
+        };
+      case 'hardDelete':
+        return {
+          title: 'Permanently Delete User',
+          message: `WARNING: This will permanently delete ${userName}. This action cannot be undone.`,
+          confirmText: 'Delete Permanently',
+          iconBgColor: 'bg-red-100 dark:bg-red-900/30',
+          iconColor: 'text-red-600 dark:text-red-400',
+          buttonColor: 'bg-red-600 hover:bg-red-700 text-white',
+          icon: AlertTriangle,
+          warning: 'This action cannot be undone. All user data will be permanently removed.',
+        };
+      default:
+        return {
+          title: 'Confirm Action',
+          message: 'Are you sure you want to proceed?',
+          confirmText: 'Confirm',
+          iconBgColor: 'bg-gray-100 dark:bg-gray-900/30',
+          iconColor: 'text-gray-600 dark:text-gray-400',
+          buttonColor: 'bg-gray-600 hover:bg-gray-700 text-white',
+          icon: AlertTriangle,
+        };
+    }
+  };
+
+  const content = getModalContent();
+  const Icon = content.icon;
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-black/50 z-40 transition-opacity"
+        onClick={onClose}
+      />
+
+      {/* Modal */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-2xl w-full max-w-md flex flex-col">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800">
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-full ${content.iconBgColor} flex items-center justify-center`}>
+                <Icon className={`h-5 w-5 ${content.iconColor}`} />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {content.title}
+                </h2>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="h-8 w-8 cursor-pointer text-gray-700 dark:text-gray-300"
+              disabled={isLoading}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 p-6">
+            <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
+              {content.message}
+            </p>
+            {content.warning && (
+              <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                <p className="text-sm text-yellow-800 dark:text-yellow-300">
+                  ⚠️ {content.warning}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="flex justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-800">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              disabled={isLoading}
+              className="cursor-pointer"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={onConfirm}
+              disabled={isLoading}
+              className={`${content.buttonColor} cursor-pointer`}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Processing...
+                </>
+              ) : (
+                content.confirmText
+              )}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
 export const UsersScreen = () => {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
@@ -451,6 +593,20 @@ export const UsersScreen = () => {
   }>({
     isOpen: false,
     userId: null,
+  });
+
+  const [confirmationModalState, setConfirmationModalState] = useState<{
+    isOpen: boolean;
+    type: 'updateRole' | 'softDelete' | 'hardDelete' | null;
+    userId: string | null;
+    userName: string;
+    role?: string;
+  }>({
+    isOpen: false,
+    type: null,
+    userId: null,
+    userName: '',
+    role: undefined,
   });
 
   const allUsers = data?.users || [];
@@ -507,46 +663,72 @@ export const UsersScreen = () => {
     }
   };
 
+  const openConfirmationModal = (type: 'updateRole' | 'softDelete' | 'hardDelete', id: string, userName: string, role?: string) => {
+    setConfirmationModalState({
+      isOpen: true,
+      type,
+      userId: id,
+      userName,
+      role,
+    });
+  };
+
+  const closeConfirmationModal = () => {
+    setConfirmationModalState({
+      isOpen: false,
+      type: null,
+      userId: null,
+      userName: '',
+      role: undefined,
+    });
+  };
+
   const handleUpdateRole = async (id: string, role: string) => {
-    if (!confirm(`Are you sure you want to change this user's role to ${role}?`)) {
-      return;
-    }
-    try {
-      await updateRole({ id, role }).unwrap();
-      showToast('User role updated successfully', 'success');
-      refetch();
-    } catch (error) {
-      showToast('Failed to update user role', 'error');
-    }
+    const user = allUsers.find((u) => (u as any)._id === id || (u as any).id === id);
+    const userName = typeof user?.name === 'string' ? user.name : 'this user';
+    openConfirmationModal('updateRole', id, userName, role);
   };
 
   const handleSoftDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to soft delete this user?')) {
-      return;
-    }
-    try {
-      setSelectedId(id);
-      await softDelete(id).unwrap();
-      showToast('User soft deleted successfully', 'success');
-      refetch();
-    } catch (error) {
-      showToast('Failed to delete user', 'error');
-    } finally {
-      setSelectedId(null);
-    }
+    const user = allUsers.find((u) => (u as any)._id === id || (u as any).id === id);
+    const userName = typeof user?.name === 'string' ? user.name : 'this user';
+    openConfirmationModal('softDelete', id, userName);
   };
 
   const handleHardDelete = async (id: string) => {
-    if (!confirm('WARNING: This will permanently delete the user. This action cannot be undone. Are you sure?')) {
-      return;
-    }
+    const user = allUsers.find((u) => (u as any)._id === id || (u as any).id === id);
+    const userName = typeof user?.name === 'string' ? user.name : 'this user';
+    openConfirmationModal('hardDelete', id, userName);
+  };
+
+  const handleConfirmAction = async () => {
+    if (!confirmationModalState.userId || !confirmationModalState.type) return;
+
+    const { userId, type, role } = confirmationModalState;
+
     try {
-      setSelectedId(id);
-      await hardDelete(id).unwrap();
-      showToast('User permanently deleted', 'success');
+      setSelectedId(userId);
+      
+      if (type === 'updateRole' && role) {
+        await updateRole({ id: userId, role }).unwrap();
+        showToast('User role updated successfully', 'success');
+      } else if (type === 'softDelete') {
+        await softDelete(userId).unwrap();
+        showToast('User soft deleted successfully', 'success');
+      } else if (type === 'hardDelete') {
+        await hardDelete(userId).unwrap();
+        showToast('User permanently deleted', 'success');
+      }
+      
+      closeConfirmationModal();
       refetch();
     } catch (error) {
-      showToast('Failed to delete user', 'error');
+      const errorMessage = (error as { data?: { message?: string } })?.data?.message;
+      showToast(
+        errorMessage || 
+        (type === 'updateRole' ? 'Failed to update user role' : 'Failed to delete user'),
+        'error'
+      );
     } finally {
       setSelectedId(null);
     }
@@ -965,6 +1147,17 @@ export const UsersScreen = () => {
         isOpen={viewModalState.isOpen}
         onClose={() => setViewModalState({ isOpen: false, userId: null })}
         userId={viewModalState.userId}
+      />
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={confirmationModalState.isOpen}
+        onClose={closeConfirmationModal}
+        onConfirm={handleConfirmAction}
+        type={confirmationModalState.type || 'updateRole'}
+        userName={confirmationModalState.userName}
+        role={confirmationModalState.role}
+        isLoading={isUpdatingRole || isSoftDeleting || isHardDeleting}
       />
     </div>
   );
