@@ -32,6 +32,9 @@ export const StatsScreen = () => {
 
   // Calculate active providers from approved applications
   const activeProvidersCount = applications.filter((app) => app.status === 'approved').length;
+  
+  // Calculate pending applications count
+  const pendingCount = applications.filter((app) => app.status === 'pending').length;
 
   // Safely extract campaigns array - handle different response structures
   const campaigns: Campaign[] = (() => {
@@ -85,7 +88,7 @@ export const StatsScreen = () => {
     },
     {
       title: 'Pending Applications',
-      value: stats?.pendingApplications || 0,
+      value: pendingCount,
       icon: FileText,
       color: 'text-yellow-600 dark:text-yellow-400',
       bgColor: 'bg-yellow-50 dark:bg-yellow-900/20',
