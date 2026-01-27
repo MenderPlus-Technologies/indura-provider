@@ -176,10 +176,11 @@ export const apiSlice = createApi({
      * Reject provider application
      * POST /provider-applications/:id/reject
      */
-    rejectProviderApplication: builder.mutation<{ message: string }, string>({
-      query: (id) => ({
+    rejectProviderApplication: builder.mutation<{ message: string }, { id: string; reason: string }>({
+      query: ({ id, reason }) => ({
         url: `/provider-applications/${id}/reject`,
         method: 'POST',
+        body: { reason },
       }),
       invalidatesTags: ['ProviderApplication', 'Stats'],
     }),

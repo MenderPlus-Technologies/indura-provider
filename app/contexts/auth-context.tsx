@@ -2,7 +2,6 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useSignInMutation, useChangePasswordMutation } from '../store/apiSlice';
-import type { SignInResponse, ChangePasswordResponse } from '../store/apiSlice';
 
 export interface User {
   id: string;
