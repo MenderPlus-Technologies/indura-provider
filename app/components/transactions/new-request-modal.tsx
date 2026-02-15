@@ -155,7 +155,7 @@ export const NewRequestModal = ({ isOpen, onClose, onSuccess }: NewRequestModalP
           <div className="flex-1 p-6 space-y-6">
             <div>
               <Label htmlFor="member" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                Customer / Member <span className="text-red-500">*</span>
+                Customer <span className="text-red-500">*</span>
               </Label>
               <Select value={selectedMember} onValueChange={setSelectedMember} disabled={isLoading}>
                 <SelectTrigger id="member" className="w-full">

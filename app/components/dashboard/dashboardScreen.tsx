@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   RefreshCw,
@@ -8,16 +9,145 @@ import {
   ChevronDown,
   ArrowUp,
   PanelLeft,
+  Coins,
+  BarChart3,
+  ShoppingBag,
 } from "lucide-react";
-import { MetricCards } from "./metric-cards";
 import { RecentActivities } from "./recentActivities";
 import { IncomeChart } from "./income-chart";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { useGetProviderDashboardStatsQuery } from "@/app/store/apiSlice";
+import { MetricCard as MetricCardType } from "@/app/types";
+import { MetricCard } from "./metric-card";
 
 
 export const DashboardScreen = () => {
+  const { data: statsData, isLoading, isError, refetch } = useGetProviderDashboardStatsQuery();
+
+  // Map API data to metric cards format with dummy data fallbacks
+  const metricCardsData: MetricCardType[] = useMemo(() => {
+    if (!statsData) {
+      // Return dummy data while loading or on error
+      return [
+        {
+          title: "Wallet Balance",
+          value: "₦0",
+          change: "+0%",
+          changeType: "success",
+          icon: Coins,
+          footer: "+₦0",
+          footerText: "from last month",
+        },
+        {
+          title: "Todays Payouts",
+          value: "₦0",
+          change: "+0%",
+          changeType: "success",
+          icon: BarChart3,
+          footer: "+₦0",
+          footerText: "from last month",
+        },
+        {
+          title: "Pending Requests",
+          value: "0",
+          change: "+0%",
+          changeType: "success",
+          icon: ShoppingBag,
+          footer: "+0",
+          footerText: "from last month",
+        },
+        {
+          title: "Failed/Refunded",
+          value: "0",
+          change: "-0%",
+          changeType: "error",
+          icon: ShoppingBag,
+          footer: "-₦0",
+          footerText: "from last month",
+        },
+      ];
+    }
+
+    const { income, activeSubscribers, transactionsSummary } = statsData;
+    
+    // Find successful transactions
+    const successfulTransactions = transactionsSummary.find(t => t._id === 'successful') || { count: 0, totalAmount: 0 };
+    const failedTransactions = transactionsSummary.find(t => t._id === 'failed' || t._id === 'refunded') || { count: 0, totalAmount: 0 };
+    
+    // Format income
+    const formattedIncome = new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(income);
+
+    // Format today's payouts (using successful transactions totalAmount)
+    const formattedPayouts = new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(successfulTransactions.totalAmount);
+
+    return [
+      {
+        title: "Wallet Balance",
+        value: formattedIncome,
+        change: "+7.7%", // Dummy data - backend will provide this later
+        changeType: "success",
+        icon: Coins,
+        footer: "+₦2,156", // Dummy data
+        footerText: "from last month",
+      },
+      {
+        title: "Todays Payouts",
+        value: formattedPayouts,
+        change: "+3.4%", // Dummy data
+        changeType: "success",
+        icon: BarChart3,
+        footer: `+${successfulTransactions.count}`, // Using real count
+        footerText: "transactions",
+      },
+      {
+        title: "Active Subscribers",
+        value: activeSubscribers.toString(),
+        change: "+0%", // Dummy data
+        changeType: "success",
+        icon: ShoppingBag,
+        footer: "+0", // Dummy data
+        footerText: "from last month",
+      },
+      {
+        title: "Failed/Refunded",
+        value: failedTransactions.count.toString(),
+        change: "-15.2%", // Dummy data
+        changeType: "error",
+        icon: ShoppingBag,
+        footer: `-${new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'NGN',
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }).format(failedTransactions.totalAmount)}`,
+        footerText: "from last month",
+      },
+    ];
+  }, [statsData]);
+
+  // Format income for display
+  const formattedOverallIncome = useMemo(() => {
+    if (!statsData) return "₦83,125"; // Dummy fallback
+    return new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(statsData.income);
+  }, [statsData]);
+
   return (
     <div className="flex flex-col w-full">
       <div className="h-18 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 px-4 sm:px-6 py-4 border-b border-solid border-gray-200 dark:border-gray-800 w-full shrink-0">
@@ -33,9 +163,11 @@ export const DashboardScreen = () => {
           <Button
             variant="outline"
             size="icon"
-            className="h-8 w-8 sm:h-10 sm:w-10 p-2 bg-white dark:bg-gray-800 rounded-lg border border-solid border-gray-200 dark:border-gray-700 cursor-pointer"
+            onClick={() => refetch()}
+            disabled={isLoading}
+            className="h-8 w-8 sm:h-10 sm:w-10 p-2 bg-white dark:bg-gray-800 rounded-lg border border-solid border-gray-200 dark:border-gray-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <RefreshCw className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+            <RefreshCw className={`h-4 w-4 text-gray-700 dark:text-gray-300 ${isLoading ? 'animate-spin' : ''}`} />
           </Button>
 
           <Button
@@ -55,7 +187,11 @@ export const DashboardScreen = () => {
       </div>
 
       <div className="flex flex-col items-start gap-4 sm:gap-6 p-4 sm:p-6 w-full">
-        <MetricCards />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+          {metricCardsData.map((card, index) => (
+            <MetricCard key={index} data={card} />
+          ))}
+        </div>
         
         <Card className="flex-1 flex flex-col gap-1 p-1 bg-greyscale-25 dark:bg-gray-800/50 rounded-2xl overflow-hidden border border-solid border-[#dfe1e6] dark:border-gray-700 shadow-[0px_2px_4px_-1px_#0d0d120f] w-full">
           <CardContent className="flex flex-col items-start justify-center w-full rounded-xl overflow-hidden border border-solid border-[#dfe1e6] dark:border-gray-700 bg-greyscale-0 dark:bg-gray-800 p-0">
@@ -67,7 +203,7 @@ export const DashboardScreen = () => {
 
                 <div className="flex items-center gap-2 w-full">
                   <div className="font-semibold text-gray-900 dark:text-white text-2xl">
-                    $83,125
+                    {formattedOverallIncome}
                   </div>
 
                   <Badge className="inline-flex items-center gap-1 px-1 py-0.5 rounded-full border border-solid bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800">

@@ -4,7 +4,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Bell } from "lucide-react";
-import { membersData, type Member } from "./member-utils";
+import { type Member } from "./member-utils";
 
 const getInitials = (name: string) => {
   return name
@@ -19,11 +19,13 @@ interface MembersTableProps {
   onIndividualNotification?: (member: Member) => void;
   selectedMembers?: Member[];
   onSelectionChange?: (members: Member[]) => void;
+  customers: Member[];
+  isLoading?: boolean;
 }
 
-export const MembersTable = ({ onIndividualNotification, selectedMembers = [], onSelectionChange }: MembersTableProps) => {
+export const MembersTable = ({ onIndividualNotification, selectedMembers = [], onSelectionChange, customers, isLoading = false }: MembersTableProps) => {
   const getSelectedIndices = () => {
-    return membersData
+    return customers
       .map((member, idx) => ({ member, idx }))
       .filter(({ member }) => selectedMembers.some(selected => selected.email === member.email))
       .map(({ idx }) => idx);
@@ -31,14 +33,14 @@ export const MembersTable = ({ onIndividualNotification, selectedMembers = [], o
 
   const handleSelectAll = (checked: boolean | 'indeterminate') => {
     if (checked === true) {
-      onSelectionChange?.(membersData);
+      onSelectionChange?.(customers);
     } else {
       onSelectionChange?.([]);
     }
   };
 
   const handleSelectRow = (index: number, checked: boolean | 'indeterminate') => {
-    const member = membersData[index];
+    const member = customers[index];
     const isChecked = checked === true;
     
     if (isChecked) {
@@ -51,8 +53,8 @@ export const MembersTable = ({ onIndividualNotification, selectedMembers = [], o
   };
 
   const selectedIndices = getSelectedIndices();
-  const isAllSelected = selectedIndices.length === membersData.length && membersData.length > 0;
-  const isIndeterminate = selectedIndices.length > 0 && selectedIndices.length < membersData.length;
+  const isAllSelected = selectedIndices.length === customers.length && customers.length > 0;
+  const isIndeterminate = selectedIndices.length > 0 && selectedIndices.length < customers.length;
 
   return (
     <Table>
@@ -103,15 +105,24 @@ export const MembersTable = ({ onIndividualNotification, selectedMembers = [], o
         </TableRow>
       </TableHeader>
       <TableBody>
-        {membersData.map((member, index) => (
-          <TableRow
-            key={index}
-            className={
-              index < membersData.length - 1
-                ? "border-b border-solid border-[#dfe1e6] dark:border-gray-700"
-                : ""
-            }
-          >
+        {customers.length === 0 ? (
+          <TableRow>
+            <TableCell colSpan={8} className="h-32 px-4 py-0 text-center">
+              <span className="font-semibold text-gray-500 dark:text-gray-400 text-sm">
+                No customers found
+              </span>
+            </TableCell>
+          </TableRow>
+        ) : (
+          customers.map((member, index) => (
+            <TableRow
+              key={member.email}
+              className={
+                index < customers.length - 1
+                  ? "border-b border-solid border-[#dfe1e6] dark:border-gray-700"
+                  : ""
+              }
+            >
             <TableCell className="h-12 px-4 py-0">
               <Checkbox 
                 checked={selectedIndices.includes(index)}
@@ -166,7 +177,8 @@ export const MembersTable = ({ onIndividualNotification, selectedMembers = [], o
               </Button>
             </TableCell>
           </TableRow>
-        ))}
+        ))
+        )}
       </TableBody>
     </Table>
   );

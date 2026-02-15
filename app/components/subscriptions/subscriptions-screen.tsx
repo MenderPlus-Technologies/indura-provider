@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { SubscriptionsHeader } from "./subscriptions-header";
 import { SubscriptionsSearchBar } from "./subscriptions-search-bar";
@@ -12,20 +12,62 @@ import {
   getSubscriptionsWithDerivedStatus,
   type Subscription,
   type SubscriptionStatus,
+  mapApiSubscriberStatus,
+  subscriptionPlans,
 } from "./subscription-utils";
+import { useGetProviderSubscribersQuery } from "@/app/store/apiSlice";
+import type { ProviderSubscriber } from "@/app/store/apiSlice";
+
+const ITEMS_PER_PAGE = 10;
 
 export const SubscriptionsScreen = () => {
+  const { data: subscribersData, isLoading, isError, refetch, isFetching } = useGetProviderSubscribersQuery();
   const [activeStatusFilter, setActiveStatusFilter] = useState<SubscriptionStatus | 'All'>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPlan, setSelectedPlan] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
   const [reminderSubscriptions, setReminderSubscriptions] = useState<Subscription[]>([]);
   const [reminderType, setReminderType] = useState<'expiring' | 'expired' | 'individual'>('individual');
-  const [subscriptions, setSubscriptions] = useState<Subscription[]>(() => getSubscriptionsWithDerivedStatus());
 
-  // Get subscriptions with derived statuses
-  const allSubscriptions = useMemo(() => subscriptions, [subscriptions]);
+  // Map API subscribers to UI format
+  const allSubscriptions: Subscription[] = useMemo(() => {
+    if (!subscribersData?.subscribers) {
+      return []; // Return empty array instead of dummy data
+    }
+
+    return subscribersData.subscribers.map((apiSubscriber: ProviderSubscriber) => {
+      // Handle userId which can be string or object
+      const userId = typeof apiSubscriber.userId === 'string' 
+        ? { _id: apiSubscriber.userId, email: '', name: '', phone: '' }
+        : apiSubscriber.userId;
+
+      return {
+        id: apiSubscriber._id,
+        memberName: userId.name || 'Unknown',
+        memberEmail: userId.email || '',
+        plan: apiSubscriber.planName,
+        startDate: apiSubscriber.startDate,
+        endDate: apiSubscriber.expiryDate,
+        status: mapApiSubscriberStatus(
+          apiSubscriber.status,
+          apiSubscriber.startDate,
+          apiSubscriber.expiryDate,
+          apiSubscriber.createdAt
+        ),
+      };
+    });
+  }, [subscribersData]);
+
+  // Get unique plan names from API data for filter dropdown
+  const availablePlans = useMemo(() => {
+    if (!subscribersData?.subscribers) {
+      return []; // Return empty array instead of dummy plans
+    }
+    const plans = new Set(subscribersData.subscribers.map(sub => sub.planName));
+    return Array.from(plans).sort();
+  }, [subscribersData]);
 
   // Filter subscriptions based on status, search query, and plan
   const filteredSubscriptions = useMemo(() => {
@@ -36,7 +78,7 @@ export const SubscriptionsScreen = () => {
       filtered = filtered.filter(sub => sub.status === activeStatusFilter);
     }
 
-    // Filter by search query (member name)
+    // Filter by search query (customer name)
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -53,6 +95,30 @@ export const SubscriptionsScreen = () => {
 
     return filtered;
   }, [allSubscriptions, activeStatusFilter, searchQuery, selectedPlan]);
+
+  // Calculate pagination
+  const totalPages = Math.max(1, Math.ceil(filteredSubscriptions.length / ITEMS_PER_PAGE));
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedSubscriptions = filteredSubscriptions.slice(startIndex, endIndex);
+
+  // Reset to page 1 if current page is out of bounds or when data changes
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(1);
+    }
+  }, [currentPage, totalPages, filteredSubscriptions.length]);
+
+  // Reset to page 1 when search or filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedPlan, activeStatusFilter]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top of table when page changes
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Check if there are expiring or expired subscriptions for bulk actions
   const hasExpiringSubscriptions = useMemo(() => {
@@ -73,8 +139,8 @@ export const SubscriptionsScreen = () => {
   };
 
   const handleCreateSuccess = (newSubscription: Subscription) => {
-    // Add new subscription to the list
-    setSubscriptions(prev => [...prev, newSubscription]);
+    // Refetch subscriptions after creating new one
+    refetch();
     console.log('Subscription created:', newSubscription);
   };
 
@@ -109,9 +175,7 @@ export const SubscriptionsScreen = () => {
   };
 
   const handleRefresh = () => {
-    // Refresh subscriptions (in real app, this would fetch from API)
-    setSubscriptions(getSubscriptionsWithDerivedStatus());
-    console.log('Refreshing subscriptions');
+    refetch();
   };
 
   const handleFilterClick = () => {
@@ -141,15 +205,46 @@ export const SubscriptionsScreen = () => {
               onPlanChange={setSelectedPlan}
               onRefresh={handleRefresh}
               onFilterClick={handleFilterClick}
+              isRefreshing={isFetching}
+              availablePlans={availablePlans}
             />
-            <div className="overflow-x-auto">
-              <SubscriptionsTable
-                subscriptions={filteredSubscriptions}
-                onActionClick={handleActionClick}
-                onSendReminder={handleSendReminder}
-              />
-            </div>
-            <SubscriptionsPagination />
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="flex flex-col items-center gap-3">
+                  <Loader2 className="h-8 w-8 animate-spin text-[#009688]" />
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Loading subscriptions...</span>
+                </div>
+              </div>
+            ) : isError ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="flex flex-col items-center gap-3">
+                  <span className="text-sm text-red-500 dark:text-red-400">Failed to load subscriptions</span>
+                  <button
+                    onClick={() => refetch()}
+                    className="text-sm text-[#009688] hover:underline"
+                  >
+                    Try again
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="overflow-x-auto">
+                  <SubscriptionsTable
+                    subscriptions={paginatedSubscriptions}
+                    onActionClick={handleActionClick}
+                    onSendReminder={handleSendReminder}
+                  />
+                </div>
+                {filteredSubscriptions.length > 0 && (
+                  <SubscriptionsPagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                )}
+              </>
+            )}
           </Card>
         </div>
       </div>

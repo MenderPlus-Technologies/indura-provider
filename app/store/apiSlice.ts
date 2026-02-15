@@ -186,6 +186,18 @@ export const apiSlice = createApi({
     }),
 
     /**
+     * Delete provider application
+     * DELETE /provider-applications/:id
+     */
+    deleteProviderApplication: builder.mutation<{ message: string }, string>({
+      query: (id) => ({
+        url: `/provider-applications/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['ProviderApplication', 'Stats'],
+    }),
+
+    /**
      * Get admin statistics
      * GET /admin/stats
      */
@@ -393,6 +405,44 @@ export const apiSlice = createApi({
         body,
       }),
     }),
+
+    // ========== PROVIDER ENDPOINTS ==========
+
+    /**
+     * Get provider dashboard stats
+     * GET /providers/dashboard/stats
+     */
+    getProviderDashboardStats: builder.query<ProviderDashboardStats, void>({
+      query: () => '/providers/dashboard/stats',
+      providesTags: ['Stats'],
+    }),
+
+    /**
+     * Get provider transactions
+     * GET /providers/dashboard/transactions
+     */
+    getProviderTransactions: builder.query<ProviderTransactionsResponse, void>({
+      query: () => '/providers/dashboard/transactions',
+      providesTags: ['Stats'],
+    }),
+
+    /**
+     * Get provider customers
+     * GET /providers/dashboard/customers
+     */
+    getProviderCustomers: builder.query<ProviderCustomersResponse, void>({
+      query: () => '/providers/dashboard/customers',
+      providesTags: ['Stats'],
+    }),
+
+    /**
+     * Get provider subscribers
+     * GET /subscriptions/provider/subscribers
+     */
+    getProviderSubscribers: builder.query<ProviderSubscribersResponse, void>({
+      query: () => '/subscriptions/provider/subscribers',
+      providesTags: ['Stats'],
+    }),
   }),
 });
 
@@ -403,29 +453,67 @@ export interface ProviderApplication {
   id?: string; // Computed from _id for compatibility
   facilityName: string;
   providerName?: string; // Computed from facilityName for compatibility
+  // Newer backend field for facility / provider type
+  providerType?: string;
   contactPerson: {
     fullName: string;
     email: string;
     phone: string;
     role: string;
   };
+  // Newer backend contact fields (flattened)
+  contactFullName?: string;
+  contactRole?: string;
+  contactPhoneNumber?: string;
   email?: string; // Computed from contactPerson.email for compatibility
   facilityType: string;
   yearEstablished: number;
   description: string;
+  // Newer backend description field
+  serviceDescription?: string;
   country: string;
   state: string;
+  // Older backend used `city`, newer uses `lga`
   city: string;
+  lga?: string;
   address: string;
   declarationAccepted: boolean;
+  // Newer backend agreement flags
+  agreeToTerms?: boolean;
+  consentToVerification?: boolean;
   status: 'pending' | 'approved' | 'rejected';
   createdAt: string;
   submittedAt?: string; // Computed from createdAt for compatibility
   updatedAt: string;
   reviewedAt?: string;
-  reviewedBy?: string;
-  providerAdminUserId?: string;
-  providerId?: string;
+  reviewedBy?:
+    | string
+    | {
+        _id?: string;
+        email?: string;
+        name?: string;
+      };
+  // Newer backend returns nested user / provider objects
+  providerAdminUserId?:
+    | string
+    | {
+        _id: string;
+        email: string;
+        name: string;
+      };
+  providerId?:
+    | string
+    | {
+        _id: string;
+        name: string;
+        status: string;
+      };
+  // Newer backend documents object
+  documents?: {
+    operatingLicense?: string;
+    cacCertificate?: string;
+    [key: string]: unknown;
+  };
   [key: string]: unknown;
 }
 
@@ -524,6 +612,86 @@ export interface Provider {
   [key: string]: unknown;
 }
 
+export interface TransactionSummary {
+  _id: string;
+  count: number;
+  totalAmount: number;
+}
+
+export interface ProviderDashboardStats {
+  income: number;
+  activeSubscribers: number;
+  transactionsSummary: TransactionSummary[];
+}
+
+export interface ProviderTransaction {
+  _id: string;
+  walletId: string;
+  userId: string;
+  type: 'debit' | 'credit';
+  category: string;
+  amount: number;
+  reference: string;
+  status: string;
+  metadata?: {
+    providerId?: string;
+    providerName?: string;
+    payerUserId?: string;
+    [key: string]: unknown;
+  };
+  createdAt: string;
+  updatedAt: string;
+  __v?: number;
+}
+
+export interface ProviderTransactionsResponse {
+  transactions: ProviderTransaction[];
+}
+
+export interface ProviderCustomer {
+  _id: string;
+  totalSpent: number;
+  lastTransactionDate: string;
+  transactionCount: number;
+  name: string;
+  email: string;
+  phone: string;
+}
+
+export interface ProviderCustomersResponse {
+  customers: ProviderCustomer[];
+}
+
+export interface ProviderSubscriberUser {
+  _id: string;
+  email: string;
+  name: string;
+  phone: string;
+}
+
+export interface ProviderSubscriber {
+  _id: string;
+  userId: ProviderSubscriberUser | string;
+  providerId: string;
+  planName: string;
+  planType: string;
+  amount: number;
+  currency: string;
+  startDate: string;
+  expiryDate: string;
+  status: string;
+  autoRenew: boolean;
+  renewalReminderSent: boolean;
+  transactionReference?: string;
+  createdAt: string;
+  updatedAt: string;
+  __v?: number;
+}
+
+export interface ProviderSubscribersResponse {
+  subscribers: ProviderSubscriber[];
+}
+
 // Export hooks for usage in components
 export const {
   useSignInMutation,
@@ -533,6 +701,7 @@ export const {
   useGetProviderApplicationQuery,
   useApproveProviderApplicationMutation,
   useRejectProviderApplicationMutation,
+  useDeleteProviderApplicationMutation,
   useGetAdminStatsQuery,
   useGetUsersQuery,
   useGetUserQuery,
@@ -548,4 +717,8 @@ export const {
   useGetForumPostsQuery,
   useGetForumPostQuery,
   useWalletWebhookMutation,
+  useGetProviderDashboardStatsQuery,
+  useGetProviderTransactionsQuery,
+  useGetProviderCustomersQuery,
+  useGetProviderSubscribersQuery,
 } = apiSlice;

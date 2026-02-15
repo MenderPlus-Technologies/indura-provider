@@ -6,6 +6,7 @@ import { AdminHeader } from "../components/admin/admin-header";
 import { AdminSidebar } from "../components/admin/admin-sidebar";
 import { useAuth } from "../contexts/auth-context";
 import { ToastProvider } from "@/components/ui/toast";
+import { useInactivityLogout } from "../hooks/use-inactivity-logout";
 
 export default function AdminDashboardLayout({
   children,
@@ -13,9 +14,18 @@ export default function AdminDashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const { isAuthenticated, user, requiresPasswordChange } = useAuth();
+  const { isAuthenticated, user, requiresPasswordChange, signOut } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Handle inactivity logout after 5 minutes
+  useInactivityLogout(
+    () => {
+      signOut();
+      router.replace('/');
+    },
+    { timeoutMs: 5 * 60 * 1000 } // 5 minutes
+  );
 
   useEffect(() => {
     // Check authentication and admin role

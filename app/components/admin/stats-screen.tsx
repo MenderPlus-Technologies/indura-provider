@@ -105,7 +105,7 @@ export const StatsScreen = () => {
   return (
     <div className="flex flex-col w-full items-start bg-white dark:bg-gray-950 relative">
       <header className="h-[72px] flex items-center justify-between px-6 py-4 bg-greyscale-0 dark:bg-gray-900 border-b border-solid border-[#dfe1e6] dark:border-gray-800 w-full">
-        <h1 className="font-heading-h4 font-[number:var(--heading-h4-font-weight)] text-greyscale-900 dark:text-white text-[length:var(--heading-h4-font-size)] tracking-[var(--heading-h4-letter-spacing)] leading-[var(--heading-h4-line-height)] [font-style:var(--heading-h4-font-style)]">
+        <h1 className="font-heading-h4 font-[number:var(--heading-h4-font-weight)] text-gray-600 dark:text-white text-[length:var(--heading-h4-font-size)] tracking-[var(--heading-h4-letter-spacing)] leading-[var(--heading-h4-line-height)] inter [font-style:var(--heading-h4-font-style)]">
           System Statistics
         </h1>
       </header>
@@ -118,10 +118,10 @@ export const StatsScreen = () => {
               <Card key={index} className="flex flex-col gap-1 p-1 bg-greyscale-25 dark:bg-gray-800/50 rounded-2xl overflow-hidden border border-solid border-[#dfe1e6] dark:border-gray-700 shadow-[0px_2px_4px_-1px_#0d0d120f] w-full">
                 <CardContent className="flex items-center gap-4 p-4 rounded-xl overflow-hidden border border-solid border-[#dfe1e6] dark:border-gray-700 bg-greyscale-0 dark:bg-gray-800">
                   <div className="flex flex-col items-start justify-end gap-2 flex-1">
-                    <div className="font-body-small-semibold font-[number:var(--body-small-semibold-font-weight)] text-greyscale-500 dark:text-gray-400 text-[length:var(--body-small-semibold-font-size)] tracking-[var(--body-small-semibold-letter-spacing)] leading-[var(--body-small-semibold-line-height)] [font-style:var(--body-small-semibold-font-style)]">
+                    <div className="font-body-small-semibold font-[number:var(--body-small-semibold-font-weight)] text-greyscale-500 dark:text-gray-400 text-[length:var(--body-small-semibold-font-size)] tracking-[var(--body-small-semibold-letter-spacing)] leading-[var(--body-small-semibold-line-height)] inter [font-style:var(--body-small-semibold-font-style)]">
                       {stat.title}
                     </div>
-                    <div className="font-heading-h6 font-[number:var(--heading-h6-font-weight)] text-greyscale-900 dark:text-white text-[length:var(--heading-h6-font-size)] tracking-[var(--heading-h6-letter-spacing)] leading-[var(--heading-h6-line-height)] [font-style:var(--heading-h6-font-style)]">
+                    <div className="font-heading-h6 font-[number:var(--heading-h6-font-weight)] text-gray-600 dark:text-white text-[length:var(--heading-h6-font-size)] tracking-[var(--heading-h6-letter-spacing)] leading-[var(--heading-h6-line-height)] inter [font-style:var(--heading-h6-font-style)]">
                       {stat.value}
                     </div>
                   </div>
@@ -137,7 +137,7 @@ export const StatsScreen = () => {
         {(!stats || Object.keys(stats).length === 0) && (
           <Card className="flex flex-col gap-1 p-1 bg-greyscale-25 dark:bg-gray-800/50 rounded-2xl overflow-hidden border border-solid border-[#dfe1e6] dark:border-gray-700 shadow-[0px_2px_4px_-1px_#0d0d120f] w-full">
             <CardContent className="p-12 text-center bg-greyscale-0 dark:bg-gray-800 rounded-xl border border-solid border-[#dfe1e6] dark:border-gray-700">
-              <p className="font-body-medium-regular font-[number:var(--body-medium-regular-font-weight)] text-greyscale-500 dark:text-gray-400 text-[length:var(--body-medium-regular-font-size)] tracking-[var(--body-medium-regular-letter-spacing)] leading-[var(--body-medium-regular-line-height)] [font-style:var(--body-medium-regular-font-style)]">
+              <p className="font-body-medium-regular font-[number:var(--body-medium-regular-font-weight)] text-greyscale-500 dark:text-gray-400 text-[length:var(--body-medium-regular-font-size)] tracking-[var(--body-medium-regular-letter-spacing)] leading-[var(--body-medium-regular-line-height)] inter [font-style:var(--body-medium-regular-font-style)]">
                 No statistics available
               </p>
             </CardContent>

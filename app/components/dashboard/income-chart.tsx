@@ -74,7 +74,7 @@ const CustomTooltip = ({ active, payload }: any) => {
         <div className="flex flex-col items-start gap-1 w-full">
           <div className="flex justify-between w-full items-center">
             <div className="flex items-center justify-center font-semibold text-[#009688] dark:text-teal-400 text-xs">
-              ${(data.thisPeriod / 1000).toFixed(1)}K
+              ₦{(data.thisPeriod / 1000).toFixed(1)}K
             </div>
 
             <div className="flex items-center justify-center font-normal text-gray-500 dark:text-gray-400 text-xs">
@@ -84,7 +84,7 @@ const CustomTooltip = ({ active, payload }: any) => {
 
           <div className="flex justify-between w-full items-center">
             <div className="flex items-center justify-center font-semibold text-yellow-500 dark:text-yellow-400 text-xs">
-              ${(data.lastPeriod / 1000).toFixed(1)}K
+              ₦{(data.lastPeriod / 1000).toFixed(1)}K
             </div>
 
             <div className="flex items-center justify-center font-normal text-gray-500 dark:text-gray-400 text-xs">
@@ -104,7 +104,7 @@ export const IncomeChart = () => {
   return (
     <div className="flex items-start gap-2 sm:gap-6 w-full">
       <div className="hidden sm:inline-flex flex-col h-[180px] items-start justify-between">
-        {["$25K", "$20K", "$15K", "$10K"].map((label, index) => (
+        {["₦25K", "₦20K", "₦15K", "₦10K"].map((label, index) => (
           <div
             key={index}
             className="flex items-center justify-center font-normal text-gray-500 dark:text-gray-400 text-sm"

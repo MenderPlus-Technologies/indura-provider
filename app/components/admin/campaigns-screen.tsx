@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, Search, Eye, X, Calendar, DollarSign, Users, Building, Tag, Megaphone } from 'lucide-react';
+import { Loader2, Search, Eye, X, Calendar, DollarSign, Users, Building, Tag, Megaphone, RefreshCw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 interface ViewCampaignModalProps {
@@ -93,7 +93,7 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
     if (!responseData) return undefined;
     // Check if response is wrapped in 'campaign' property
     if (typeof responseData === 'object' && 'campaign' in responseData) {
-      return (responseData as { campaign: Campaign }).campaign;
+      return (responseData as unknown as { campaign: Campaign }).campaign;
     }
     // Otherwise assume it's the campaign directly
     return responseData as Campaign;
@@ -113,7 +113,9 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
   const organizer = campaign?.organizerId;
   const beneficiaryId = campaign?.beneficiaryId;
   const createdAt = campaign?.createdAt ? new Date(campaign.createdAt).toLocaleString() : 'N/A';
-  const updatedAt = campaign?.updatedAt ? new Date(campaign.updatedAt).toLocaleString() : null;
+  const updatedAt = campaign?.updatedAt && typeof campaign.updatedAt === 'string' 
+    ? new Date(campaign.updatedAt).toLocaleString() 
+    : null;
 
   const getStatusBadge = (status: string) => {
     switch (status?.toLowerCase()) {
@@ -121,7 +123,7 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
         return (
           <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-alertssuccess-0 border-[#c6ede5] text-alertssuccess-100">
             <div className="w-1 h-1 rounded-sm bg-alertssuccess-100" />
-            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
               Active
             </span>
           </Badge>
@@ -129,7 +131,7 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
       case 'completed':
         return (
           <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-blue-100 border-blue-200 text-blue-800">
-            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
               Completed
             </span>
           </Badge>
@@ -138,7 +140,7 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
         return (
           <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-alertswarning-0 border-[#fff1db] text-alertswarning-100">
             <div className="w-1 h-1 rounded-sm bg-alertswarning-100" />
-            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
               Paused
             </span>
           </Badge>
@@ -161,7 +163,7 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
         <div className="bg-white dark:bg-gray-900 rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-lg font-semibold text-gray-600 dark:text-white inter">
               Campaign Details
             </h2>
             <Button
@@ -188,23 +190,23 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
               <div className="space-y-6">
                 {/* Basic Information */}
                 <div className="space-y-4">
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
+                  <h3 className="text-base font-semibold text-gray-600 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2 inter">
                     Basic Information
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                         Campaign Name
                       </label>
                       <div className="mt-1 flex items-center gap-2">
                         <Megaphone className="h-4 w-4 text-gray-400" />
-                        <p className="text-base text-gray-900 dark:text-white">
+                        <p className="text-base text-gray-600 dark:text-white inter">
                           {campaignName}
                         </p>
                       </div>
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                         Status
                       </label>
                       <div className="mt-1">
@@ -213,12 +215,12 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
                     </div>
                     {category && (
                       <div>
-                        <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                           Category
                         </label>
                         <div className="mt-1 flex items-center gap-2">
                           <Tag className="h-4 w-4 text-gray-400" />
-                          <p className="text-base text-gray-900 dark:text-white">
+                          <p className="text-base text-gray-600 dark:text-white inter">
                             {category}
                           </p>
                         </div>
@@ -226,7 +228,7 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
                     )}
                     {isFeatured && (
                       <div>
-                        <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                           Featured
                         </label>
                         <div className="mt-1">
@@ -237,11 +239,11 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
                       </div>
                     )}
                     <div className="md:col-span-2">
-                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                         Description
                       </label>
                       <div className="mt-1">
-                        <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">
+                        <p className="text-sm text-gray-600 dark:text-white whitespace-pre-wrap inter">
                           {description}
                         </p>
                       </div>
@@ -251,18 +253,18 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
 
                 {/* Dates */}
                 <div className="space-y-4 border-t border-gray-200 dark:border-gray-700 pt-6">
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
+                  <h3 className="text-base font-semibold text-gray-600 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2 inter">
                     Timeline
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {startDate && (
                       <div>
-                        <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                           Start Date
                         </label>
                         <div className="mt-1 flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-gray-400" />
-                          <p className="text-sm text-gray-900 dark:text-white">
+                          <p className="text-sm text-gray-600 dark:text-white inter">
                             {new Date(startDate).toLocaleString()}
                           </p>
                         </div>
@@ -270,36 +272,36 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
                     )}
                     {endDate && (
                       <div>
-                        <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                           End Date
                         </label>
                         <div className="mt-1 flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-gray-400" />
-                          <p className="text-sm text-gray-900 dark:text-white">
+                          <p className="text-sm text-gray-600 dark:text-white inter">
                             {new Date(endDate).toLocaleString()}
                           </p>
                         </div>
                       </div>
                     )}
                     <div>
-                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                         Created Date
                       </label>
                       <div className="mt-1 flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-gray-400" />
-                        <p className="text-sm text-gray-900 dark:text-white">
+                        <p className="text-sm text-gray-600 dark:text-white">
                           {createdAt}
                         </p>
                       </div>
                     </div>
                     {updatedAt && (
                       <div>
-                        <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                           Last Updated
                         </label>
                         <div className="mt-1 flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-gray-400" />
-                          <p className="text-sm text-gray-900 dark:text-white">
+                          <p className="text-sm text-gray-600 dark:text-white inter">
                             {updatedAt}
                           </p>
                         </div>
@@ -311,18 +313,18 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
                 {/* Financial Information */}
                 {(targetAmount !== undefined || raisedAmount !== undefined) && (
                   <div className="space-y-4 border-t border-gray-200 dark:border-gray-700 pt-6">
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
+                    <h3 className="text-base font-semibold text-gray-600 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2 inter">
                       Financial Information
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {targetAmount !== undefined && (
                         <div>
-                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                             Target Amount
                           </label>
                           <div className="mt-1 flex items-center gap-2">
                             <DollarSign className="h-4 w-4 text-gray-400" />
-                            <p className="text-base text-gray-900 dark:text-white">
+                            <p className="text-base text-gray-600 dark:text-white inter">
                               {currency} {targetAmount.toLocaleString()}
                             </p>
                           </div>
@@ -330,7 +332,7 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
                       )}
                       {raisedAmount !== undefined && (
                         <div>
-                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                             Raised Amount
                           </label>
                           <div className="mt-1 flex items-center gap-2">
@@ -343,7 +345,7 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
                       )}
                       {targetAmount !== undefined && raisedAmount !== undefined && (
                         <div className="md:col-span-2">
-                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                             Progress
                           </label>
                           <div className="mt-2">
@@ -368,19 +370,19 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
                 {/* Additional Information */}
                 {(organizer || beneficiaryId || contributorsCount !== undefined) && (
                   <div className="space-y-4 border-t border-gray-200 dark:border-gray-700 pt-6">
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
+                    <h3 className="text-base font-semibold text-gray-600 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2 inter">
                       Additional Information
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {organizer && (
                         <div>
-                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                             Organizer
                           </label>
                           <div className="mt-1 flex items-center gap-2">
                             <Building className="h-4 w-4 text-gray-400" />
                             <div className="flex items-center gap-2">
-                              <p className="text-base text-gray-900 dark:text-white">
+                              <p className="text-base text-gray-600 dark:text-white inter">
                                 {organizer.name}
                               </p>
                               {organizer.isVerified && (
@@ -394,12 +396,12 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
                       )}
                       {contributorsCount !== undefined && (
                         <div>
-                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                             Contributors
                           </label>
                           <div className="mt-1 flex items-center gap-2">
                             <Users className="h-4 w-4 text-gray-400" />
-                            <p className="text-base text-gray-900 dark:text-white">
+                            <p className="text-base text-gray-600 dark:text-white inter">
                               {contributorsCount}
                             </p>
                           </div>
@@ -407,11 +409,11 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
                       )}
                       {beneficiaryId && (
                         <div>
-                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                             Beneficiary ID
                           </label>
                           <div className="mt-1">
-                            <p className="text-base text-gray-900 dark:text-white font-mono text-sm">
+                            <p className="text-base text-gray-600 dark:text-white font-mono text-sm">
                               {beneficiaryId}
                             </p>
                           </div>
@@ -446,7 +448,7 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
         return (
           <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-alertssuccess-0 border-[#c6ede5] text-alertssuccess-100">
             <div className="w-1 h-1 rounded-sm bg-alertssuccess-100" />
-            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
               Active
             </span>
           </Badge>
@@ -454,7 +456,7 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
       case 'completed':
         return (
           <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-blue-100 border-blue-200 text-blue-800">
-            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
               Completed
             </span>
           </Badge>
@@ -463,7 +465,7 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
         return (
           <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-alertswarning-0 border-[#fff1db] text-alertswarning-100">
             <div className="w-1 h-1 rounded-sm bg-alertswarning-100" />
-            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
               Paused
             </span>
           </Badge>
@@ -475,18 +477,24 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
 
   return (
     <div className="flex flex-col w-full items-start bg-white dark:bg-gray-950 relative">
-      <header className="h-[72px] flex items-center justify-between px-6 py-4 bg-greyscale-0 dark:bg-gray-900 border-b border-solid border-[#dfe1e6] dark:border-gray-800 w-full">
-        <h1 className="font-heading-h4 font-[number:var(--heading-h4-font-weight)] text-greyscale-900 dark:text-white text-[length:var(--heading-h4-font-size)] tracking-[var(--heading-h4-letter-spacing)] leading-[var(--heading-h4-line-height)] [font-style:var(--heading-h4-font-style)]">
-          Campaigns
-        </h1>
+      <header className="h-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-6 py-4 bg-greyscale-0 dark:bg-gray-900 border-b border-solid border-[#dfe1e6] dark:border-gray-800 w-full">
+        <div className="flex flex-col gap-1">
+          <h1 className="font-heading-h4 text-gray-600 font-semibold text-base dark:text-white inter [font-style:var(--heading-h4-font-style)]">
+            Campaigns
+          </h1>
+          <p className="font-body-medium-regular text-sm text-gray-500 dark:text-gray-400 inter [font-style:var(--body-medium-regular-font-style)]">
+            View and manage all fundraising campaigns. Click on any campaign to see detailed information.
+          </p>
+        </div>
         <div className="inline-flex items-center gap-2 sm:gap-3">
           <Button
             variant="outline"
             size="icon"
             onClick={() => refetch()}
             className="h-8 w-8 p-2 bg-greyscale-0 dark:bg-gray-800 rounded-lg border border-solid border-[#dfe1e6] dark:border-gray-700 shadow-shadow-xsmall cursor-pointer"
+            title="Refresh campaigns"
           >
-            <Loader2 className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+            <RefreshCw className="h-4 w-4 text-gray-700 dark:text-gray-300" />
           </Button>
         </div>
       </header>
@@ -505,14 +513,14 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
                       setSearchTerm(e.target.value);
                       setPage(1);
                     }}
-                    className="pl-10 h-10 bg-greyscale-0 dark:bg-gray-800 border-[#dfe1e6] dark:border-gray-700 text-greyscale-900 dark:text-white"
+                    className="pl-10 h-10 bg-greyscale-0 dark:bg-gray-800 border-[#dfe1e6] dark:border-gray-700 text-gray-600 dark:text-white inter"
                   />
                 </div>
               </div>
 
               {filteredCampaigns.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="font-body-medium-regular text-greyscale-500 dark:text-gray-400">No campaigns found</p>
+                  <p className="font-body-medium-regular text-gray-500 dark:text-gray-400 inter">No campaigns found</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -521,32 +529,32 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
                       <TableHeader>
                         <TableRow className="border-b border-solid border-[#dfe1e6] dark:border-gray-700">
                           <TableHead className="w-[246px] h-10 px-4 py-0">
-                            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-greyscale-500 dark:text-gray-400 text-[length:var(--body-small-medium-font-size)] tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+                            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-gray-500 dark:text-gray-400 text-[length:var(--body-small-medium-font-size)] tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
                               Name
                             </span>
                           </TableHead>
                           <TableHead className="w-60 h-10 px-4 py-0">
-                            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-greyscale-500 dark:text-gray-400 text-[length:var(--body-small-medium-font-size)] tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+                            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-gray-500 dark:text-gray-400 text-[length:var(--body-small-medium-font-size)] tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
                               Description
                             </span>
                           </TableHead>
                           <TableHead className="flex-1 h-10 px-4 py-0">
-                            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-greyscale-500 dark:text-gray-400 text-[length:var(--body-small-medium-font-size)] tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+                            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-gray-500 dark:text-gray-400 text-[length:var(--body-small-medium-font-size)] tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
                               Status
                             </span>
                           </TableHead>
                           <TableHead className="w-[178px] h-10 px-4 py-0">
-                            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-greyscale-500 dark:text-gray-400 text-[length:var(--body-small-medium-font-size)] tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+                            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-gray-500 dark:text-gray-400 text-[length:var(--body-small-medium-font-size)] tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
                               Start Date
                             </span>
                           </TableHead>
                           <TableHead className="w-[178px] h-10 px-4 py-0">
-                            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-greyscale-500 dark:text-gray-400 text-[length:var(--body-small-medium-font-size)] tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+                            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-gray-500 dark:text-gray-400 text-[length:var(--body-small-medium-font-size)] tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
                               End Date
                             </span>
                           </TableHead>
                           <TableHead className="w-[100px] h-10 px-4 py-0">
-                            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-greyscale-500 dark:text-gray-400 text-[length:var(--body-small-medium-font-size)] tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+                            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-gray-500 dark:text-gray-400 text-[length:var(--body-small-medium-font-size)] tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
                               Actions
                             </span>
                           </TableHead>
@@ -568,12 +576,12 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
                               }
                             >
                               <TableCell className="h-12 px-4 py-0">
-                                <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-900 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+                                <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-gray-600 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] inter [font-style:var(--body-medium-semibold-font-style)]">
                                   {campaign.name}
                                 </span>
                               </TableCell>
                               <TableCell className="h-12 px-4 py-0 max-w-md truncate">
-                                <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-900 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+                                <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-gray-600 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] inter [font-style:var(--body-medium-semibold-font-style)]">
                                   {campaign.description}
                                 </span>
                               </TableCell>
@@ -581,12 +589,12 @@ const ViewCampaignModal = ({ isOpen, onClose, campaignId }: ViewCampaignModalPro
                                 {getStatusBadge(campaign.status)}
                               </TableCell>
                               <TableCell className="h-12 px-4 py-0">
-                                <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-900 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+                                <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-gray-600 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] inter [font-style:var(--body-medium-semibold-font-style)]">
                                   {new Date(campaign.startDate).toLocaleDateString()}
                                 </span>
                               </TableCell>
                               <TableCell className="h-12 px-4 py-0">
-                                <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-900 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+                                <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-gray-600 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] inter [font-style:var(--body-medium-semibold-font-style)]">
                                   {campaign.endDate ? new Date(campaign.endDate).toLocaleDateString() : 'N/A'}
                                 </span>
                               </TableCell>

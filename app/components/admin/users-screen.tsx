@@ -66,7 +66,7 @@ const ViewUserModal = ({ isOpen, onClose, userId }: ViewUserModalProps) => {
         return (
           <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-alertssuccess-0 border-[#c6ede5] text-alertssuccess-100">
             <div className="w-1 h-1 rounded-sm bg-alertssuccess-100" />
-            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
               Active
             </span>
           </Badge>
@@ -75,7 +75,7 @@ const ViewUserModal = ({ isOpen, onClose, userId }: ViewUserModalProps) => {
         return (
           <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-alertswarning-0 border-[#fff1db] text-alertswarning-100">
             <div className="w-1 h-1 rounded-sm bg-alertswarning-100" />
-            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
               Suspended
             </span>
           </Badge>
@@ -84,7 +84,7 @@ const ViewUserModal = ({ isOpen, onClose, userId }: ViewUserModalProps) => {
         return (
           <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-alertserror-0 border-[#f9d2d9] text-alertserror-100">
             <div className="w-1 h-1 rounded-sm bg-alertserror-100" />
-            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
               Deleted
             </span>
           </Badge>
@@ -99,15 +99,16 @@ const ViewUserModal = ({ isOpen, onClose, userId }: ViewUserModalProps) => {
       case 'admin':
         return (
           <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-purple-100 border-purple-200 text-purple-800 dark:bg-purple-900/30 dark:border-purple-800 dark:text-purple-300">
-            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
               Admin
             </span>
           </Badge>
         );
       case 'provider_staff':
+      case 'provider':
         return (
           <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-blue-100 border-blue-200 text-blue-800 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300">
-            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
               Provider Staff
             </span>
           </Badge>
@@ -115,7 +116,7 @@ const ViewUserModal = ({ isOpen, onClose, userId }: ViewUserModalProps) => {
       case 'user':
         return (
           <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-gray-100 border-gray-200 text-gray-800 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
-            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
               User
             </span>
           </Badge>
@@ -138,7 +139,7 @@ const ViewUserModal = ({ isOpen, onClose, userId }: ViewUserModalProps) => {
         <div className="bg-white dark:bg-gray-900 rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-lg font-semibold text-gray-600 dark:text-white inter">
               User Details
             </h2>
             <Button
@@ -165,23 +166,23 @@ const ViewUserModal = ({ isOpen, onClose, userId }: ViewUserModalProps) => {
               <div className="space-y-6">
                 {/* Core Information */}
                 <div className="space-y-4">
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
+                  <h3 className="text-base font-semibold text-gray-600 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2 inter">
                     Core Information
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                         Full Name
                       </label>
                       <div className="mt-1 flex items-center gap-2">
                         <UserIcon className="h-4 w-4 text-gray-400" />
-                        <p className="text-base text-gray-900 dark:text-white">
+                        <p className="text-base text-gray-600 dark:text-white inter">
                           {userName}
                         </p>
                       </div>
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                         Email
                       </label>
                       <div className="mt-1 flex items-center gap-2">
@@ -192,18 +193,18 @@ const ViewUserModal = ({ isOpen, onClose, userId }: ViewUserModalProps) => {
                       </div>
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                         Phone Number
                       </label>
                       <div className="mt-1 flex items-center gap-2">
                         <Phone className="h-4 w-4 text-gray-400" />
-                        <p className="text-base text-gray-900 dark:text-white">
+                        <p className="text-base text-gray-600 dark:text-white inter">
                           {userPhone}
                         </p>
                       </div>
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                         Role
                       </label>
                       <div className="mt-1">
@@ -216,7 +217,7 @@ const ViewUserModal = ({ isOpen, onClose, userId }: ViewUserModalProps) => {
                       </div>
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                         Status
                       </label>
                       <div className="mt-1">
@@ -224,7 +225,7 @@ const ViewUserModal = ({ isOpen, onClose, userId }: ViewUserModalProps) => {
                       </div>
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                         Verification Status
                       </label>
                       <div className="mt-1 flex items-center gap-2">
@@ -242,23 +243,23 @@ const ViewUserModal = ({ isOpen, onClose, userId }: ViewUserModalProps) => {
                       </div>
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                         Created Date
                       </label>
                       <div className="mt-1 flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-gray-400" />
-                        <p className="text-sm text-gray-900 dark:text-white">
+                        <p className="text-sm text-gray-600 dark:text-white">
                           {createdAt ? new Date(createdAt).toLocaleString() : 'N/A'}
                         </p>
                       </div>
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                         Last Updated
                       </label>
                       <div className="mt-1 flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-gray-400" />
-                        <p className="text-sm text-gray-900 dark:text-white">
+                        <p className="text-sm text-gray-600 dark:text-white">
                           {updatedAt ? new Date(updatedAt).toLocaleString() : 'N/A'}
                         </p>
                       </div>
@@ -276,24 +277,24 @@ const ViewUserModal = ({ isOpen, onClose, userId }: ViewUserModalProps) => {
                 {/* Provider Information (if applicable) */}
                 {providerId && (
                   <div className="space-y-4 border-t border-gray-200 dark:border-gray-700 pt-6">
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
+                    <h3 className="text-base font-semibold text-gray-600 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2 inter">
                       Provider Information
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                           Provider ID
                         </label>
                         <div className="mt-1 flex items-center gap-2">
                           <Building className="h-4 w-4 text-gray-400" />
-                          <p className="text-base text-gray-900 dark:text-white font-mono text-sm">
+                          <p className="text-base text-gray-600 dark:text-white font-mono text-sm">
                             {providerId}
                           </p>
                         </div>
                       </div>
                       {providerRole && (
                         <div>
-                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                             Provider Role
                           </label>
                           <div className="mt-1">
@@ -310,18 +311,18 @@ const ViewUserModal = ({ isOpen, onClose, userId }: ViewUserModalProps) => {
                 {/* Preferences */}
                 {preferences && Object.keys(preferences).length > 0 && (
                   <div className="space-y-4 border-t border-gray-200 dark:border-gray-700 pt-6">
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
+                    <h3 className="text-base font-semibold text-gray-600 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2 inter">
                       Preferences
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {preferences.currency && (
                         <div>
-                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                             Currency
                           </label>
                           <div className="mt-1 flex items-center gap-2">
                             <CreditCard className="h-4 w-4 text-gray-400" />
-                            <p className="text-base text-gray-900 dark:text-white">
+                            <p className="text-base text-gray-600 dark:text-white inter">
                               {preferences.currency}
                             </p>
                           </div>
@@ -329,12 +330,12 @@ const ViewUserModal = ({ isOpen, onClose, userId }: ViewUserModalProps) => {
                       )}
                       {preferences.language && (
                         <div>
-                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                             Language
                           </label>
                           <div className="mt-1 flex items-center gap-2">
                             <Globe className="h-4 w-4 text-gray-400" />
-                            <p className="text-base text-gray-900 dark:text-white">
+                            <p className="text-base text-gray-600 dark:text-white inter">
                               {preferences.language.toUpperCase()}
                             </p>
                           </div>
@@ -342,7 +343,7 @@ const ViewUserModal = ({ isOpen, onClose, userId }: ViewUserModalProps) => {
                       )}
                       {preferences.notifications && (
                         <div className="md:col-span-2">
-                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                             Notification Settings
                           </label>
                           <div className="mt-1 flex flex-wrap gap-4">
@@ -374,13 +375,13 @@ const ViewUserModal = ({ isOpen, onClose, userId }: ViewUserModalProps) => {
                 {/* KYC Status */}
                 {(nin?.status || bvn?.status) && (
                   <div className="space-y-4 border-t border-gray-200 dark:border-gray-700 pt-6">
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
+                    <h3 className="text-base font-semibold text-gray-600 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2 inter">
                       KYC Status
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {nin?.status && (
                         <div>
-                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                             NIN Status
                           </label>
                           <div className="mt-1">
@@ -396,7 +397,7 @@ const ViewUserModal = ({ isOpen, onClose, userId }: ViewUserModalProps) => {
                       )}
                       {bvn?.status && (
                         <div>
-                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                             BVN Status
                           </label>
                           <div className="mt-1">
@@ -508,7 +509,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, type, userName, role, i
                 <Icon className={`h-5 w-5 ${content.iconColor}`} />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h2 className="text-lg font-semibold text-gray-600 dark:text-white inter">
                   {content.title}
                 </h2>
               </div>
@@ -617,7 +618,12 @@ export const UsersScreen = () => {
     
     // Filter by role
     if (activeTab !== 'all') {
-      filtered = filtered.filter((user) => user.role === activeTab);
+      if (activeTab === 'provider_staff') {
+        // Handle both 'provider' and 'provider_staff' roles for provider staff tab
+        filtered = filtered.filter((user) => user.role === 'provider' || user.role === 'provider_staff');
+      } else {
+        filtered = filtered.filter((user) => user.role === activeTab);
+      }
     }
     
     // Filter by search term
@@ -648,7 +654,7 @@ export const UsersScreen = () => {
     return {
       all: allUsers.length,
       user: allUsers.filter((u) => u.role === 'user').length,
-      provider_staff: allUsers.filter((u) => u.role === 'provider_staff').length,
+      provider_staff: allUsers.filter((u) => u.role === 'provider' || u.role === 'provider_staff').length,
       admin: allUsers.filter((u) => u.role === 'admin').length,
     };
   }, [allUsers]);
@@ -740,7 +746,7 @@ export const UsersScreen = () => {
         return (
           <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-alertssuccess-0 border-[#c6ede5] text-alertssuccess-100">
             <div className="w-1 h-1 rounded-sm bg-alertssuccess-100" />
-            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
               Active
             </span>
           </Badge>
@@ -749,7 +755,7 @@ export const UsersScreen = () => {
         return (
           <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-alertswarning-0 border-[#fff1db] text-alertswarning-100">
             <div className="w-1 h-1 rounded-sm bg-alertswarning-100" />
-            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
               Suspended
             </span>
           </Badge>
@@ -758,7 +764,7 @@ export const UsersScreen = () => {
         return (
           <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-alertserror-0 border-[#f9d2d9] text-alertserror-100">
             <div className="w-1 h-1 rounded-sm bg-alertserror-100" />
-            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
               Deleted
             </span>
           </Badge>
@@ -773,15 +779,16 @@ export const UsersScreen = () => {
       case 'admin':
         return (
           <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-purple-100 border-purple-200 text-purple-800 dark:bg-purple-900/30 dark:border-purple-800 dark:text-purple-300">
-            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
               Admin
             </span>
           </Badge>
         );
       case 'provider_staff':
+      case 'provider':
         return (
           <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-blue-100 border-blue-200 text-blue-800 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300">
-            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
               Provider Staff
             </span>
           </Badge>
@@ -789,7 +796,7 @@ export const UsersScreen = () => {
       case 'user':
         return (
           <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-gray-100 border-gray-200 text-gray-800 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
-            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
               User
             </span>
           </Badge>
@@ -819,7 +826,7 @@ export const UsersScreen = () => {
   return (
     <div className="flex flex-col w-full items-start bg-white dark:bg-gray-950 relative">
       <header className="h-auto sm:h-[72px] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 px-4 sm:px-6 py-4 bg-greyscale-0 dark:bg-gray-900 border-b border-solid border-[#dfe1e6] dark:border-gray-800 w-full">
-        <h1 className="font-heading-h4 font-[number:var(--heading-h4-font-weight)] text-greyscale-900 dark:text-white text-[length:var(--heading-h4-font-size)] tracking-[var(--heading-h4-letter-spacing)] leading-[var(--heading-h4-line-height)] [font-style:var(--heading-h4-font-style)]">
+        <h1 className="font-heading-h4 font-[number:var(--heading-h4-font-weight)] text-gray-600 dark:text-white text-[length:var(--heading-h4-font-size)] tracking-[var(--heading-h4-letter-spacing)] leading-[var(--heading-h4-line-height)] [font-style:var(--heading-h4-font-style)]">
           User Management
         </h1>
         <div className="inline-flex items-center gap-2 sm:gap-3">
@@ -856,7 +863,7 @@ export const UsersScreen = () => {
                 className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-colors whitespace-nowrap ${
                   isActive
                     ? 'border-[#009688] text-[#009688] dark:text-teal-400 dark:border-teal-400'
-                    : 'border-transparent text-greyscale-600 dark:text-gray-400 hover:text-greyscale-900 dark:hover:text-gray-300'
+                    : 'border-transparent text-greyscale-600 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -890,7 +897,7 @@ export const UsersScreen = () => {
                       setSearchTerm(e.target.value);
                       setPage(1);
                     }}
-                    className="pl-10 h-10 bg-greyscale-0 dark:bg-gray-800 border-[#dfe1e6] dark:border-gray-700 text-greyscale-900 dark:text-white"
+                    className="pl-10 h-10 bg-greyscale-0 dark:bg-gray-800 border-[#dfe1e6] dark:border-gray-700 text-gray-600 dark:text-white"
                   />
                 </div>
               </div>
@@ -968,7 +975,7 @@ export const UsersScreen = () => {
                             >
                               <TableCell className="h-12 px-4 py-0">
                                 <div className="flex flex-col">
-                                  <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-900 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+                                  <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-gray-600 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
                                     {userName}
                                   </span>
                                   {isProviderAdmin && (
@@ -984,7 +991,7 @@ export const UsersScreen = () => {
                                 </span>
                               </TableCell>
                               <TableCell className="h-12 px-4 py-0">
-                                <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-900 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+                                <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-gray-600 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
                                   {userPhone}
                                 </span>
                               </TableCell>
@@ -995,7 +1002,7 @@ export const UsersScreen = () => {
                                 {getStatusBadge(userStatus)}
                               </TableCell>
                               <TableCell className="h-12 px-4 py-0">
-                                <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-900 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+                                <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-gray-600 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
                                   {userCreatedAt ? new Date(userCreatedAt).toLocaleDateString() : 'N/A'}
                                 </span>
                               </TableCell>
@@ -1048,9 +1055,9 @@ export const UsersScreen = () => {
                                   Make Admin
                                 </DropdownMenuItem>
                               )}
-                              {userRole !== 'provider_staff' && (
+                              {userRole !== 'provider_staff' && userRole !== 'provider' && (
                                 <DropdownMenuItem
-                                  onClick={() => handleUpdateRole(userId, 'provider_staff')}
+                                  onClick={() => handleUpdateRole(userId, 'provider')}
                                   disabled={isUpdatingRole}
                                   className="cursor-pointer"
                                 >
@@ -1088,7 +1095,7 @@ export const UsersScreen = () => {
                   {totalPages > 1 && (
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0 p-4 w-full bg-greyscale-0 dark:bg-gray-800 rounded-xl border border-solid border-[#dfe1e6] dark:border-gray-700 mt-4">
                       <div className="inline-flex justify-center gap-2 items-center">
-                        <div className="font-medium text-gray-900 dark:text-white text-xs sm:text-sm">
+                        <div className="font-medium text-gray-600 dark:text-white text-xs sm:text-sm">
                           Page {page} of {totalPages} ({total} total)
                         </div>
                       </div>
@@ -1116,7 +1123,7 @@ export const UsersScreen = () => {
                             >
                               <span className={page === pageNum 
                                 ? "text-white text-sm font-medium"
-                                : "text-greyscale-900 dark:text-white text-sm font-medium"
+                                : "text-gray-600 dark:text-white text-sm font-medium"
                               }>
                                 {pageNum}
                               </span>

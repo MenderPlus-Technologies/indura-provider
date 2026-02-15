@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Mail, Key, Eye, EyeOff, HelpCircle, AlertCircle } from 'lucide-react';
+import { Mail, Key, Eye, EyeOff, HelpCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,7 +13,7 @@ import { useAuth } from '@/app/contexts/auth-context';
 export const SignInScreen = () => {
   const router = useRouter();
   const { signIn, isSigningIn } = useAuth();
-  const [email, setEmail] = useState('devonlane@mail.com');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [keepLoggedIn, setKeepLoggedIn] = useState(true);
@@ -222,7 +222,7 @@ export const SignInScreen = () => {
             >
               {isSigningIn ? (
                 <>
-                  <span className="animate-spin mr-2">⏳</span>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   Signing in...
                 </>
               ) : (

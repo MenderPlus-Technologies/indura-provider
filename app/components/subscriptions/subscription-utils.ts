@@ -199,3 +199,18 @@ export const formatDate = (dateString: string): string => {
     year: 'numeric',
   });
 };
+
+/**
+ * Map API subscriber status to UI status
+ * API status: "active" -> derive from dates
+ */
+export const mapApiSubscriberStatus = (
+  apiStatus: string,
+  startDate: string,
+  expiryDate: string,
+  createdAt?: string
+): SubscriptionStatus => {
+  // If status is not active, we might need to handle other statuses
+  // For now, derive status from dates regardless of API status
+  return deriveSubscriptionStatus(startDate, expiryDate, createdAt);
+};

@@ -3,8 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Search, RefreshCw, ArrowUpDown, Filter, ChevronDown } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { subscriptionPlans } from "./subscription-utils";
-
 interface SubscriptionsSearchBarProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
@@ -12,6 +10,8 @@ interface SubscriptionsSearchBarProps {
   onPlanChange: (plan: string) => void;
   onRefresh?: () => void;
   onFilterClick?: () => void;
+  isRefreshing?: boolean;
+  availablePlans?: string[];
 }
 
 export const SubscriptionsSearchBar = ({
@@ -21,16 +21,18 @@ export const SubscriptionsSearchBar = ({
   onPlanChange,
   onRefresh,
   onFilterClick,
+  isRefreshing = false,
+  availablePlans = [],
 }: SubscriptionsSearchBarProps) => {
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center my-2 justify-between gap-2 sm:gap-0 px-2 w-full">
-      <div className="relative flex-1">
+      <div className="relative w-[300px]">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-greyscale-500 dark:text-gray-400" />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Search by member name..."
+          placeholder="Search by customer name..."
           className="w-full h-10 pl-10 pr-4 bg-white dark:bg-gray-800 rounded-lg border border-solid border-gray-200 dark:border-gray-700 font-normal text-gray-900 dark:text-white text-sm placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#009688] focus:border-[#009688]"
         />
       </div>
@@ -53,7 +55,7 @@ export const SubscriptionsSearchBar = ({
             >
               All Plans
             </DropdownMenuItem>
-            {subscriptionPlans.map((plan) => (
+            {availablePlans.map((plan) => (
               <DropdownMenuItem
                 key={plan}
                 onClick={() => onPlanChange(plan)}
@@ -63,29 +65,32 @@ export const SubscriptionsSearchBar = ({
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={onRefresh}
-          className="h-10 w-10 p-2 bg-greyscale-0 dark:bg-gray-800 rounded-[10px] border border-solid border-[#dfe1e6] dark:border-gray-700 shadow-shadow-xsmall cursor-pointer"
-        >
-          <RefreshCw className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-        </Button>
-        <Button
+        {onRefresh && (
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={onRefresh}
+            disabled={isRefreshing}
+            className="h-10 w-10 p-2 bg-greyscale-0 dark:bg-gray-800 rounded-[10px] border border-solid border-[#dfe1e6] dark:border-gray-700 shadow-shadow-xsmall cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <RefreshCw className={`h-4 w-4 text-gray-700 dark:text-gray-300 ${isRefreshing ? 'animate-spin' : ''}`} />
+          </Button>
+        )}
+        {/* <Button
           variant="outline"
           size="icon"
           className="h-10 w-10 p-2 bg-greyscale-0 dark:bg-gray-800 rounded-[10px] border border-solid border-[#dfe1e6] dark:border-gray-700 shadow-shadow-xsmall cursor-pointer"
         >
           <ArrowUpDown className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-        </Button>
-        <Button
+        </Button> */}
+        {/* <Button
           variant="outline"
           size="icon"
           onClick={onFilterClick}
           className="h-10 w-10 p-2 bg-greyscale-0 dark:bg-gray-800 rounded-[10px] border border-solid border-[#dfe1e6] dark:border-gray-700 shadow-shadow-xsmall cursor-pointer"
         >
           <Filter className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-        </Button>
+        </Button> */}
       </div>
     </div>
   );

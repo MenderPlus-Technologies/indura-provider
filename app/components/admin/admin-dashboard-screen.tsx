@@ -281,7 +281,7 @@ export const AdminDashboardScreen = () => {
           <Card className="flex flex-col gap-1 p-1 bg-greyscale-25 dark:bg-gray-800/50 rounded-2xl overflow-hidden border border-solid border-[#dfe1e6] dark:border-gray-700 shadow-[0px_2px_4px_-1px_#0d0d120f] w-full">
             <CardContent className="flex flex-col gap-5 p-5 bg-greyscale-0 dark:bg-gray-800 rounded-xl overflow-hidden border border-solid border-[#dfe1e6] dark:border-gray-700">
               <div className="flex items-center justify-between">
-                <h2 className="font-body-small-semibold inter text-gray-900 dark:text-white font-[number:var(--body-small-semibold-font-weight)] text-[length:var(--body-small-semibold-font-size)] tracking-[var(--body-small-semibold-letter-spacing)] leading-[var(--body-small-semibold-line-height)] [font-style:var(--body-small-semibold-font-style)]">
+                <h2 className="font-body-small-semibold inter text-gray-600 dark:text-white font-[number:var(--body-small-semibold-font-weight)] text-[length:var(--body-small-semibold-font-size)] tracking-[var(--body-small-semibold-letter-spacing)] leading-[var(--body-small-semibold-line-height)] [font-style:var(--body-small-semibold-font-style)]">
                   Quick Actions
                 </h2>
               </div>
@@ -293,7 +293,7 @@ export const AdminDashboardScreen = () => {
                         <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                       </div>
                       <div className="flex flex-col gap-0.5">
-                        <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-gray-900 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+                        <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-gray-600 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
                           Applications
                         </span>
                         <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -315,7 +315,7 @@ export const AdminDashboardScreen = () => {
                         <Users className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                       </div>
                       <div className="flex flex-col gap-0.5">
-                        <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-gray-900 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+                        <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-gray-600 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
                           Users
                         </span>
                         <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -332,7 +332,7 @@ export const AdminDashboardScreen = () => {
                         <MessageSquare className="h-5 w-5 text-green-600 dark:text-green-400" />
                       </div>
                       <div className="flex flex-col gap-0.5">
-                        <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-gray-900 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+                        <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-gray-600 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
                           Forum
                         </span>
                         <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -349,7 +349,7 @@ export const AdminDashboardScreen = () => {
                         <BarChart3 className="h-5 w-5 text-orange-600 dark:text-orange-400" />
                       </div>
                       <div className="flex flex-col gap-0.5">
-                        <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-gray-900 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+                        <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-gray-600 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
                           Statistics
                         </span>
                         <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -415,7 +415,7 @@ export const AdminDashboardScreen = () => {
                   {totalPages > 1 && (
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0 p-4 w-full bg-greyscale-0 dark:bg-gray-800 rounded-xl border border-solid border-[#dfe1e6] dark:border-gray-700 mt-4">
                       <div className="inline-flex justify-center gap-2 items-center">
-                        <div className="font-medium text-gray-900 dark:text-white text-xs sm:text-sm">
+                        <div className="font-medium text-gray-600 dark:text-white text-xs sm:text-sm">
                           Page {activitiesPage} of {totalPages} ({totalActivities} total)
                         </div>
                       </div>
@@ -443,7 +443,7 @@ export const AdminDashboardScreen = () => {
                             >
                               <span className={activitiesPage === pageNum 
                                 ? "text-white text-sm font-medium"
-                                : "text-greyscale-900 dark:text-white text-sm font-medium"
+                                : "text-gray-600 dark:text-white text-sm font-medium"
                               }>
                                 {pageNum}
                               </span>

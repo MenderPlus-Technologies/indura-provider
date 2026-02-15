@@ -98,7 +98,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, action, postTitle, isLo
                 <Icon className={`h-5 w-5 ${details.iconColor}`} />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h2 className="text-lg font-semibold text-gray-600 dark:text-white inter">
                   {details.title}
                 </h2>
               </div>
@@ -116,11 +116,11 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, action, postTitle, isLo
 
           {/* Content */}
           <div className="flex-1 p-6">
-            <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
+            <p className="text-sm text-gray-700 dark:text-gray-300 mb-4 inter">
               {details.message}
             </p>
             {action === 'delete' && (
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-500 dark:text-gray-400 inter">
                 This action cannot be undone. The post will be permanently removed.
               </p>
             )}
@@ -194,7 +194,7 @@ const ViewForumModal = ({ isOpen, onClose, postId }: ViewForumModalProps) => {
         <div className="bg-white dark:bg-gray-900 rounded-lg shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-lg font-semibold text-gray-600 dark:text-white">
               Forum Post Details
             </h2>
             <Button
@@ -222,21 +222,21 @@ const ViewForumModal = ({ isOpen, onClose, postId }: ViewForumModalProps) => {
                 {/* Post Details */}
                 <div className="space-y-4">
                   <div>
-                    <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                    <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                       Title
                     </label>
-                    <p className="mt-1 text-lg font-semibold text-gray-900 dark:text-white">
+                    <p className="mt-1 text-lg font-semibold text-gray-600 dark:text-white inter">
                       {post.title || 'N/A'}
                     </p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                         Author
                       </label>
                       <div className="mt-1 flex items-center gap-2">
-                        <p className="text-base text-gray-900 dark:text-white">
+                        <p className="text-base text-gray-600 dark:text-white inter">
                           {authorName}
                         </p>
                         {authorRole && (
@@ -248,12 +248,12 @@ const ViewForumModal = ({ isOpen, onClose, postId }: ViewForumModalProps) => {
                     </div>
                     {post.category && (
                       <div>
-                        <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                           Category
                         </label>
                         <div className="mt-1 flex items-center gap-2">
                           <Tag className="h-4 w-4 text-gray-400" />
-                          <p className="text-base text-gray-900 dark:text-white">
+                          <p className="text-base text-gray-600 dark:text-white inter">
                             {post.category}
                           </p>
                         </div>
@@ -262,11 +262,11 @@ const ViewForumModal = ({ isOpen, onClose, postId }: ViewForumModalProps) => {
                   </div>
 
                   <div>
-                    <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                    <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide inter">
                       Content
                     </label>
                     <div className="mt-1 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                      <p className="text-base text-gray-900 dark:text-white whitespace-pre-wrap leading-relaxed">
+                      <p className="text-base text-gray-600 dark:text-white whitespace-pre-wrap leading-relaxed">
                         {post.content || 'N/A'}
                       </p>
                     </div>
@@ -321,14 +321,14 @@ const ViewForumModal = ({ isOpen, onClose, postId }: ViewForumModalProps) => {
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
                   <div className="flex items-center gap-2 mb-4">
                     <MessageSquare className="h-5 w-5 text-gray-400" />
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                    <h3 className="text-base font-semibold text-gray-600 dark:text-white">
                       Comments ({comments.length})
                     </h3>
                   </div>
                   
                   {comments.length === 0 ? (
                     <div className="text-center py-8">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">No comments yet</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 inter">No comments yet</p>
                     </div>
                   ) : (
                     <div className="space-y-4 max-h-96 overflow-y-auto">
@@ -351,7 +351,7 @@ const ViewForumModal = ({ isOpen, onClose, postId }: ViewForumModalProps) => {
                           >
                             <div className="flex items-start justify-between mb-2">
                               <div className="flex items-center gap-2">
-                                <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                                <p className="text-sm font-semibold text-gray-600 dark:text-white">
                                   {commentAuthor}
                                 </p>
                                 {commentAuthorRole && (
@@ -505,7 +505,7 @@ export const ForumScreen = () => {
   return (
     <div className="flex flex-col w-full items-start bg-white dark:bg-gray-950 relative">
       <header className="h-[72px] flex items-center justify-between px-6 py-4 bg-greyscale-0 dark:bg-gray-900 border-b border-solid border-[#dfe1e6] dark:border-gray-800 w-full">
-        <h1 className="font-heading-h4 font-[number:var(--heading-h4-font-weight)] text-greyscale-900 dark:text-white text-[length:var(--heading-h4-font-size)] tracking-[var(--heading-h4-letter-spacing)] leading-[var(--heading-h4-line-height)] [font-style:var(--heading-h4-font-style)]">
+        <h1 className="font-heading-h4 font-[number:var(--heading-h4-font-weight)] text-gray-600 dark:text-white text-[length:var(--heading-h4-font-size)] tracking-[var(--heading-h4-letter-spacing)] leading-[var(--heading-h4-line-height)] inter [font-style:var(--heading-h4-font-style)]">
           Forum Moderation
         </h1>
         <div className="inline-flex items-center gap-2 sm:gap-3">
@@ -532,7 +532,7 @@ export const ForumScreen = () => {
                     placeholder="Search posts..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 h-10 bg-greyscale-0 dark:bg-gray-800 border-[#dfe1e6] dark:border-gray-700 text-greyscale-900 dark:text-white"
+                    className="pl-10 h-10 bg-greyscale-0 dark:bg-gray-800 border-[#dfe1e6] dark:border-gray-700 text-gray-600 dark:text-white"
                   />
                 </div>
               </div>
@@ -548,7 +548,7 @@ export const ForumScreen = () => {
                 </div>
               ) : filteredPosts.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="font-body-medium-regular text-greyscale-500 dark:text-gray-400">
+                  <p className="font-body-medium-regular text-greyscale-500 dark:text-gray-400 inter">
                     {searchTerm ? 'No posts found matching your search' : 'No forum posts found'}
                   </p>
                 </div>
@@ -559,27 +559,27 @@ export const ForumScreen = () => {
                       <TableHeader>
                         <TableRow className="border-b border-solid border-[#dfe1e6] dark:border-gray-700">
                           <TableHead className="w-[246px] h-10 px-4 py-0">
-                            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-greyscale-500 dark:text-gray-400 text-[length:var(--body-small-medium-font-size)] tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+                            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-greyscale-500 dark:text-gray-400 text-[length:var(--body-small-medium-font-size)] tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
                               Title
                             </span>
                           </TableHead>
                           <TableHead className="w-60 h-10 px-4 py-0">
-                            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-greyscale-500 dark:text-gray-400 text-[length:var(--body-small-medium-font-size)] tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+                            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-greyscale-500 dark:text-gray-400 text-[length:var(--body-small-medium-font-size)] tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
                               Author
                             </span>
                           </TableHead>
                           <TableHead className="flex-1 h-10 px-4 py-0">
-                            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-greyscale-500 dark:text-gray-400 text-[length:var(--body-small-medium-font-size)] tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+                            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-greyscale-500 dark:text-gray-400 text-[length:var(--body-small-medium-font-size)] tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
                               Status
                             </span>
                           </TableHead>
                           <TableHead className="w-[178px] h-10 px-4 py-0">
-                            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-greyscale-500 dark:text-gray-400 text-[length:var(--body-small-medium-font-size)] tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+                            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-greyscale-500 dark:text-gray-400 text-[length:var(--body-small-medium-font-size)] tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
                               Created
                             </span>
                           </TableHead>
                           <TableHead className="w-[100px] h-10 px-4 py-0">
-                            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-greyscale-500 dark:text-gray-400 text-[length:var(--body-small-medium-font-size)] tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
+                            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-greyscale-500 dark:text-gray-400 text-[length:var(--body-small-medium-font-size)] tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
                               Actions
                             </span>
                           </TableHead>
@@ -604,7 +604,7 @@ export const ForumScreen = () => {
                             }
                           >
                             <TableCell className="h-12 px-4 py-0">
-                              <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-900 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+                              <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-gray-600 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] inter [font-style:var(--body-medium-semibold-font-style)]">
                                 {postTitle}
                               </span>
                             </TableCell>
@@ -639,7 +639,7 @@ export const ForumScreen = () => {
                               </div>
                             </TableCell>
                             <TableCell className="h-12 px-4 py-0">
-                              <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-900 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+                              <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-gray-600 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] inter [font-style:var(--body-medium-semibold-font-style)]">
                                 {new Date(postCreatedAt).toLocaleDateString()}
                               </span>
                             </TableCell>

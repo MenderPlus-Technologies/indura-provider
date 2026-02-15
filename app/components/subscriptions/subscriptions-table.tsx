@@ -33,7 +33,7 @@ export const SubscriptionsTable = ({ subscriptions, onActionClick, onSendReminde
         <TableRow className="border-b border-solid border-[#dfe1e6] dark:border-gray-700">
           <TableHead className="w-[246px] h-10 px-4 py-0">
             <span className="font-medium text-gray-500 dark:text-gray-400 text-xs">
-              Member
+              Customer
             </span>
           </TableHead>
           <TableHead className="w-[180px] h-10 px-4 py-0">

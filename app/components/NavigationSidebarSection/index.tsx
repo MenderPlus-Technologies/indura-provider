@@ -8,7 +8,7 @@ import Image from "next/image";
 const mainMenuItems = [
   { icon: Home, label: "Dashboard", isActive: true },
   { icon: RefreshCw, label: "Transactions", isActive: false },
-  { icon: User, label: "Members", isActive: false },
+  { icon: User, label: "Customers", isActive: false },
 ];
 
 const bottomMenuItems = [

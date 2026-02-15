@@ -37,6 +37,16 @@ export const TransactionsTable = ({ transactions }: TransactionsTableProps) => {
               Method
             </span>
           </TableHead>
+          <TableHead className="w-[100px] h-10 px-4 py-0">
+            <span className="font-medium text-gray-500 dark:text-gray-400 text-xs">
+              Type
+            </span>
+          </TableHead>
+          <TableHead className="w-[180px] h-10 px-4 py-0">
+            <span className="font-medium text-gray-500 dark:text-gray-400 text-xs">
+              Reference
+            </span>
+          </TableHead>
           <TableHead className="flex-1 h-10 px-4 py-0">
             <span className="font-medium text-gray-500 dark:text-gray-400 text-xs">
               Status
@@ -52,7 +62,7 @@ export const TransactionsTable = ({ transactions }: TransactionsTableProps) => {
       <TableBody>
         {transactions.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={7} className="h-32 px-4 py-0 text-center">
+            <TableCell colSpan={9} className="h-32 px-4 py-0 text-center">
               <span className="font-semibold text-gray-500 dark:text-gray-400 text-sm">
                 No transactions found
               </span>
@@ -93,12 +103,30 @@ export const TransactionsTable = ({ transactions }: TransactionsTableProps) => {
               </TableCell>
               <TableCell className="h-12 px-4 py-0">
                 <Badge
+                  className={`inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid ${
+                    row.type === 'credit'
+                      ? 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800 text-green-700 dark:text-green-400'
+                      : 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-700 dark:text-red-400'
+                  }`}
+                >
+                  <span className="font-medium text-xs capitalize">
+                    {row.type || 'N/A'}
+                  </span>
+                </Badge>
+              </TableCell>
+              <TableCell className="h-12 px-4 py-0">
+                <span className="font-semibold text-gray-600 dark:text-gray-400 text-xs font-mono">
+                  {row.reference || 'N/A'}
+                </span>
+              </TableCell>
+              <TableCell className="h-12 px-4 py-0">
+                <Badge
                   className={`inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid ${getStatusBadgeStyles(row.status)}`}
                 >
                   <div
                     className={`w-1 h-1 rounded-sm ${getStatusDotColor(row.status)}`}
                   />
-                  <span className="font-medium text-xs text-gray-900 dark:text-white">
+                  <span className="font-medium text-xs">
                     {row.status}
                   </span>
                 </Badge>

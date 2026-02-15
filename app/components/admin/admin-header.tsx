@@ -49,7 +49,7 @@ export const AdminHeader = ({ onMenuClick }: AdminHeaderProps = {}) => {
         >
           <PanelLeft className="h-4 w-4" />
         </Button>
-        <h1 className="font-semibold text-gray-900 dark:text-white text-lg sm:text-xl lg:text-2xl">{title}</h1>
+        <h1 className="font-semibold text-gray-600 dark:text-white text-lg sm:text-xl lg:text-2xl inter">{title}</h1>
       </div>
 
       <div className="inline-flex items-center gap-2 sm:gap-3">

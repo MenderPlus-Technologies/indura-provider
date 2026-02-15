@@ -7,7 +7,31 @@ import { Calendar, ChevronDown, ArrowUp } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { TransactionsSearchBar } from "./transactions-search-bar";
 
-export const OverallIncomeCard = () => {
+interface OverallIncomeCardProps {
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+  onFilterClick: () => void;
+  onSortChange: (sortBy: string) => void;
+  sortBy: string;
+  sortOrder: 'asc' | 'desc';
+  activeFilterCount: number;
+  onDownload?: () => void;
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
+}
+
+export const OverallIncomeCard = ({
+  searchQuery,
+  onSearchChange,
+  onFilterClick,
+  onSortChange,
+  sortBy,
+  sortOrder,
+  activeFilterCount,
+  onDownload,
+  onRefresh,
+  isRefreshing,
+}: OverallIncomeCardProps) => {
   return (
     <Card className="flex flex-col gap-1 p-1 rounded-2xl overflow-hidden border border-solid border-[#dfe1e6] dark:border-gray-700 shadow-[0px_2px_4px_-1px_#0d0d120f] w-full bg-white dark:bg-gray-800">
       <CardContent className="flex flex-col items-start justify-center w-full rounded-xl overflow-hidden p-0">
@@ -18,7 +42,7 @@ export const OverallIncomeCard = () => {
             </div>
             <div className="flex items-center gap-2 w-full">
               <div className="font-semibold text-gray-900 dark:text-white text-xl sm:text-2xl">
-                $83,125
+                ₦83,125
               </div>
               <Badge className="inline-flex items-center gap-1 px-1 py-0.5 rounded-full border border-solid bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800">
                 <ArrowUp className="h-4 w-4 text-green-600 dark:text-green-400" />
@@ -51,7 +75,18 @@ export const OverallIncomeCard = () => {
           </DropdownMenu>
         </div>
 
-        <TransactionsSearchBar />
+        <TransactionsSearchBar
+          searchQuery={searchQuery}
+          onSearchChange={onSearchChange}
+          onFilterClick={onFilterClick}
+          onSortChange={onSortChange}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          activeFilterCount={activeFilterCount}
+          onDownload={onDownload}
+          onRefresh={onRefresh}
+          isRefreshing={isRefreshing}
+        />
       </CardContent>
     </Card>
   );

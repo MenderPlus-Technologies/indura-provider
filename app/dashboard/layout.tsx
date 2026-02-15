@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Header } from "../components/layouts/header";
 import { Sidebar } from "../components/layouts/sidebar";
 import { useAuth } from "../contexts/auth-context";
+import { useInactivityLogout } from "../hooks/use-inactivity-logout";
 
 export default function DashboardLayout({
   children,
@@ -12,9 +13,18 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const { isAuthenticated, requiresPasswordChange } = useAuth();
+  const { isAuthenticated, requiresPasswordChange, signOut } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Handle inactivity logout after 5 minutes
+  useInactivityLogout(
+    () => {
+      signOut();
+      router.replace('/');
+    },
+    { timeoutMs: 5 * 60 * 1000 } // 5 minutes
+  );
 
   useEffect(() => {
     // Check authentication and password change requirement

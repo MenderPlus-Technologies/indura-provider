@@ -1,14 +1,16 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { Calendar, Download, ChevronDown, Plus, PanelLeft } from "lucide-react";
+import { Calendar, ChevronDown, Plus, PanelLeft } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 interface TransactionsHeaderProps {
   onNewRequest?: () => void;
 }
 
-export const TransactionsHeader = ({ onNewRequest }: TransactionsHeaderProps) => {
+export const TransactionsHeader = ({ 
+  onNewRequest
+}: TransactionsHeaderProps) => {
   return (
     <header className="h-auto sm:h-[72px] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 px-4 sm:px-6 py-4 bg-greyscale-0 dark:bg-gray-900 border-b border-solid border-[#dfe1e6] dark:border-gray-800 w-full">
       <Button
@@ -22,35 +24,7 @@ export const TransactionsHeader = ({ onNewRequest }: TransactionsHeaderProps) =>
       </Button>
 
       <div className="inline-flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-        <Button
-          variant="outline"
-          size="icon"
-          className="h-8 w-8 p-2 bg-greyscale-0 dark:bg-gray-800 rounded-lg border border-solid border-[#dfe1e6] dark:border-gray-700 shadow-shadow-xsmall cursor-pointer"
-        >
-          <Download className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-        </Button>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              className="h-auto inline-flex h-10 items-center justify-center gap-2 px-2 sm:px-3 py-2 bg-greyscale-0 dark:bg-gray-800 rounded-[10px] border border-solid border-[#dfe1e6] dark:border-gray-700 shadow-shadow-xsmall cursor-pointer flex-1 sm:flex-initial"
-            >
-              <Calendar className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-              <span className="font-semibold text-gray-900 dark:text-white text-xs sm:text-sm">
-                Monthly
-              </span>
-              <ChevronDown className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>Daily</DropdownMenuItem>
-            <DropdownMenuItem>Weekly</DropdownMenuItem>
-            <DropdownMenuItem>Monthly</DropdownMenuItem>
-            <DropdownMenuItem>Yearly</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
+      
         <Button
           onClick={onNewRequest}
           className="h-auto inline-flex h-10 items-center justify-center gap-2 px-2 sm:px-3 py-2 bg-[#009688] hover:bg-[#008577] rounded-[10px] shadow-shadow-xsmall cursor-pointer flex-1 sm:flex-initial"
