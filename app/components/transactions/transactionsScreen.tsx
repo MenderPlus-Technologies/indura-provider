@@ -8,21 +8,27 @@ import { TransactionsTable } from "./transactions-table";
 import { TransactionsPagination } from "./transactions-pagination";
 import { NewRequestModal } from "./new-request-modal";
 import { TransactionsFilterPanel, type FilterState } from "./transactions-filter-panel";
-import { type Transaction, mapApiStatusToUIStatus, formatTransactionDate, formatTransactionAmount, getPayerName, getPayerEmail, exportToCSV } from "./transaction-utils";
+import { type Transaction, mapApiStatusToUIStatus, formatTransactionDate, formatTransactionAmount, getPayerName, exportToCSV } from "./transaction-utils";
 import { useGetProviderTransactionsQuery } from "@/app/store/apiSlice";
 import type { ProviderTransaction } from "@/app/store/apiSlice";
+import { TransactionDetailsSheet } from "./transaction-details-sheet";
 import { Loader2 } from "lucide-react";
 
-const ITEMS_PER_PAGE = 10;
-
 export const TransactionsScreen = () => {
-  const { data: transactionsData, isLoading, isError, refetch, isFetching } = useGetProviderTransactionsQuery();
-  const [isNewRequestModalOpen, setIsNewRequestModalOpen] = useState(false);
-  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+
+  const { data: transactionsData, isLoading, isError, refetch, isFetching } =
+    useGetProviderTransactionsQuery({
+      page: currentPage,
+      limit: 10,
+      sortBy,
+      sortOrder,
+    });
+  const [isNewRequestModalOpen, setIsNewRequestModalOpen] = useState(false);
+  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<FilterState>({
     status: [],
     type: [],
@@ -33,6 +39,9 @@ export const TransactionsScreen = () => {
     dateTo: '',
   });
 
+  const [selectedTransactionId, setSelectedTransactionId] = useState<string | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
   // Map API transactions to UI format
   const allTransactions: Transaction[] = useMemo(() => {
     if (!transactionsData?.transactions) {
@@ -40,18 +49,34 @@ export const TransactionsScreen = () => {
     }
 
     return transactionsData.transactions.map((apiTransaction: ProviderTransaction) => {
+      const user =
+        apiTransaction.userId && typeof apiTransaction.userId === "object"
+          ? (apiTransaction.userId as { name?: string })
+          : null;
+
       return {
-        payer: getPayerName(apiTransaction),
-        email: getPayerEmail(apiTransaction),
+        id: apiTransaction._id,
+        payer: user?.name || getPayerName(apiTransaction),
         datetime: formatTransactionDate(apiTransaction.createdAt),
-        method: apiTransaction.category === 'provider_payment' ? 'Provider Payment' : 
-                apiTransaction.category === 'payment_received' ? 'Payment Received' : 
-                'Wallet',
+        method:
+          apiTransaction.metadata?.paymentMethod ??
+          (apiTransaction.category === "provider_payment"
+            ? "Provider Payment"
+            : apiTransaction.category === "payment_received"
+            ? "Payment Received"
+            : "Wallet"),
         status: mapApiStatusToUIStatus(apiTransaction.status),
         amount: formatTransactionAmount(apiTransaction.amount),
         type: apiTransaction.type,
         reference: apiTransaction.reference,
         category: apiTransaction.category,
+        description:
+          (apiTransaction.metadata as any)?.description ||
+          (apiTransaction.category === "provider_payment"
+            ? "Provider payment"
+            : apiTransaction.category === "payment_received"
+            ? "Payment received"
+            : ""),
         // Store raw data for filtering/sorting
         rawAmount: apiTransaction.amount,
         rawDate: new Date(apiTransaction.createdAt),
@@ -68,8 +93,8 @@ export const TransactionsScreen = () => {
       const query = searchQuery.toLowerCase();
       result = result.filter(t => 
         t.payer.toLowerCase().includes(query) ||
-        t.email.toLowerCase().includes(query) ||
-        (t.reference && t.reference.toLowerCase().includes(query))
+        (t.reference && t.reference.toLowerCase().includes(query)) ||
+        (t.description && t.description.toLowerCase().includes(query))
       );
     }
 
@@ -138,11 +163,7 @@ export const TransactionsScreen = () => {
     return result;
   }, [allTransactions, searchQuery, filters, sortBy, sortOrder]);
 
-  // Calculate pagination
-  const totalPages = Math.max(1, Math.ceil(filteredAndSortedTransactions.length / ITEMS_PER_PAGE));
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const paginatedTransactions = filteredAndSortedTransactions.slice(startIndex, endIndex);
+  const totalPages = transactionsData?.pagination?.totalPages ?? 1;
 
   // Reset to page 1 if current page is out of bounds or when data changes
   useEffect(() => {
@@ -245,9 +266,17 @@ export const TransactionsScreen = () => {
             ) : (
               <>
                 <div className="overflow-x-auto">
-                  <TransactionsTable transactions={paginatedTransactions} />
+                      <TransactionsTable
+                        transactions={filteredAndSortedTransactions}
+                        onRowClick={(t) => {
+                          if (t.id) {
+                            setSelectedTransactionId(t.id);
+                            setIsDetailsOpen(true);
+                          }
+                        }}
+                      />
                 </div>
-                {filteredAndSortedTransactions.length > 0 && (
+                    {transactionsData?.pagination && transactionsData.pagination.totalPages > 1 && (
                   <TransactionsPagination
                     currentPage={currentPage}
                     totalPages={totalPages}
@@ -274,6 +303,18 @@ export const TransactionsScreen = () => {
         filters={filters}
         onFilterChange={handleFilterChange}
         onReset={handleFilterReset}
+      />
+
+      {/* Transaction details sheet */}
+      <TransactionDetailsSheet
+        transactionId={selectedTransactionId}
+        open={isDetailsOpen}
+        onOpenChange={(open) => {
+          setIsDetailsOpen(open);
+          if (!open) {
+            setSelectedTransactionId(null);
+          }
+        }}
       />
     </div>
   );

@@ -18,7 +18,7 @@ export const TransactionsHeader = ({
         className="h-auto bg-[#F9F9FB] dark:bg-gray-800 inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-lg border border-solid border-[#dfe1e6] dark:border-gray-700 cursor-pointer"
       >
         <PanelLeft className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-        <span className="text-greyscale-900 dark:text-white text-sm">
+        <span className="text-[#344054] dark:text-white text-sm">
           Transactions
         </span>
       </Button>

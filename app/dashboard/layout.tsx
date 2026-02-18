@@ -6,6 +6,7 @@ import { Header } from "../components/layouts/header";
 import { Sidebar } from "../components/layouts/sidebar";
 import { useAuth } from "../contexts/auth-context";
 import { useInactivityLogout } from "../hooks/use-inactivity-logout";
+import { ToastProvider } from "@/components/ui/toast";
 
 export default function DashboardLayout({
   children,
@@ -32,8 +33,8 @@ export default function DashboardLayout({
       const token = localStorage.getItem('authToken');
       const requiresChange = localStorage.getItem('requiresPasswordChange') === 'true';
       
-      // Redirect to sign-in if not authenticated
-      if (!token || !isAuthenticated) {
+      // Redirect to sign-in if no auth token
+      if (!token) {
         router.replace('/');
         return;
       }
@@ -53,23 +54,25 @@ export default function DashboardLayout({
   }, [router, isAuthenticated, requiresPasswordChange]);
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-white dark:bg-gray-950">
-      <Sidebar
-        isCollapsed={isCollapsed}
-        setIsCollapsed={setIsCollapsed}
-        isMobileMenuOpen={isMobileMenuOpen}
-        setIsMobileMenuOpen={setIsMobileMenuOpen}
-      />
-
-      <div className="flex flex-col flex-1 overflow-hidden">
-        <Header 
-          onMenuClick={() => setIsMobileMenuOpen(true)}
+    <ToastProvider>
+      <div className="flex h-screen w-full overflow-hidden bg-white dark:bg-gray-950">
+        <Sidebar
+          isCollapsed={isCollapsed}
+          setIsCollapsed={setIsCollapsed}
+          isMobileMenuOpen={isMobileMenuOpen}
+          setIsMobileMenuOpen={setIsMobileMenuOpen}
         />
 
-        <main className="flex-1 overflow-y-auto bg-white dark:bg-gray-950">
-          {children}
-        </main>
+        <div className="flex flex-col flex-1 overflow-hidden">
+          <Header 
+            onMenuClick={() => setIsMobileMenuOpen(true)}
+          />
+
+          <main className="flex-1 overflow-y-auto bg-white dark:bg-gray-950">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </ToastProvider>
   );
 }

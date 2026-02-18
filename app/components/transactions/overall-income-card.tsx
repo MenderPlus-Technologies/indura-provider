@@ -41,7 +41,7 @@ export const OverallIncomeCard = ({
               OVERALL INCOME
             </div>
             <div className="flex items-center gap-2 w-full">
-              <div className="font-semibold text-gray-900 dark:text-white text-xl sm:text-2xl">
+              <div className="font-semibold text-[#344054] dark:text-white text-xl sm:text-2xl">
                 ₦83,125
               </div>
               <Badge className="inline-flex items-center gap-1 px-1 py-0.5 rounded-full border border-solid bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800">
@@ -60,7 +60,7 @@ export const OverallIncomeCard = ({
                 className="h-auto inline-flex h-10 items-center justify-center gap-2 px-3 py-2 bg-greyscale-0 dark:bg-gray-700 rounded-[10px] border border-solid border-[#dfe1e6] dark:border-gray-600 shadow-shadow-xsmall cursor-pointer"
               >
                 <Calendar className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-                <span className="font-semibold text-gray-900 dark:text-white text-xs sm:text-sm">
+                <span className="font-semibold text-[#344054] dark:text-white text-xs sm:text-sm">
                   Monthly
                 </span>
                 <ChevronDown className="h-4 w-4 text-gray-700 dark:text-gray-300" />

@@ -33,8 +33,8 @@ export default function AdminDashboardLayout({
       const token = localStorage.getItem('authToken');
       const userStr = localStorage.getItem('authUser');
       
-      // Redirect to sign-in if not authenticated
-      if (!token || !isAuthenticated) {
+      // Redirect to sign-in if no auth token
+      if (!token) {
         router.replace('/');
         return;
       }

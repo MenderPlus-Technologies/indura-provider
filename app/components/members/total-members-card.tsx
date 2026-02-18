@@ -31,7 +31,7 @@ export const TotalMembersCard = ({
               TOTAL CUSTOMERS
             </div>
             <div className="flex items-center gap-2 w-full">
-              <div className="font-semibold text-gray-900 dark:text-white text-xl sm:text-2xl">
+              <div className="font-semibold text-[#344054] dark:text-white text-xl sm:text-2xl">
                 {totalCustomers.toLocaleString()}
               </div>
               <Badge className="inline-flex items-center gap-1 px-1 py-0.5 rounded-full border border-solid bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800">

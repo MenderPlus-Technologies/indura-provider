@@ -106,9 +106,9 @@ export const Sidebar = ({
         <div className="flex flex-col items-start gap-1 w-full flex-[0_0_auto]">
           {!isCollapsed && (
             <div className="flex items-center gap-2 px-3 py-1 w-full flex-[0_0_auto]">
-              <span className="w-fit -mt-px text-gray-500 dark:text-gray-400 whitespace-nowrap font-medium text-sm">
+              <span className="w-fit -mt-px text-[#475467] dark:text-gray-400 whitespace-nowrap font-medium text-sm">
                 Main Menu
-              </span>
+              </span> 
             </div>
           )}
           <div className="flex flex-col gap-2 items-start flex-[0_0_auto] w-full">
@@ -123,7 +123,7 @@ export const Sidebar = ({
                     isCollapsed ? "justify-center" : "gap-2"
                   } px-3 py-2 flex-[0_0_auto] rounded-lg w-full transition-colors ${
                     isActive
-                      ? "bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+                      ? "bg-[#F9F9FB] dark:bg-gray-800 border border-[#DFE1E6] dark:border-gray-700"
                       : "hover:bg-gray-50 dark:hover:bg-gray-800"
                   }`}
                   title={isCollapsed ? item.label : undefined}

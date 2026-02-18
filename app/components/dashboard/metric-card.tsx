@@ -15,10 +15,10 @@ export const MetricCard = ({ data }: MetricCardProps) => {
     <Card className="flex flex-col gap-1 p-1 bg-gray-50 dark:bg-gray-800/50 rounded-2xl overflow-hidden border border-solid border-gray-200 dark:border-gray-700">
       <CardContent className="flex items-center gap-4 p-4 rounded-xl overflow-hidden border border-solid border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
         <div className="flex flex-col items-start justify-end gap-2 flex-1">
-          <div className="font-semibold text-gray-500 dark:text-gray-400 text-xs">{title}</div>
+          <div className="font-semibold text-[#475467] dark:text-gray-400 text-xs">{title}</div>
 
           <div className="flex items-center gap-2 w-full">
-            <div className="font-semibold text-gray-900 dark:text-white text-xl">{value}</div>
+            <div className="font-semibold text-[#344054] dark:text-white text-xl">{value}</div>
 
             <Badge
               className={`inline-flex items-center gap-1 px-1 py-0.5 rounded-full border border-solid ${
@@ -49,7 +49,7 @@ export const MetricCard = ({ data }: MetricCardProps) => {
       </CardContent>
 
       <div className="flex gap-2 px-3 py-2 w-full rounded-xl items-center">
-        <div className="font-semibold text-gray-900 dark:text-white text-sm">{footer}</div>
+        <div className="font-semibold text-[#344054] dark:text-white text-sm">{footer}</div>
         <div className="flex-1 font-normal text-gray-500 dark:text-gray-400 text-sm">{footerText}</div>
         <ArrowRight className="h-5 w-5 text-gray-700 dark:text-gray-300" />
       </div>

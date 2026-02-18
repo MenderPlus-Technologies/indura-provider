@@ -36,9 +36,9 @@ export const MembersSearchBar = ({
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="h-auto inline-flex h-10 items-center justify-center gap-2 px-2 sm:px-4 py-2 bg-greyscale-0 dark:bg-gray-800 rounded-[10px] border border-solid border-[#dfe1e6] dark:border-gray-700 cursor-pointer"
+              className="h-auto inline-flex items-center justify-center gap-2 px-2 sm:px-4 py-2 bg-greyscale-0 dark:bg-gray-800 rounded-[10px] border border-solid border-[#dfe1e6] dark:border-gray-700 cursor-pointer"
             >
-              <span className="font-semibold text-gray-900 dark:text-white text-xs sm:text-sm">
+              <span className="font-semibold text-[#344054] dark:text-white text-xs sm:text-sm">
                 All Customers
               </span>
               <ChevronDown className="h-4 w-4 text-gray-700 dark:text-gray-300" />

@@ -32,6 +32,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const AUTH_STORAGE_KEY = 'authToken';
 const USER_STORAGE_KEY = 'authUser';
 const PASSWORD_CHANGE_KEY = 'requiresPasswordChange';
+const LAST_ACTIVITY_AT_KEY = 'indura:lastActivityAt';
 
 /**
  * Load auth state from localStorage
@@ -118,6 +119,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (typeof window !== 'undefined') {
         localStorage.setItem(AUTH_STORAGE_KEY, token);
         localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+        // Reset inactivity timer on successful sign-in to prevent immediate logout
+        localStorage.setItem(LAST_ACTIVITY_AT_KEY, String(Date.now()));
         if (requiresPasswordChange) {
           localStorage.setItem(PASSWORD_CHANGE_KEY, 'true');
         } else {
@@ -185,6 +188,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem(USER_STORAGE_KEY);
       localStorage.removeItem(PASSWORD_CHANGE_KEY);
       localStorage.removeItem('isLoggedIn'); // Legacy support
+      localStorage.removeItem(LAST_ACTIVITY_AT_KEY);
     }
 
     setAuthState({

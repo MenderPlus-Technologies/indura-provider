@@ -49,8 +49,8 @@ export default function GeneralTabContent() {
 
   return (
     <div className="w-full bg-[#fafafa] dark:bg-gray-950 pb-8">
-      <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
-        <div className="bg-white dark:bg-gray-900 shadow-sm">
+      <div className="mx-auto max-w-[1400px] ">
+        <div className="bg-white dark:bg-gray-900 ">
           {/* Provider Details Section */}
           <div className="border-b border-gray-200 dark:border-gray-800 px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
             <div className="flex flex-col lg:flex-row gap-6 lg:gap-12">

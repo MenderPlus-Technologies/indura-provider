@@ -414,15 +414,94 @@ export const apiSlice = createApi({
      */
     getProviderDashboardStats: builder.query<ProviderDashboardStats, void>({
       query: () => '/providers/dashboard/stats',
+      transformResponse: (response: ProviderDashboardStatsApiResponse | ProviderDashboardStats) => {
+        // Support both wrapped and unwrapped backend responses
+        if (response && typeof response === 'object' && 'data' in response) {
+          return (response as ProviderDashboardStatsApiResponse).data;
+        }
+        return response as ProviderDashboardStats;
+      },
       providesTags: ['Stats'],
     }),
 
     /**
-     * Get provider transactions
-     * GET /providers/dashboard/transactions
+     * Get provider income chart data
+     * GET /providers/dashboard/income-chart?period={daily|weekly|monthly}
      */
-    getProviderTransactions: builder.query<ProviderTransactionsResponse, void>({
-      query: () => '/providers/dashboard/transactions',
+    getProviderIncomeChart: builder.query<ProviderIncomeChartData, { period?: IncomeChartPeriod }>({
+      query: ({ period = 'monthly' } = {}) => ({
+        url: '/providers/dashboard/income-chart',
+        params: { period },
+      }),
+      transformResponse: (response: ProviderIncomeChartApiResponse | ProviderIncomeChartData) => {
+        if (response && typeof response === 'object' && 'data' in response) {
+          return (response as ProviderIncomeChartApiResponse).data;
+        }
+        return response as ProviderIncomeChartData;
+      },
+      providesTags: ['Stats'],
+    }),
+
+    /**
+     * Get provider recent activities
+     * GET /providers/dashboard/recent-activities
+     */
+    getProviderRecentActivities: builder.query<
+      ProviderRecentActivitiesData,
+      { limit?: number; offset?: number; period?: IncomeChartPeriod }
+    >({
+      query: ({ limit = 10, offset = 0, period = 'monthly' } = {}) => ({
+        url: '/providers/dashboard/recent-activities',
+        params: { limit, offset, period },
+      }),
+      transformResponse: (
+        response: ProviderRecentActivitiesApiResponse | ProviderRecentActivitiesData
+      ) => {
+        if (response && typeof response === 'object' && 'data' in response) {
+          return (response as ProviderRecentActivitiesApiResponse).data;
+        }
+        return response as ProviderRecentActivitiesData;
+      },
+      providesTags: ['Stats'],
+    }),
+
+    /**
+     * Get provider transactions (paginated)
+     * GET /providers/transactions?page=1&limit=10&sortBy=date&sortOrder=desc
+     */
+    getProviderTransactions: builder.query<
+      ProviderTransactionsData,
+      { page?: number; limit?: number; sortBy?: string; sortOrder?: 'asc' | 'desc' }
+    >({
+      query: ({ page = 1, limit = 10, sortBy = 'date', sortOrder = 'desc' } = {}) => ({
+        url: '/providers/transactions',
+        params: { page, limit, sortBy, sortOrder },
+      }),
+      transformResponse: (
+        response: ProviderTransactionsApiResponse | ProviderTransactionsData
+      ) => {
+        if (response && typeof response === 'object' && 'data' in response) {
+          return (response as ProviderTransactionsApiResponse).data;
+        }
+        return response as ProviderTransactionsData;
+      },
+      providesTags: ['Stats'],
+    }),
+
+    /**
+     * Get single provider transaction by id
+     * GET /providers/transactions/:id
+     */
+    getProviderTransaction: builder.query<ProviderTransactionDetail, string>({
+      query: (id) => `/providers/transactions/${id}`,
+      transformResponse: (
+        response: ProviderTransactionDetailApiResponse | ProviderTransactionDetail
+      ) => {
+        if (response && typeof response === 'object' && 'data' in response) {
+          return (response as ProviderTransactionDetailApiResponse).data;
+        }
+        return response as ProviderTransactionDetail;
+      },
       providesTags: ['Stats'],
     }),
 
@@ -430,8 +509,16 @@ export const apiSlice = createApi({
      * Get provider customers
      * GET /providers/dashboard/customers
      */
-    getProviderCustomers: builder.query<ProviderCustomersResponse, void>({
+    getProviderCustomers: builder.query<ProviderCustomersData, void>({
       query: () => '/providers/dashboard/customers',
+      transformResponse: (
+        response: ProviderCustomersApiResponse | ProviderCustomersData
+      ) => {
+        if (response && typeof response === 'object' && 'data' in response) {
+          return (response as ProviderCustomersApiResponse).data;
+        }
+        return response as ProviderCustomersData;
+      },
       providesTags: ['Stats'],
     }),
 
@@ -442,6 +529,38 @@ export const apiSlice = createApi({
     getProviderSubscribers: builder.query<ProviderSubscribersResponse, void>({
       query: () => '/subscriptions/provider/subscribers',
       providesTags: ['Stats'],
+    }),
+
+    /**
+     * Create provider payment request
+     * POST /providers/transactions/payment-request
+     */
+    createProviderPaymentRequest: builder.mutation<
+      {
+        success: boolean;
+        message: string;
+        data?: {
+          _id: string;
+          customerId: string;
+          amount: number;
+          currency: string;
+          paymentMethod: string;
+          status: string;
+          reference: string;
+          description?: string | null;
+          dueDate?: string | null;
+          createdAt: string;
+        };
+        timestamp?: string;
+      },
+      { customerId: string; amount: number; currency: string; paymentMethod: string; description?: string }
+    >({
+      query: (body) => ({
+        url: '/providers/transactions/payment-request',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Stats'],
     }),
   }),
 });
@@ -622,12 +741,87 @@ export interface ProviderDashboardStats {
   income: number;
   activeSubscribers: number;
   transactionsSummary: TransactionSummary[];
+  periodComparison?: {
+    incomeChange?: number;
+    incomeChangeAmount?: number;
+    payoutsChange?: number;
+    payoutsChangeCount?: number;
+    subscribersChange?: number;
+    subscribersChangeCount?: number;
+  };
+  walletBalance?: number;
+  pendingPayouts?: number;
+  failedRefundedCount?: number;
+  failedRefundedAmount?: number;
+}
+
+export interface ProviderDashboardStatsApiResponse {
+  success: boolean;
+  message?: string;
+  data: ProviderDashboardStats;
+  timestamp?: string;
+}
+
+// Income chart types
+export type IncomeChartPeriod = 'daily' | 'weekly' | 'monthly';
+
+export interface ProviderIncomeChartPoint {
+  date: string; // e.g. "2026-02-17"
+  thisPeriod: number;
+  lastPeriod: number;
+}
+
+export interface ProviderIncomeChartSummary {
+  thisPeriodTotal: number;
+  lastPeriodTotal: number;
+  percentageChange: number;
+}
+
+export interface ProviderIncomeChartData {
+  period: string;
+  startDate: string;
+  endDate: string;
+  dataPoints: ProviderIncomeChartPoint[];
+  summary: ProviderIncomeChartSummary;
+}
+
+export interface ProviderIncomeChartApiResponse {
+  success: boolean;
+  message?: string;
+  data: ProviderIncomeChartData;
+  timestamp?: string;
+}
+
+// Recent activities types
+export interface ProviderRecentActivity {
+  id: string;
+  payer: string;
+  email: string;
+  datetime: string;
+  method: string;
+  status: string;
+  amount: string;
+  reference: string;
+}
+
+export interface ProviderRecentActivitiesData {
+  activities: ProviderRecentActivity[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface ProviderRecentActivitiesApiResponse {
+  success: boolean;
+  message?: string;
+  data: ProviderRecentActivitiesData;
+  timestamp?: string;
 }
 
 export interface ProviderTransaction {
   _id: string;
   walletId: string;
-  userId: string;
+  userId: string | ProviderTransactionUser;
   type: 'debit' | 'credit';
   category: string;
   amount: number;
@@ -644,8 +838,58 @@ export interface ProviderTransaction {
   __v?: number;
 }
 
-export interface ProviderTransactionsResponse {
+export interface ProviderTransactionsPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface ProviderTransactionsSummary {
+  totalAmount: number;
+  totalCount: number;
+  filteredCount: number;
+}
+
+export interface ProviderTransactionsData {
   transactions: ProviderTransaction[];
+  pagination?: ProviderTransactionsPagination;
+  summary?: ProviderTransactionsSummary;
+}
+
+export interface ProviderTransactionsApiResponse {
+  success: boolean;
+  message?: string;
+  data: ProviderTransactionsData;
+  timestamp?: string;
+}
+
+export interface ProviderTransactionUser {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+}
+
+export interface ProviderRelatedTransaction {
+  _id: string;
+  type: 'debit' | 'credit';
+  amount: number;
+  reference: string;
+  createdAt: string;
+}
+
+export interface ProviderTransactionDetail extends ProviderTransaction {
+  uiStatus?: string;
+  uiStatusKey?: string;
+  relatedTransactions?: ProviderRelatedTransaction[];
+}
+
+export interface ProviderTransactionDetailApiResponse {
+  success: boolean;
+  message?: string;
+  data: ProviderTransactionDetail;
+  timestamp?: string;
 }
 
 export interface ProviderCustomer {
@@ -658,8 +902,18 @@ export interface ProviderCustomer {
   phone: string;
 }
 
-export interface ProviderCustomersResponse {
+export interface ProviderCustomersData {
   customers: ProviderCustomer[];
+  total?: number;
+  limit?: number;
+  offset?: number;
+}
+
+export interface ProviderCustomersApiResponse {
+  success: boolean;
+  message?: string;
+  data: ProviderCustomersData;
+  timestamp?: string;
 }
 
 export interface ProviderSubscriberUser {
@@ -721,4 +975,8 @@ export const {
   useGetProviderTransactionsQuery,
   useGetProviderCustomersQuery,
   useGetProviderSubscribersQuery,
+  useGetProviderIncomeChartQuery,
+  useGetProviderRecentActivitiesQuery,
+  useCreateProviderPaymentRequestMutation,
+  useGetProviderTransactionQuery,
 } = apiSlice;

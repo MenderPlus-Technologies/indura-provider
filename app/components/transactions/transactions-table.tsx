@@ -7,9 +7,10 @@ import { getStatusBadgeStyles, getStatusDotColor, type Transaction } from "./tra
 
 interface TransactionsTableProps {
   transactions: Transaction[];
+  onRowClick?: (transaction: Transaction) => void;
 }
 
-export const TransactionsTable = ({ transactions }: TransactionsTableProps) => {
+export const TransactionsTable = ({ transactions, onRowClick }: TransactionsTableProps) => {
   return (
     <Table>
       <TableHeader>
@@ -20,11 +21,6 @@ export const TransactionsTable = ({ transactions }: TransactionsTableProps) => {
           <TableHead className="w-[246px] h-10 px-4 py-0">
             <span className="font-medium text-gray-500 dark:text-gray-400 text-xs">
               Payer
-            </span>
-          </TableHead>
-          <TableHead className="w-60 h-10 px-4 py-0">
-            <span className="font-medium text-gray-500 dark:text-gray-400 text-xs">
-              Email Address
             </span>
           </TableHead>
           <TableHead className="w-[178px] h-10 px-4 py-0">
@@ -45,6 +41,11 @@ export const TransactionsTable = ({ transactions }: TransactionsTableProps) => {
           <TableHead className="w-[180px] h-10 px-4 py-0">
             <span className="font-medium text-gray-500 dark:text-gray-400 text-xs">
               Reference
+            </span>
+          </TableHead>
+          <TableHead className="w-[220px] h-10 px-4 py-0">
+            <span className="font-medium text-gray-500 dark:text-gray-400 text-xs">
+              Description
             </span>
           </TableHead>
           <TableHead className="flex-1 h-10 px-4 py-0">
@@ -72,32 +73,28 @@ export const TransactionsTable = ({ transactions }: TransactionsTableProps) => {
           transactions.map((row, index) => (
             <TableRow
               key={index}
-              className={
+              className={`cursor-pointer hover:bg-gray-50/80 dark:hover:bg-gray-800/60 ${
                 index < transactions.length - 1
                   ? "border-b border-solid border-[#dfe1e6] dark:border-gray-700"
                   : ""
-              }
+              }`}
+              onClick={() => onRowClick?.(row)}
             >
               <TableCell className="h-12 px-4 py-0">
                 <Checkbox className="w-4 h-4 bg-greyscale-0 dark:bg-gray-800 rounded-[4.8px] border border-solid border-[#dfe1e6] dark:border-gray-700" />
               </TableCell>
               <TableCell className="h-12 px-4 py-0">
-                <span className="font-semibold text-gray-900 dark:text-white text-sm">
+                <span className="font-semibold text-[#344054] dark:text-white text-sm">
                   {row.payer}
                 </span>
               </TableCell>
               <TableCell className="h-12 px-4 py-0">
-                <span className="font-semibold text-[#009688] dark:text-teal-400 text-sm">
-                  {row.email}
-                </span>
-              </TableCell>
-              <TableCell className="h-12 px-4 py-0">
-                <span className="font-semibold text-gray-900 dark:text-white text-sm">
+                <span className="font-semibold text-[#344054] dark:text-white text-sm">
                   {row.datetime}
                 </span>
               </TableCell>
               <TableCell className="h-12 px-4 py-0">
-                <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-900 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+                <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-[#344054] dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
                   {row.method}
                 </span>
               </TableCell>
@@ -115,8 +112,13 @@ export const TransactionsTable = ({ transactions }: TransactionsTableProps) => {
                 </Badge>
               </TableCell>
               <TableCell className="h-12 px-4 py-0">
-                <span className="font-semibold text-gray-600 dark:text-gray-400 text-xs font-mono">
+                <span className="font-semibold text-[#475467] dark:text-gray-400 text-xs font-mono">
                   {row.reference || 'N/A'}
+                </span>
+              </TableCell>
+              <TableCell className="h-12 px-4 py-0">
+                <span className="font-medium text-[#475467] dark:text-gray-300 text-xs line-clamp-2">
+                  {row.description || '—'}
                 </span>
               </TableCell>
               <TableCell className="h-12 px-4 py-0">
@@ -126,13 +128,13 @@ export const TransactionsTable = ({ transactions }: TransactionsTableProps) => {
                   <div
                     className={`w-1 h-1 rounded-sm ${getStatusDotColor(row.status)}`}
                   />
-                  <span className="font-medium text-xs">
+                  <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] [font-style:var(--body-small-medium-font-style)]">
                     {row.status}
                   </span>
                 </Badge>
               </TableCell>
               <TableCell className="h-12 px-4 py-0">
-                <span className="font-semibold text-gray-900 dark:text-white text-sm">
+                <span className="font-semibold text-[#344054] dark:text-white text-sm">
                   {row.amount}
                 </span>
               </TableCell>

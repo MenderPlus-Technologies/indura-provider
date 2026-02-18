@@ -112,7 +112,7 @@ export const SignInScreen = () => {
         <div className="w-full max-w-md">
           {/* Welcome Section */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-3xl font-bold text-[#344054] dark:text-white mb-2">
               Welcome back
             </h1>
             <p className="text-gray-600 dark:text-gray-400 text-base">

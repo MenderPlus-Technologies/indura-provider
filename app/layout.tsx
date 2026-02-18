@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
-import {  Inter_Tight } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./contexts/theme-context";
 import { ProviderProvider } from "./contexts/provider-context";
 import { AuthProvider } from "./contexts/auth-context";
 import { ReduxProvider } from "./store/provider";
 
-const inter = Inter_Tight({
-  variable: "--font-inter",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
 });
-
-
 
 export const metadata: Metadata = {
   title: "Indura Provider",
@@ -36,8 +35,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
-      <body className="font-sans">
+    <html lang="en" className={poppins.variable} suppressHydrationWarning>
+      <body>
         <ReduxProvider>
           <ThemeProvider>
             <AuthProvider>

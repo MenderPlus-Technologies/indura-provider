@@ -135,7 +135,7 @@ export const MembersTable = ({ onIndividualNotification, selectedMembers = [], o
                 <div className="w-8 h-8 rounded-full bg-[#009688] flex items-center justify-center text-white text-xs font-semibold">
                   {getInitials(member.name)}
                 </div>
-                <span className="font-semibold text-gray-900 dark:text-white text-sm">
+                <span className="font-semibold text-[#344054] dark:text-white text-sm">
                   {member.name}
                 </span>
               </div>
@@ -146,22 +146,22 @@ export const MembersTable = ({ onIndividualNotification, selectedMembers = [], o
               </span>
             </TableCell>
             <TableCell className="h-12 px-4 py-0">
-              <span className="font-semibold text-gray-900 dark:text-white text-sm">
+              <span className="font-semibold text-[#344054] dark:text-white text-sm">
                 {member.phone}
               </span>
             </TableCell>
             <TableCell className="h-12 px-4 py-0">
-              <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-900 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+              <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-[#344054] dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
                 {member.location}
               </span>
             </TableCell>
             <TableCell className="h-12 px-4 py-0">
-              <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-900 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+              <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-[#344054] dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
                 {member.totalOrders}
               </span>
             </TableCell>
             <TableCell className="h-12 px-4 py-0">
-              <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-greyscale-900 dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
+              <span className="font-body-medium-semibold font-[number:var(--body-medium-semibold-font-weight)] text-[#344054] dark:text-white text-[length:var(--body-medium-semibold-font-size)] tracking-[var(--body-medium-semibold-letter-spacing)] leading-[var(--body-medium-semibold-line-height)] [font-style:var(--body-medium-semibold-font-style)]">
                 {member.totalSpent}
               </span>
             </TableCell>

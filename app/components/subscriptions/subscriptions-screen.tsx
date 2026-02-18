@@ -17,6 +17,7 @@ import {
 } from "./subscription-utils";
 import { useGetProviderSubscribersQuery } from "@/app/store/apiSlice";
 import type { ProviderSubscriber } from "@/app/store/apiSlice";
+import { Loader2 } from "lucide-react";
 
 const ITEMS_PER_PAGE = 10;
 

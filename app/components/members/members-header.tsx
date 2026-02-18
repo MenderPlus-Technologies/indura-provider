@@ -16,7 +16,7 @@ export const MembersHeader = ({ onSendNotification, hasSelectedMembers = false }
         className="h-auto bg-[#F9F9FB] dark:bg-gray-800 inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-lg border border-solid border-[#dfe1e6] dark:border-gray-700 cursor-pointer"
       >
         <PanelLeft className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-        <span className="text-greyscale-900 dark:text-white text-sm">
+        <span className="text-[#344054] dark:text-white text-sm">
           Customers
         </span>
       </Button>
@@ -38,13 +38,13 @@ export const MembersHeader = ({ onSendNotification, hasSelectedMembers = false }
           className="h-auto inline-flex h-10 items-center justify-center gap-2 px-2 sm:px-3 py-2 bg-greyscale-0 dark:bg-gray-800 rounded-[10px] border border-solid border-[#dfe1e6] dark:border-gray-700 shadow-shadow-xsmall cursor-pointer flex-1 sm:flex-initial"
         >
           <Bell className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-          <span className="font-semibold text-gray-900 dark:text-white text-xs sm:text-sm">
+          <span className="font-semibold text-[#344054] dark:text-white text-xs sm:text-sm">
             {hasSelectedMembers ? 'Notify Selected' : 'Notify All'}
           </span>
         </Button>
 
         <Button className="h-auto inline-flex h-10 items-center justify-center gap-2 px-2 sm:px-3 py-2 bg-[#009688] hover:bg-[#008577] rounded-[10px] shadow-shadow-xsmall cursor-pointer flex-1 sm:flex-initial">
-          <UserPlus className="h-4 w-4 text-greyscale-0" />
+          <UserPlus className="h-4 w-4 text-white" />
           <span className="font-semibold text-white text-xs sm:text-sm">
             Add Customers
           </span>

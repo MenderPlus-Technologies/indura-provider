@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { membersData, type Member } from '../members/member-utils';
 import { subscriptionPlans, type Subscription, deriveSubscriptionStatus } from './subscription-utils';
+import { useGetProviderCustomersQuery, type ProviderCustomer } from '@/app/store/apiSlice';
 
 interface CreateSubscriptionModalProps {
   isOpen: boolean;
@@ -27,12 +27,17 @@ const planDurations: Record<string, number> = {
 };
 
 export const CreateSubscriptionModal = ({ isOpen, onClose, onSuccess }: CreateSubscriptionModalProps) => {
-  const [selectedMember, setSelectedMember] = useState<string>('');
+  const { data: customersData, isLoading: isLoadingCustomers, isError: isCustomersError, refetch } = useGetProviderCustomersQuery();
+  const customers: ProviderCustomer[] = customersData?.customers ?? [];
+
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
   const [selectedPlan, setSelectedPlan] = useState<string>('');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isLoading = isSubmitting || isLoadingCustomers;
 
   // Auto-suggest end date when plan or start date changes
   useEffect(() => {
@@ -54,18 +59,18 @@ export const CreateSubscriptionModal = ({ isOpen, onClose, onSuccess }: CreateSu
   }, [isOpen, startDate]);
 
   const handleSubmit = async () => {
-    if (!selectedMember || !selectedPlan || !startDate || !endDate) {
+    if (!selectedCustomerId || !selectedPlan || !startDate || !endDate) {
       console.log('Please fill in all required fields');
       return;
     }
 
-    const member = membersData.find(m => m.email === selectedMember);
-    if (!member) {
-      console.log('Selected member not found');
+    const customer = customers.find(c => c._id === selectedCustomerId);
+    if (!customer) {
+      console.log('Selected customer not found');
       return;
     }
 
-    setIsLoading(true);
+    setIsSubmitting(true);
 
     // Mock API call - simulate network delay
     setTimeout(() => {
@@ -74,8 +79,8 @@ export const CreateSubscriptionModal = ({ isOpen, onClose, onSuccess }: CreateSu
       if (success) {
         const newSubscription: Subscription = {
           id: `sub-${Date.now()}`,
-          memberName: member.name,
-          memberEmail: member.email,
+          memberName: customer.name,
+          memberEmail: customer.email,
           plan: selectedPlan,
           startDate: new Date(startDate).toISOString(),
           endDate: new Date(endDate).toISOString(),
@@ -89,22 +94,22 @@ export const CreateSubscriptionModal = ({ isOpen, onClose, onSuccess }: CreateSu
         onSuccess(newSubscription);
         
         // Reset form
-        setSelectedMember('');
+        setSelectedCustomerId('');
         setSelectedPlan('');
         setStartDate('');
         setEndDate('');
         setNotes('');
-        setIsLoading(false);
+        setIsSubmitting(false);
         onClose();
       } else {
         console.log('Failed to create subscription. Please try again.');
-        setIsLoading(false);
+        setIsSubmitting(false);
       }
     }, 1500);
   };
 
   const handleCancel = () => {
-    setSelectedMember('');
+    setSelectedCustomerId('');
     setSelectedPlan('');
     setStartDate('');
     setEndDate('');
@@ -151,14 +156,18 @@ export const CreateSubscriptionModal = ({ isOpen, onClose, onSuccess }: CreateSu
               <Label htmlFor="member" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                 Customer <span className="text-red-500">*</span>
               </Label>
-              <Select value={selectedMember} onValueChange={setSelectedMember} disabled={isLoading}>
+              <Select
+                value={selectedCustomerId}
+                onValueChange={setSelectedCustomerId}
+                disabled={isLoading || customers.length === 0}
+              >
                 <SelectTrigger id="member" className="w-full">
-                  <SelectValue placeholder="Select a customer" />
+                  <SelectValue placeholder={isLoadingCustomers ? "Loading customers..." : "Select a customer"} />
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-gray-800">
-                  {membersData.map((member) => (
-                    <SelectItem key={member.email} value={member.email}>
-                      {member.name} ({member.email})
+                  {customers.map((customer) => (
+                    <SelectItem key={customer._id} value={customer._id}>
+                      {customer.name} ({customer.email})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -246,12 +255,12 @@ export const CreateSubscriptionModal = ({ isOpen, onClose, onSuccess }: CreateSu
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={isLoading || !selectedMember || !selectedPlan || !startDate || !endDate}
+              disabled={isLoading || !selectedCustomerId || !selectedPlan || !startDate || !endDate}
               className="bg-[#009688] hover:bg-[#008577] text-white cursor-pointer"
             >
               {isLoading ? (
                 <>
-                  <span className="animate-spin mr-2">⏳</span>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   Creating...
                 </>
               ) : (

@@ -1,6 +1,6 @@
 export interface Transaction {
+  id?: string;
   payer: string;
-  email: string;
   datetime: string;
   method: string;
   status: "Failed" | "Settled" | "Pending";
@@ -8,90 +8,8 @@ export interface Transaction {
   type?: "debit" | "credit";
   reference?: string;
   category?: string;
+  description?: string;
 }
-
-export const tableData: Transaction[] = [
-  {
-    payer: "Sharon Lehner",
-    email: "Sharon.Lehner@yahoo.com",
-    datetime: "Dec 6, 2024  12:23:23",
-    method: "Wallet",
-    status: "Failed",
-    amount: "₦1,100",
-  },
-  {
-    payer: "Bob Denesik",
-    email: "Bob_Denesik@hotmail.com",
-    datetime: "Dec 6, 2024  12:23:23",
-    method: "Wallet",
-    status: "Settled",
-    amount: "₦1,100",
-  },
-  {
-    payer: "Judy Bruen",
-    email: "Judy45@yahoo.com",
-    datetime: "Dec 6, 2024  12:23:23",
-    method: "Wallet",
-    status: "Pending",
-    amount: "₦1,100",
-  },
-  {
-    payer: "Rafael Price",
-    email: "Rafael95@yahoo.com",
-    datetime: "Dec 6, 2024  12:23:23",
-    method: "Wallet",
-    status: "Settled",
-    amount: "₦1,100",
-  },
-  {
-    payer: "Ana Kerluke",
-    email: "Ana.Kerluke50@gmail.com",
-    datetime: "Dec 6, 2024  12:23:23",
-    method: "Wallet",
-    status: "Settled",
-    amount: "₦1,100",
-  },
-  {
-    payer: "Eddie Kohler",
-    email: "Eddie_Kohler@gmail.com",
-    datetime: "Dec 6, 2024  12:23:23",
-    method: "Wallet",
-    status: "Pending",
-    amount: "₦1,100",
-  },
-  {
-    payer: "Henrietta Carter",
-    email: "Henrietta4@gmail.com",
-    datetime: "Dec 6, 2024  12:23:23",
-    method: "Wallet",
-    status: "Failed",
-    amount: "₦1,100",
-  },
-  {
-    payer: "Walter Treutel",
-    email: "Walter_Treutel36@gmail.com",
-    datetime: "Dec 6, 2024  12:23:23",
-    method: "Wallet",
-    status: "Failed",
-    amount: "₦1,100",
-  },
-  {
-    payer: "Rosa Mann",
-    email: "Rosa.Mann19@yahoo.com",
-    datetime: "Dec 6, 2024  12:23:23",
-    method: "Wallet",
-    status: "Settled",
-    amount: "₦1,100",
-  },
-  {
-    payer: "Ramon Mayert",
-    email: "Ramon43@yahoo.com",
-    datetime: "Dec 6, 2024  12:23:23",
-    method: "Wallet",
-    status: "Settled",
-    amount: "₦1,100",
-  },
-];
 
 export const getStatusBadgeStyles = (status: string) => {
   switch (status) {
@@ -191,23 +109,6 @@ export const getPayerName = (transaction: {
 };
 
 /**
- * Get payer email from transaction or use fallback
- */
-export const getPayerEmail = (transaction: {
-  metadata?: {
-    [key: string]: unknown;
-  };
-  type: string;
-  category: string;
-}): string => {
-  // Since API doesn't provide email, we'll use a placeholder
-  if (transaction.type === 'credit' && transaction.category === 'payment_received') {
-    return 'payment@indura.com';
-  }
-  return 'N/A';
-};
-
-/**
  * Export transactions to CSV
  */
 export const exportToCSV = (transactions: Transaction[], filename: string = 'transactions') => {
@@ -216,17 +117,17 @@ export const exportToCSV = (transactions: Transaction[], filename: string = 'tra
     return;
   }
 
-  // CSV Headers
-  const headers = ['Payer', 'Email', 'Date & Time', 'Method', 'Type', 'Reference', 'Status', 'Amount'];
+  // CSV Headers (all from real API-backed fields)
+  const headers = ['Payer', 'Date & Time', 'Method', 'Type', 'Reference', 'Description', 'Status', 'Amount'];
   
   // Convert transactions to CSV rows
   const rows = transactions.map(transaction => [
     transaction.payer,
-    transaction.email,
     transaction.datetime,
     transaction.method,
     transaction.type || 'N/A',
     transaction.reference || 'N/A',
+    transaction.description || '',
     transaction.status,
     transaction.amount.replace('₦', '').replace(/,/g, ''), // Remove currency symbol and commas for CSV
   ]);

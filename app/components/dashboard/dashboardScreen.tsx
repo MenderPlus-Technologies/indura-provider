@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   RefreshCw,
@@ -25,6 +25,7 @@ import { MetricCard } from "./metric-card";
 
 export const DashboardScreen = () => {
   const { data: statsData, isLoading, isError, refetch } = useGetProviderDashboardStatsQuery();
+  const [chartPeriod, setChartPeriod] = useState<"daily" | "weekly" | "monthly">("monthly");
 
   // Map API data to metric cards format with dummy data fallbacks
   const metricCardsData: MetricCardType[] = useMemo(() => {
@@ -70,19 +71,36 @@ export const DashboardScreen = () => {
       ];
     }
 
-    const { income, activeSubscribers, transactionsSummary } = statsData;
+    const {
+      income,
+      activeSubscribers,
+      transactionsSummary,
+      periodComparison,
+      walletBalance,
+      pendingPayouts,
+      failedRefundedCount,
+      failedRefundedAmount,
+    } = statsData ?? {};
+
+    // Safely handle missing or malformed transactionsSummary
+    const summaryArray = Array.isArray(transactionsSummary) ? transactionsSummary : [];
     
-    // Find successful transactions
-    const successfulTransactions = transactionsSummary.find(t => t._id === 'successful') || { count: 0, totalAmount: 0 };
-    const failedTransactions = transactionsSummary.find(t => t._id === 'failed' || t._id === 'refunded') || { count: 0, totalAmount: 0 };
+    // Find successful and failed/refunded transactions (with safe defaults)
+    const successfulTransactions =
+      summaryArray.find((t) => t._id === 'successful') || { count: 0, totalAmount: 0 };
+    const failedTransactions =
+      summaryArray.find((t) => t._id === 'failed' || t._id === 'refunded') || {
+        count: 0,
+        totalAmount: 0,
+      };
     
-    // Format income
-    const formattedIncome = new Intl.NumberFormat('en-NG', {
+    // Format wallet balance (preferred) with fallback to income
+    const formattedWalletBalance = new Intl.NumberFormat('en-NG', {
       style: 'currency',
       currency: 'NGN',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(income);
+    }).format((walletBalance ?? income) ?? 0);
 
     // Format today's payouts (using successful transactions totalAmount)
     const formattedPayouts = new Intl.NumberFormat('en-NG', {
@@ -92,46 +110,55 @@ export const DashboardScreen = () => {
       maximumFractionDigits: 0,
     }).format(successfulTransactions.totalAmount);
 
+    const formatPct = (n?: number) => {
+      const v = typeof n === 'number' && Number.isFinite(n) ? n : 0;
+      const sign = v > 0 ? '+' : '';
+      return `${sign}${v}%`;
+    };
+
+    const formatMoney = (n?: number) =>
+      new Intl.NumberFormat('en-NG', {
+        style: 'currency',
+        currency: 'NGN',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(typeof n === 'number' && Number.isFinite(n) ? n : 0);
+
     return [
       {
         title: "Wallet Balance",
-        value: formattedIncome,
-        change: "+7.7%", // Dummy data - backend will provide this later
-        changeType: "success",
+        value: formattedWalletBalance,
+        change: formatPct(periodComparison?.incomeChange),
+        changeType: (periodComparison?.incomeChange ?? 0) >= 0 ? "success" : "error",
         icon: Coins,
-        footer: "+₦2,156", // Dummy data
+        footer: formatMoney(periodComparison?.incomeChangeAmount),
         footerText: "from last month",
       },
       {
         title: "Todays Payouts",
         value: formattedPayouts,
-        change: "+3.4%", // Dummy data
-        changeType: "success",
+        change: formatPct(periodComparison?.payoutsChange),
+        changeType: (periodComparison?.payoutsChange ?? 0) >= 0 ? "success" : "error",
         icon: BarChart3,
-        footer: `+${successfulTransactions.count}`, // Using real count
+        footer: `+${periodComparison?.payoutsChangeCount ?? successfulTransactions.count ?? 0}`,
         footerText: "transactions",
       },
       {
         title: "Active Subscribers",
-        value: activeSubscribers.toString(),
-        change: "+0%", // Dummy data
-        changeType: "success",
+        value: (activeSubscribers ?? 0).toString(),
+        change: formatPct(periodComparison?.subscribersChange),
+        changeType: (periodComparison?.subscribersChange ?? 0) >= 0 ? "success" : "error",
         icon: ShoppingBag,
-        footer: "+0", // Dummy data
+        footer: `+${periodComparison?.subscribersChangeCount ?? 0}`,
         footerText: "from last month",
       },
       {
         title: "Failed/Refunded",
-        value: failedTransactions.count.toString(),
-        change: "-15.2%", // Dummy data
+        value: String(failedRefundedCount ?? failedTransactions.count ?? 0),
+        change: "-0%",
         changeType: "error",
         icon: ShoppingBag,
-        footer: `-${new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'NGN',
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 0,
-        }).format(failedTransactions.totalAmount)}`,
+        footer: `-${formatMoney(failedRefundedAmount ?? failedTransactions.totalAmount ?? 0)}`,
         footerText: "from last month",
       },
     ];
@@ -156,7 +183,7 @@ export const DashboardScreen = () => {
           className="h-auto inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-solid border-gray-200 dark:border-gray-700 cursor-pointer"
         >
           <PanelLeft className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-          <span className="font-semibold text-gray-900 dark:text-white text-sm">Overview</span>
+          <span className="font-semibold text-[#344054] dark:text-white text-sm">Overview</span>
         </Button>
 
         <div className="inline-flex items-start gap-2 w-full sm:w-auto">
@@ -175,7 +202,7 @@ export const DashboardScreen = () => {
             className="h-auto inline-flex items-center justify-center gap-2 px-2 sm:px-3 py-2 bg-white dark:bg-gray-800 rounded-lg border border-solid border-gray-200 dark:border-gray-700 cursor-pointer flex-1 sm:flex-initial"
           >
             <Calendar className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-            <span className="font-semibold text-gray-900 dark:text-white text-xs sm:text-sm">Monthly</span>
+            <span className="font-semibold text-[#344054] dark:text-white text-xs sm:text-sm">Monthly</span>
             <ChevronDown className="h-4 w-4 text-gray-700 dark:text-gray-300" />
           </Button>
 
@@ -202,7 +229,7 @@ export const DashboardScreen = () => {
                 </div>
 
                 <div className="flex items-center gap-2 w-full">
-                  <div className="font-semibold text-gray-900 dark:text-white text-2xl">
+                  <div className="font-semibold text-[#344054] dark:text-white text-2xl">
                     {formattedOverallIncome}
                   </div>
 
@@ -222,17 +249,16 @@ export const DashboardScreen = () => {
                     className="h-auto inline-flex h-10 items-center justify-center gap-2 px-3 py-2 bg-greyscale-0 dark:bg-gray-700 rounded-[10px] border border-solid border-[#dfe1e6] dark:border-gray-600 shadow-shadow-xsmall cursor-pointer"
                   >
                     <Calendar className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-                    <span className="font-semibold text-gray-900 dark:text-white text-sm">
-                      Monthly
+                    <span className="font-semibold text-[#344054] dark:text-white text-sm capitalize">
+                      {chartPeriod}
                     </span>
                     <ChevronDown className="h-4 w-4 text-gray-700 dark:text-gray-300" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem>Daily</DropdownMenuItem>
-                  <DropdownMenuItem>Weekly</DropdownMenuItem>
-                  <DropdownMenuItem>Monthly</DropdownMenuItem>
-                  <DropdownMenuItem>Yearly</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setChartPeriod("daily")}>Daily</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setChartPeriod("weekly")}>Weekly</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setChartPeriod("monthly")}>Monthly</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -244,7 +270,7 @@ export const DashboardScreen = () => {
                     variant="outline"
                     className="h-auto inline-flex h-10 items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-[10px] overflow-hidden bg-greyscale-0 dark:bg-gray-700 border border-solid border-[#dfe1e6] dark:border-gray-600 cursor-pointer"
                   >
-                    <span className="font-semibold text-gray-900 dark:text-white text-xs sm:text-sm">
+                        <span className="font-semibold text-[#344054] dark:text-white text-xs sm:text-sm">
                       All Service
                     </span>
                     <ChevronDown className="h-4 w-4 text-gray-700 dark:text-gray-300" />
@@ -253,7 +279,7 @@ export const DashboardScreen = () => {
                 <DropdownMenuContent>
                   <DropdownMenuItem>All Service</DropdownMenuItem>
                   <DropdownMenuItem>Service 1</DropdownMenuItem>
-                  <DropdownMenuItem>Service 2</DropdownMenuItem>
+                  <DropdownMenuItem>Service 2</DropdownMenuItem>    
                 </DropdownMenuContent>
               </DropdownMenu>
 
@@ -276,17 +302,7 @@ export const DashboardScreen = () => {
           </CardContent>
 
           <div className="flex flex-col items-start gap-4 p-4 w-full bg-greyscale-0 dark:bg-gray-800 rounded-xl border border-solid border-[#dfe1e6] dark:border-gray-700">
-            <IncomeChart />
-
-            <div className="flex items-center justify-between pl-0 sm:pl-[58px] pr-0 py-0 w-full px-4 sm:px-0">
-              <div className="flex items-center justify-center font-normal text-gray-500 dark:text-gray-400 text-xs sm:text-sm">
-                Dec 01, 2025
-              </div>
-
-              <div className="flex items-center justify-center font-normal text-gray-500 dark:text-gray-400 text-xs sm:text-sm">
-                Dec 31, 2025
-              </div>
-            </div>
+            <IncomeChart period={chartPeriod} />
           </div>
         </Card>
         
