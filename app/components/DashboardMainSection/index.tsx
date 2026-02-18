@@ -444,7 +444,7 @@ export const DashboardMainSection = (): JSX.Element => {
           </CardContent>
 
           <div className="flex flex-col items-start gap-4 p-4 w-full bg-greyscale-0 rounded-xl border border-solid border-[#dfe1e6]">
-            <IncomeChart />
+            <IncomeChart period="monthly" />
 
             <div className="flex items-center justify-between pl-[58px] pr-0 py-0 w-full">
               <div className="flex items-center justify-center font-body-medium-regular font-[number:var(--body-medium-regular-font-weight)] text-greyscale-500 text-[length:var(--body-medium-regular-font-size)] tracking-[var(--body-medium-regular-letter-spacing)] leading-[var(--body-medium-regular-line-height)] [font-style:var(--body-medium-regular-font-style)]">

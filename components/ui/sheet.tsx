@@ -38,7 +38,7 @@ const useSheetContext = () => {
 const SheetTrigger = ({
   children,
 }: {
-  children: React.ReactElement
+  children: React.ReactElement<{ onClick?: React.MouseEventHandler<any> }>
 }) => {
   const { onOpenChange } = useSheetContext()
   return React.cloneElement(children, {
@@ -49,7 +49,7 @@ const SheetTrigger = ({
 const SheetClose = ({
   children,
 }: {
-  children: React.ReactElement
+  children: React.ReactElement<{ onClick?: React.MouseEventHandler<any> }>
 }) => {
   const { onOpenChange } = useSheetContext()
   return React.cloneElement(children, {
