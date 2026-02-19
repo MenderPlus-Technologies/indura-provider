@@ -24,7 +24,7 @@ export const TeamSearchBar = ({
   selectedStatus,
   onStatusChange,
   onRefresh,
-  onFilterClick,
+  // onFilterClick,
 }: TeamSearchBarProps) => {
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center my-2 justify-between gap-2 sm:gap-0 px-2 w-full">
