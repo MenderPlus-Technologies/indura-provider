@@ -532,6 +532,108 @@ export const apiSlice = createApi({
     }),
 
     /**
+     * Get provider team members
+     * GET /providers/team/members?page=1&limit=10
+     */
+    getProviderTeamMembers: builder.query<
+      ProviderTeamMembersData,
+      { page?: number; limit?: number }
+    >({
+      query: ({ page = 1, limit = 10 } = {}) => ({
+        url: '/providers/team/members',
+        params: { page, limit },
+      }),
+      transformResponse: (
+        response: ProviderTeamMembersApiResponse | ProviderTeamMembersData
+      ) => {
+        if (response && typeof response === 'object' && 'data' in response) {
+          return (response as ProviderTeamMembersApiResponse).data;
+        }
+        return response as ProviderTeamMembersData;
+      },
+      providesTags: ['Stats'],
+    }),
+
+    /**
+     * Invite team member
+     * POST /providers/team/members/invite
+     */
+    inviteProviderTeamMember: builder.mutation<
+      {
+        success: boolean;
+        message?: string;
+        data?: ProviderTeamMember;
+        timestamp?: string;
+      },
+      { name: string; email: string; role: string }
+    >({
+      query: (body) => ({
+        url: '/providers/team/members/invite',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Stats'],
+    }),
+
+    /**
+     * Resend invitation to team member
+     * POST /providers/team/members/:id/resend-invitation
+     */
+    resendTeamMemberInvitation: builder.mutation<
+      {
+        success: boolean;
+        message?: string;
+        timestamp?: string;
+      },
+      string
+    >({
+      query: (teamMemberId) => ({
+        url: `/providers/team/members/${teamMemberId}/resend-invitation`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['Stats'],
+    }),
+
+    /**
+     * Update team member role
+     * PUT /providers/team/members/:id/role
+     */
+    updateTeamMemberRole: builder.mutation<
+      {
+        success: boolean;
+        message?: string;
+        timestamp?: string;
+      },
+      { teamMemberId: string; role: string }
+    >({
+      query: ({ teamMemberId, role }) => ({
+        url: `/providers/team/members/${teamMemberId}/role`,
+        method: 'PUT',
+        body: { role },
+      }),
+      invalidatesTags: ['Stats'],
+    }),
+
+    /**
+     * Delete team member
+     * DELETE /providers/team/members/:id
+     */
+    deleteTeamMember: builder.mutation<
+      {
+        success: boolean;
+        message?: string;
+        timestamp?: string;
+      },
+      string
+    >({
+      query: (teamMemberId) => ({
+        url: `/providers/team/members/${teamMemberId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Stats'],
+    }),
+
+    /**
      * Create provider payment request
      * POST /providers/transactions/payment-request
      */
@@ -916,6 +1018,46 @@ export interface ProviderCustomersApiResponse {
   timestamp?: string;
 }
 
+export interface ProviderTeamMember {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  roleKey: string;
+  status: string;
+  invitedAt?: string;
+  joinedAt?: string;
+  lastActive?: string;
+  permissions: string[];
+  source: string;
+}
+
+export interface ProviderTeamMembersPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface ProviderTeamMembersSummary {
+  totalMembers: number;
+  activeCount: number;
+  pendingCount: number;
+}
+
+export interface ProviderTeamMembersData {
+  members: ProviderTeamMember[];
+  pagination: ProviderTeamMembersPagination;
+  summary: ProviderTeamMembersSummary;
+}
+
+export interface ProviderTeamMembersApiResponse {
+  success: boolean;
+  message?: string;
+  data: ProviderTeamMembersData;
+  timestamp?: string;
+}
+
 export interface ProviderSubscriberUser {
   _id: string;
   email: string;
@@ -979,4 +1121,9 @@ export const {
   useGetProviderRecentActivitiesQuery,
   useCreateProviderPaymentRequestMutation,
   useGetProviderTransactionQuery,
+  useGetProviderTeamMembersQuery,
+  useInviteProviderTeamMemberMutation,
+  useResendTeamMemberInvitationMutation,
+  useUpdateTeamMemberRoleMutation,
+  useDeleteTeamMemberMutation,
 } = apiSlice;

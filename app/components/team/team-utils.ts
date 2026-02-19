@@ -1,4 +1,4 @@
-export type UserRole = 'Owner' | 'Admin' | 'Manager' | 'Staff' | 'Viewer';
+export type UserRole = 'Owner' | 'Admin' | 'Manager' | 'Staff';
 
 export type UserStatus = 'Active' | 'Invited' | 'Pending';
 
@@ -10,54 +10,39 @@ export interface TeamUser {
   status: UserStatus;
   invitedAt?: string; // ISO date string
   joinedAt?: string; // ISO date string
+  lastActive?: string; // ISO date string
 }
 
-// Available roles
-export const userRoles: UserRole[] = ['Owner', 'Admin', 'Manager', 'Staff', 'Viewer'];
+// Available roles for selection (Owner cannot be assigned, only displayed)
+export const userRoles: UserRole[] = ['Admin', 'Manager', 'Staff'];
 
-// Mock team users data
-export const mockTeamUsers: TeamUser[] = [
-  {
-    id: '1',
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    role: 'Owner',
-    status: 'Active',
-    joinedAt: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year ago
-  },
-  {
-    id: '2',
-    name: 'Jane Smith',
-    email: 'jane.smith@example.com',
-    role: 'Admin',
-    status: 'Active',
-    joinedAt: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString(), // 6 months ago
-  },
-  {
-    id: '3',
-    name: 'Mike Johnson',
-    email: 'mike.johnson@example.com',
-    role: 'Manager',
-    status: 'Active',
-    joinedAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(), // 3 months ago
-  },
-  {
-    id: '4',
-    name: 'Sarah Williams',
-    email: 'sarah.williams@example.com',
-    role: 'Staff',
-    status: 'Invited',
-    invitedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
-  },
-  {
-    id: '5',
-    name: 'David Brown',
-    email: 'david.brown@example.com',
-    role: 'Viewer',
-    status: 'Pending',
-    invitedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
-  },
-];
+/**
+ * Map API status (lowercase) to UI status (capitalized)
+ */
+export const mapApiStatusToUIStatus = (apiStatus: string): UserStatus => {
+  const statusMap: Record<string, UserStatus> = {
+    active: 'Active',
+    invited: 'Invited',
+    pending: 'Pending',
+  };
+  return statusMap[apiStatus.toLowerCase()] || 'Pending';
+};
+
+/**
+ * Map API role to UI role (capitalize first letter)
+ */
+export const mapApiRoleToUIRole = (apiRole: string): UserRole => {
+  // Capitalize first letter
+  const capitalized = apiRole.charAt(0).toUpperCase() + apiRole.slice(1);
+  
+  // Check if it's a valid role (including Owner for display)
+  const allRoles: UserRole[] = ['Owner', 'Admin', 'Manager', 'Staff'];
+  if (allRoles.includes(capitalized as UserRole)) {
+    return capitalized as UserRole;
+  }
+  // Default to Staff if role doesn't match
+  return 'Staff';
+};
 
 // Role badge styles
 export const getRoleBadgeStyles = (role: UserRole) => {

@@ -35,7 +35,7 @@ export const TeamSearchBar = ({
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search by name or email..."
-          className="w-full h-10 pl-10 pr-4 bg-white dark:bg-gray-800 rounded-lg border border-solid border-gray-200 dark:border-gray-700 font-normal text-gray-900 dark:text-white text-sm placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#009688] focus:border-[#009688]"
+          className="w-[300px] h-10 pl-10 pr-4 bg-white dark:bg-gray-800 rounded-lg border border-solid border-gray-200 dark:border-gray-700 font-normal text-gray-900 dark:text-white text-sm placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#009688] focus:border-[#009688]"
         />
       </div>
       <div className="flex items-center gap-2">
@@ -110,7 +110,7 @@ export const TeamSearchBar = ({
         >
           <RefreshCw className="h-4 w-4 text-gray-700 dark:text-gray-300" />
         </Button>
-        <Button
+        {/* <Button
           variant="outline"
           size="icon"
           className="h-10 w-10 p-2 bg-greyscale-0 dark:bg-gray-800 rounded-[10px] border border-solid border-[#dfe1e6] dark:border-gray-700 shadow-shadow-xsmall cursor-pointer"
@@ -124,7 +124,7 @@ export const TeamSearchBar = ({
           className="h-10 w-10 p-2 bg-greyscale-0 dark:bg-gray-800 rounded-[10px] border border-solid border-[#dfe1e6] dark:border-gray-700 shadow-shadow-xsmall cursor-pointer"
         >
           <Filter className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-        </Button>
+        </Button> */}
       </div>
     </div>
   );

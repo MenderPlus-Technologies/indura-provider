@@ -128,12 +128,14 @@ export const TeamTable = ({ users, onEditRole, onResendInvite, onRemoveUser }: T
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    <DropdownMenuItem
-                      onClick={() => onEditRole?.(user)}
-                    >
-                      <Edit className="h-4 w-4 mr-2" />
-                      Edit Role
-                    </DropdownMenuItem>
+                    {user.role !== 'Owner' && (
+                      <DropdownMenuItem
+                        onClick={() => onEditRole?.(user)}
+                      >
+                        <Edit className="h-4 w-4 mr-2" />
+                        Edit Role
+                      </DropdownMenuItem>
+                    )}
                     {(user.status === 'Invited' || user.status === 'Pending') && (
                       <DropdownMenuItem
                         onClick={() => onResendInvite?.(user)}

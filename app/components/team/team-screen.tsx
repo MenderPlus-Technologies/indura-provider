@@ -9,24 +9,56 @@ import { InviteUserModal } from "./invite-user-modal";
 import { EditRoleModal } from "./edit-role-modal";
 import { RemoveUserConfirmationModal } from "./remove-user-confirmation-modal";
 import {
-  mockTeamUsers,
   type TeamUser,
   type UserRole,
   type UserStatus,
+  mapApiStatusToUIStatus,
+  mapApiRoleToUIRole,
 } from "./team-utils";
+import { useGetProviderTeamMembersQuery, useResendTeamMemberInvitationMutation, useDeleteTeamMemberMutation } from "@/app/store/apiSlice";
+import type { ProviderTeamMember } from "@/app/store/apiSlice";
+import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/toast";
 
 export const TeamScreen = () => {
-  const [users, setUsers] = useState<TeamUser[]>(mockTeamUsers);
+  const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState<UserRole | 'All'>('All');
   const [selectedStatus, setSelectedStatus] = useState<UserStatus | 'All'>('All');
+  
+  const { data: teamMembersData, isLoading, isError, refetch, isFetching } =
+    useGetProviderTeamMembersQuery({
+      page: currentPage,
+      limit: 10,
+    });
+  const [resendInvitation, { isLoading: isResendingInvite }] = useResendTeamMemberInvitationMutation();
+  const [deleteTeamMember, { isLoading: isRemoving }] = useDeleteTeamMemberMutation();
+  const { showToast } = useToast();
   
   // Modal states
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isEditRoleModalOpen, setIsEditRoleModalOpen] = useState(false);
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<TeamUser | null>(null);
-  const [isRemoving, setIsRemoving] = useState(false);
+
+  // Map API team members to UI format
+  const users: TeamUser[] = useMemo(() => {
+    if (!teamMembersData?.members) {
+      return [];
+    }
+
+    return teamMembersData.members.map((apiMember: ProviderTeamMember) => ({
+      id: apiMember.id,
+      name: apiMember.name,
+      email: apiMember.email,
+      role: mapApiRoleToUIRole(apiMember.role),
+      status: mapApiStatusToUIStatus(apiMember.status),
+      invitedAt: apiMember.invitedAt,
+      joinedAt: apiMember.joinedAt,
+      lastActive: apiMember.lastActive,
+    }));
+  }, [teamMembersData]);
 
   // Filter users based on search, role, and status
   const filteredUsers = useMemo(() => {
@@ -56,7 +88,8 @@ export const TeamScreen = () => {
   }, [users, searchQuery, selectedRole, selectedStatus]);
 
   const handleInviteSuccess = (newUser: TeamUser) => {
-    setUsers(prev => [...prev, newUser]);
+    // Refetch team members to get updated list
+    refetch();
     console.log('User invited:', newUser);
   };
 
@@ -66,31 +99,26 @@ export const TeamScreen = () => {
   };
 
   const handleRoleUpdateSuccess = (userId: string, newRole: UserRole) => {
-    setUsers(prev =>
-      prev.map(user => (user.id === userId ? { ...user, role: newRole } : user))
-    );
+    // Refetch team members to get updated list
+    refetch();
     console.log('Role updated:', { userId, newRole });
   };
 
-  const handleResendInvite = (user: TeamUser) => {
-    setIsRemoving(false);
-    
-    // Mock resend invite
-    setTimeout(() => {
-      const success = Math.random() > 0.1; // 90% success rate
-      if (success) {
-        setUsers(prev =>
-          prev.map(u =>
-            u.id === user.id
-              ? { ...u, status: 'Pending' as UserStatus, invitedAt: new Date().toISOString() }
-              : u
-          )
-        );
-        console.log('Invitation resent:', user.email);
+  const handleResendInvite = async (user: TeamUser) => {
+    try {
+      const response = await resendInvitation(user.id).unwrap();
+      
+      if (response.success) {
+        showToast(response.message || 'Invitation resent successfully', 'success');
+        // Refetch to get updated status
+        refetch();
       } else {
-        console.log('Failed to resend invitation. Please try again.');
+        showToast(response.message || 'Failed to resend invitation', 'error');
       }
-    }, 1000);
+    } catch (error: any) {
+      const errorMessage = error?.data?.message || error?.message || 'Failed to resend invitation. Please try again.';
+      showToast(errorMessage, 'error');
+    }
   };
 
   const handleRemoveUser = (user: TeamUser) => {
@@ -98,30 +126,29 @@ export const TeamScreen = () => {
     setIsRemoveModalOpen(true);
   };
 
-  const handleConfirmRemove = () => {
+  const handleConfirmRemove = async () => {
     if (!selectedUser) return;
 
-    setIsRemoving(true);
+    try {
+      const response = await deleteTeamMember(selectedUser.id).unwrap();
 
-    // Mock API call
-    setTimeout(() => {
-      const success = Math.random() > 0.1; // 90% success rate
-
-      if (success) {
-        setUsers(prev => prev.filter(user => user.id !== selectedUser.id));
-        console.log('User removed:', selectedUser.email);
+      if (response.success) {
+        showToast(response.message || 'Team member removed successfully', 'success');
+        // Refetch to get updated list
+        refetch();
         setIsRemoveModalOpen(false);
         setSelectedUser(null);
-        setIsRemoving(false);
       } else {
-        console.log('Failed to remove user. Please try again.');
-        setIsRemoving(false);
+        showToast(response.message || 'Failed to remove team member', 'error');
       }
-    }, 1000);
+    } catch (error: any) {
+      const errorMessage = error?.data?.message || error?.message || 'Failed to remove team member. Please try again.';
+      showToast(errorMessage, 'error');
+    }
   };
 
   const handleRefresh = () => {
-    // Refresh users (in real app, this would fetch from API)
+    refetch();
     console.log('Refreshing team members');
   };
 
@@ -148,13 +175,61 @@ export const TeamScreen = () => {
               onFilterClick={handleFilterClick}
             />
             <div className="overflow-x-auto">
-              <TeamTable
-                users={filteredUsers}
-                onEditRole={handleEditRole}
-                onResendInvite={handleResendInvite}
-                onRemoveUser={handleRemoveUser}
-              />
+              {isLoading || isFetching ? (
+                <div className="flex items-center justify-center h-64">
+                  <Loader2 className="h-8 w-8 animate-spin text-[#009688]" />
+                </div>
+              ) : isError ? (
+                <div className="flex flex-col items-center justify-center h-64 gap-2">
+                  <span className="font-semibold text-gray-500 dark:text-gray-400 text-sm">
+                    Failed to load team members
+                  </span>
+                  <button
+                    onClick={() => refetch()}
+                    className="px-4 py-2 bg-[#009688] text-white rounded-lg hover:bg-[#007a6b] transition-colors"
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : (
+                <TeamTable
+                  users={filteredUsers}
+                  onEditRole={handleEditRole}
+                  onResendInvite={handleResendInvite}
+                  onRemoveUser={handleRemoveUser}
+                />
+              )}
             </div>
+            {/* Pagination */}
+            {!isLoading && !isError && teamMembersData?.pagination && teamMembersData.pagination.totalPages > 1 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0 p-4 w-full bg-greyscale-0 dark:bg-gray-800 rounded-xl border border-solid border-[#dfe1e6] dark:border-gray-700">
+                <div className="inline-flex justify-center gap-2 items-center">
+                  <div className="font-medium text-gray-900 dark:text-white text-xs sm:text-sm">
+                    Page {teamMembersData.pagination.page} of {teamMembersData.pagination.totalPages}
+                  </div>
+                </div>
+                <div className="inline-flex items-start gap-[5px]">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                    className="h-8 w-8 p-2.5 bg-greyscale-0 dark:bg-gray-800 rounded-lg overflow-hidden border border-solid border-[#dfe1e6] dark:border-gray-700 shadow-[0px_1px_2px_#0d0d120f] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setCurrentPage(Math.min(teamMembersData.pagination.totalPages, currentPage + 1))}
+                    disabled={currentPage === teamMembersData.pagination.totalPages}
+                    className="h-8 w-8 p-2.5 bg-greyscale-0 dark:bg-gray-800 rounded-lg overflow-hidden border border-solid border-[#dfe1e6] dark:border-gray-700 shadow-[0px_1px_2px_#0d0d120f] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronRight className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </Card>
         </div>
       </div>
@@ -183,7 +258,6 @@ export const TeamScreen = () => {
         onClose={() => {
           setIsRemoveModalOpen(false);
           setSelectedUser(null);
-          setIsRemoving(false);
         }}
         user={selectedUser}
         onConfirm={handleConfirmRemove}

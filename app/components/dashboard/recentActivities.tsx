@@ -183,7 +183,7 @@ export const RecentActivities = () => {
                   </span>
                 </th>
                 <th className="px-4 py-2 text-left">
-                  <span className="font-medium text-gray-500 dark:text-gray-400 text-xs">
+                  <span className="font-medium whitespace-nowrap text-gray-500 dark:text-gray-400 text-xs">
                     Time and Date
                   </span>
                 </th>

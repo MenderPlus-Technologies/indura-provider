@@ -1,6 +1,6 @@
 'use client';
 
-import { X, AlertTriangle } from 'lucide-react';
+import { X, AlertTriangle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { type TeamUser } from './team-utils';
 
@@ -82,7 +82,7 @@ export const RemoveUserConfirmationModal = ({
             >
               {isLoading ? (
                 <>
-                  <span className="animate-spin mr-2">⏳</span>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   Removing...
                 </>
               ) : (

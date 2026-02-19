@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { userRoles, type TeamUser, type UserRole } from './team-utils';
+import { useUpdateTeamMemberRoleMutation } from '@/app/store/apiSlice';
+import { useToast } from '@/components/ui/toast';
 
 interface EditRoleModalProps {
   isOpen: boolean;
@@ -16,14 +18,23 @@ interface EditRoleModalProps {
 
 export const EditRoleModal = ({ isOpen, onClose, user, onSuccess }: EditRoleModalProps) => {
   const [selectedRole, setSelectedRole] = useState<UserRole>('Staff');
-  const [isLoading, setIsLoading] = useState(false);
+  const [updateTeamMemberRole, { isLoading }] = useUpdateTeamMemberRoleMutation();
+  const { showToast } = useToast();
 
   // Set initial role when modal opens
   useEffect(() => {
     if (isOpen && user) {
-      setSelectedRole(user.role);
+      // If user is Owner, default to Staff (Owner cannot be selected)
+      setSelectedRole(user.role === 'Owner' ? 'Staff' : user.role);
     }
   }, [isOpen, user]);
+
+  /**
+   * Map UI role to API role format (Staff -> staff)
+   */
+  const mapUIRoleToAPIRole = (uiRole: UserRole): string => {
+    return uiRole.toLowerCase();
+  };
 
   const handleSubmit = async () => {
     if (!user || !selectedRole || selectedRole === user.role) {
@@ -31,22 +42,23 @@ export const EditRoleModal = ({ isOpen, onClose, user, onSuccess }: EditRoleModa
       return;
     }
 
-    setIsLoading(true);
+    try {
+      const response = await updateTeamMemberRole({
+        teamMemberId: user.id,
+        role: mapUIRoleToAPIRole(selectedRole),
+      }).unwrap();
 
-    // Mock API call - simulate network delay
-    setTimeout(() => {
-      const success = Math.random() > 0.1; // 90% success rate for demo
-
-      if (success) {
-        console.log('Role updated successfully', { userId: user.id, newRole: selectedRole });
+      if (response.success) {
+        showToast(response.message || 'Role updated successfully', 'success');
         onSuccess(user.id, selectedRole);
-        setIsLoading(false);
         onClose();
       } else {
-        console.log('Failed to update role. Please try again.');
-        setIsLoading(false);
+        showToast(response.message || 'Failed to update role', 'error');
       }
-    }, 1000);
+    } catch (error: any) {
+      const errorMessage = error?.data?.message || error?.message || 'Failed to update role. Please try again.';
+      showToast(errorMessage, 'error');
+    }
   };
 
   const handleCancel = () => {
@@ -92,27 +104,35 @@ export const EditRoleModal = ({ isOpen, onClose, user, onSuccess }: EditRoleModa
 
           {/* Form */}
           <div className="flex-1 p-6">
-            <div>
-              <Label htmlFor="role" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                Role <span className="text-red-500">*</span>
-              </Label>
-              <Select
-                value={selectedRole}
-                onValueChange={(value) => setSelectedRole(value as UserRole)}
-                disabled={isLoading}
-              >
-                <SelectTrigger id="role" className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-gray-800">
-                  {userRoles.map((r) => (
-                    <SelectItem key={r} value={r}>
-                      {r}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {user.role === 'Owner' ? (
+              <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                  Owner role cannot be changed. Only Admin, Manager, and Staff roles can be assigned.
+                </p>
+              </div>
+            ) : (
+              <div>
+                <Label htmlFor="role" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                  Role <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={selectedRole}
+                  onValueChange={(value) => setSelectedRole(value as UserRole)}
+                  disabled={isLoading}
+                >
+                  <SelectTrigger id="role" className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white dark:bg-gray-800">
+                    {userRoles.map((r) => (
+                      <SelectItem key={r} value={r}>
+                        {r}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
 
           {/* Footer */}
@@ -127,12 +147,12 @@ export const EditRoleModal = ({ isOpen, onClose, user, onSuccess }: EditRoleModa
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={isLoading || selectedRole === user.role}
+              disabled={isLoading || selectedRole === user.role || user.role === 'Owner'}
               className="bg-[#009688] hover:bg-[#008577] text-white cursor-pointer"
             >
               {isLoading ? (
                 <>
-                  <span className="animate-spin mr-2">⏳</span>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   Updating...
                 </>
               ) : (

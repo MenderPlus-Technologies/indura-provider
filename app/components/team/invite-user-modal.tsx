@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { userRoles, type TeamUser, type UserRole } from './team-utils';
+import { userRoles, type TeamUser, type UserRole, mapApiStatusToUIStatus, mapApiRoleToUIRole } from './team-utils';
+import { useInviteProviderTeamMemberMutation } from '@/app/store/apiSlice';
+import { useToast } from '@/components/ui/toast';
 
 interface InviteUserModalProps {
   isOpen: boolean;
@@ -18,7 +20,8 @@ export const InviteUserModal = ({ isOpen, onClose, onSuccess }: InviteUserModalP
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<UserRole>('Staff');
-  const [isLoading, setIsLoading] = useState(false);
+  const [inviteTeamMember, { isLoading }] = useInviteProviderTeamMemberMutation();
+  const { showToast } = useToast();
 
   // Reset form when modal opens
   useEffect(() => {
@@ -29,49 +32,79 @@ export const InviteUserModal = ({ isOpen, onClose, onSuccess }: InviteUserModalP
     }
   }, [isOpen]);
 
+  /**
+   * Map UI role to API role format (Staff -> staff)
+   */
+  const mapUIRoleToAPIRole = (uiRole: UserRole): string => {
+    return uiRole.toLowerCase();
+  };
+
   const handleSubmit = async () => {
     if (!name.trim() || !email.trim() || !role) {
-      console.log('Please fill in all required fields');
+      showToast('Please fill in all required fields', 'error');
       return;
     }
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      console.log('Please enter a valid email address');
+      showToast('Please enter a valid email address', 'error');
       return;
     }
 
-    setIsLoading(true);
+    try {
+      const response = await inviteTeamMember({
+        name: name.trim(),
+        email: email.trim(),
+        role: mapUIRoleToAPIRole(role),
+      }).unwrap();
 
-    // Mock API call - simulate network delay
-    setTimeout(() => {
-      const success = Math.random() > 0.1; // 90% success rate for demo
+      if (response.success) {
+        // Map API response to UI format
+        const apiMember = response.data;
+        if (apiMember) {
+          const newUser: TeamUser = {
+            id: apiMember.id,
+            name: apiMember.name,
+            email: apiMember.email,
+            role: mapApiRoleToUIRole(apiMember.role),
+            status: mapApiStatusToUIStatus(apiMember.status),
+            invitedAt: apiMember.invitedAt,
+            joinedAt: apiMember.joinedAt,
+            lastActive: apiMember.lastActive,
+          };
 
-      if (success) {
-        const newUser: TeamUser = {
-          id: `user-${Date.now()}`,
-          name: name.trim(),
-          email: email.trim(),
-          role,
-          status: 'Pending',
-          invitedAt: new Date().toISOString(),
-        };
-
-        console.log('User invited successfully', newUser);
-        onSuccess(newUser);
-        
-        // Reset form
-        setName('');
-        setEmail('');
-        setRole('Staff');
-        setIsLoading(false);
-        onClose();
+          showToast(response.message || 'Team member invited successfully', 'success');
+          onSuccess(newUser);
+          
+          // Reset form
+          setName('');
+          setEmail('');
+          setRole('Staff');
+          onClose();
+        } else {
+          showToast(response.message || 'Team member invited successfully', 'success');
+          // Still call onSuccess to trigger refetch
+          onSuccess({
+            id: `temp-${Date.now()}`,
+            name: name.trim(),
+            email: email.trim(),
+            role,
+            status: 'Pending',
+            invitedAt: new Date().toISOString(),
+          });
+          setName('');
+          setEmail('');
+          setRole('Staff');
+          onClose();
+        }
       } else {
-        console.log('Failed to invite user. Please try again.');
-        setIsLoading(false);
+        showToast(response.message || 'Failed to invite team member', 'error');
       }
-    }, 1500);
+    } catch (error: any) {
+      const errorMessage = error?.data?.message || error?.message || 'Failed to invite team member. Please try again.';
+      showToast(errorMessage, 'error');
+    }
   };
 
   const handleCancel = () => {
@@ -181,7 +214,7 @@ export const InviteUserModal = ({ isOpen, onClose, onSuccess }: InviteUserModalP
             >
               {isLoading ? (
                 <>
-                  <span className="animate-spin mr-2">⏳</span>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   Sending Invitation...
                 </>
               ) : (
