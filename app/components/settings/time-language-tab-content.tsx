@@ -1,18 +1,56 @@
-import React, { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ChevronDown, Loader2 } from 'lucide-react';
+import type { ProviderSettingsTimeLanguage } from '@/app/store/apiSlice';
+import {
+  useUpdateProviderTimeLanguageSettingsMutation,
+  useGetProviderSettingsQuery,
+} from '@/app/store/apiSlice';
+import { useToast } from '@/components/ui/toast';
 
-export default function TimeLanguageTabContent() {
-  const [timezone, setTimezone] = useState('EST - San Fransisco, CA (GMT-7:00)');
-  const [language, setLanguage] = useState('English (United States)');
+interface TimeLanguageTabContentProps {
+  settings: ProviderSettingsTimeLanguage;
+}
 
-  const handleSave = () => {
-    console.log('Saving changes:', { timezone, language });
-    alert('Changes saved successfully!');
+export default function TimeLanguageTabContent({ settings }: TimeLanguageTabContentProps) {
+  const [timezone, setTimezone] = useState(settings.timezone || '');
+  const [language, setLanguage] = useState(settings.language || 'en');
+  const [dateFormat, setDateFormat] = useState(settings.dateFormat || 'DD/MM/YYYY');
+  const [timeFormat, setTimeFormat] = useState(settings.timeFormat || '24h');
+
+  const { showToast } = useToast();
+  const [updateTimeLanguage, { isLoading }] = useUpdateProviderTimeLanguageSettingsMutation();
+  const { refetch: refetchSettings } = useGetProviderSettingsQuery();
+
+  useEffect(() => {
+    setTimezone(settings.timezone || '');
+    setLanguage(settings.language || 'en');
+    setDateFormat(settings.dateFormat || 'DD/MM/YYYY');
+    setTimeFormat(settings.timeFormat || '24h');
+  }, [settings]);
+
+  const handleSave = async () => {
+    try {
+      const response = await updateTimeLanguage({
+        timezone,
+        language,
+        dateFormat,
+        timeFormat,
+      }).unwrap();
+
+      showToast(response.message || 'Time & language settings updated successfully', 'success');
+      await refetchSettings();
+    } catch (error: any) {
+      const errorMessage =
+        error?.data?.message || error?.message || 'Failed to update time & language settings';
+      showToast(errorMessage, 'error');
+    }
   };
 
   const handleCancel = () => {
-    setTimezone('EST - San Fransisco, CA (GMT-7:00)');
-    setLanguage('English (United States)');
+    setTimezone(settings.timezone || '');
+    setLanguage(settings.language || 'en');
+    setDateFormat(settings.dateFormat || 'DD/MM/YYYY');
+    setTimeFormat(settings.timeFormat || '24h');
   };
 
   return (
@@ -32,26 +70,74 @@ export default function TimeLanguageTabContent() {
             </div>
 
             {/* Right Section */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Timezone
-              </label>
-              <div className="relative mb-3">
-                <select
-                  value={timezone}
-                  onChange={(e) => setTimezone(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg appearance-none bg-white text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
-                >
-                  <option>EST - San Fransisco, CA (GMT-7:00)</option>
-                  <option>PST - Los Angeles, CA (GMT-8:00)</option>
-                  <option>CST - Chicago, IL (GMT-6:00)</option>
-                  <option>MST - Denver, CO (GMT-7:00)</option>
-                </select>
-                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+            <div className="space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Timezone
+                </label>
+                <div className="relative">
+                  <select
+                    value={timezone}
+                    onChange={(e) => setTimezone(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg appearance-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
+                  >
+                    <option value="">Select timezone</option>
+                    <option value="Africa/Lagos">Africa/Lagos (WAT)</option>
+                    <option value="Africa/Accra">Africa/Accra (GMT)</option>
+                    <option value="Africa/Nairobi">Africa/Nairobi (EAT)</option>
+                    <option value="Africa/Johannesburg">Africa/Johannesburg (SAST)</option>
+                    <option value="America/New_York">America/New_York (EST)</option>
+                    <option value="America/Los_Angeles">America/Los_Angeles (PST)</option>
+                    <option value="America/Chicago">America/Chicago (CST)</option>
+                    <option value="Europe/London">Europe/London (GMT)</option>
+                    <option value="Europe/Paris">Europe/Paris (CET)</option>
+                    <option value="Asia/Dubai">Asia/Dubai (GST)</option>
+                    <option value="Asia/Singapore">Asia/Singapore (SGT)</option>
+                  </select>
+                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
+                </div>
+                {timezone && (
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Current timezone: {timezone}
+                  </p>
+                )}
               </div>
-              <p className="text-sm text-gray-500">
-                Current Time 02:45 AM
-              </p>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Date Format
+                </label>
+                <div className="relative">
+                  <select
+                    value={dateFormat}
+                    onChange={(e) => setDateFormat(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg appearance-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
+                  >
+                    <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                    <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                    <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                    <option value="DD-MM-YYYY">DD-MM-YYYY</option>
+                  </select>
+                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Time Format
+                </label>
+                <div className="relative">
+                  <select
+                    value={timeFormat}
+                    onChange={(e) => setTimeFormat(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg appearance-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
+                  >
+                    <option value="24h">24-hour (24h)</option>
+                    <option value="12h">12-hour (12h)</option>
+                  </select>
+                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -71,22 +157,27 @@ export default function TimeLanguageTabContent() {
 
             {/* Right Section */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Language
               </label>
               <div className="relative">
                 <select
                   value={language}
                   onChange={(e) => setLanguage(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg appearance-none bg-white text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg appearance-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
                 >
-                  <option>English (United States)</option>
-                  <option>English (United Kingdom)</option>
-                  <option>Spanish (Spain)</option>
-                  <option>French (France)</option>
-                  <option>German (Germany)</option>
+                  <option value="en">English</option>
+                  <option value="es">Spanish</option>
+                  <option value="fr">French</option>
+                  <option value="de">German</option>
+                  <option value="pt">Portuguese</option>
+                  <option value="ar">Arabic</option>
+                  <option value="zh">Chinese</option>
+                  <option value="ja">Japanese</option>
+                  <option value="ko">Korean</option>
+                  <option value="hi">Hindi</option>
                 </select>
-                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
               </div>
             </div>
           </div>
@@ -96,15 +187,18 @@ export default function TimeLanguageTabContent() {
         <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
           <button
             onClick={handleCancel}
-            className="px-6 py-2.5 text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer"
+            disabled={isLoading}
+            className="px-6 py-2.5 text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="px-6 py-2.5 bg-teal-600 text-white font-medium rounded-lg hover:bg-teal-700 transition-colors cursor-pointer"
+            disabled={isLoading}
+            className="px-6 py-2.5 bg-teal-600 text-white font-medium rounded-lg hover:bg-teal-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            Save Change
+            {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+            {isLoading ? 'Saving...' : 'Save Change'}
           </button>
         </div>
       </div>

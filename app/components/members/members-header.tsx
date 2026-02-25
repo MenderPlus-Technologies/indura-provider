@@ -6,9 +6,10 @@ import { Upload, Mail, UserPlus, PanelLeft, Bell } from "lucide-react";
 interface MembersHeaderProps {
   onSendNotification?: (type: 'all' | 'selected') => void;
   hasSelectedMembers?: boolean;
+  onAddCustomer?: () => void;
 }
 
-export const MembersHeader = ({ onSendNotification, hasSelectedMembers = false }: MembersHeaderProps) => {
+export const MembersHeader = ({ onSendNotification, hasSelectedMembers = false, onAddCustomer }: MembersHeaderProps) => {
   return (
     <header className="h-auto sm:h-[72px] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 px-4 sm:px-6 py-4 bg-greyscale-0 dark:bg-gray-900 border-b border-solid border-[#dfe1e6] dark:border-gray-800 w-full">
       <Button
@@ -43,7 +44,10 @@ export const MembersHeader = ({ onSendNotification, hasSelectedMembers = false }
           </span>
         </Button>
 
-        <Button className="h-auto inline-flex h-10 items-center justify-center gap-2 px-2 sm:px-3 py-2 bg-[#009688] hover:bg-[#008577] rounded-[10px] shadow-shadow-xsmall cursor-pointer flex-1 sm:flex-initial">
+        <Button
+          onClick={onAddCustomer}
+          className="h-auto inline-flex h-10 items-center justify-center gap-2 px-2 sm:px-3 py-2 bg-[#009688] hover:bg-[#008577] rounded-[10px] shadow-shadow-xsmall cursor-pointer flex-1 sm:flex-initial"
+        >
           <UserPlus className="h-4 w-4 text-white" />
           <span className="font-semibold text-white text-xs sm:text-sm">
             Add Customers

@@ -1,14 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronDown, Download, Bell } from 'lucide-react';
+import type { ProviderSettingsPayouts } from '@/app/store/apiSlice';
 
-export default function PayoutsTabContent() {
+interface PayoutsTabContentProps {
+  settings: ProviderSettingsPayouts;
+}
+
+export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) {
   const [formData, setFormData] = useState({
-    payoutFrequency: 'Weekly (Every Friday)',
-    storeCurrency: 'US Dollar - USD',
-    bankName: 'Zagadat Bank',
-    accountNumber: '102910293839',
-    accountName: 'Timothy Tips Store'
+    payoutFrequency: settings.payoutFrequency || '',
+    payoutDay: settings.payoutDay || '',
+    storeCurrency: settings.storeCurrency || '',
+    bankName: settings.bankDetails?.bankName || '',
+    accountNumber: settings.bankDetails?.accountNumber || '',
+    accountName: settings.bankDetails?.accountName || '',
+    routingNumber: settings.bankDetails?.routingNumber || '',
+    swiftCode: settings.bankDetails?.swiftCode || ''
   });
+
+  useEffect(() => {
+    setFormData({
+      payoutFrequency: settings.payoutFrequency || '',
+      payoutDay: settings.payoutDay || '',
+      storeCurrency: settings.storeCurrency || '',
+      bankName: settings.bankDetails?.bankName || '',
+      accountNumber: settings.bankDetails?.accountNumber || '',
+      accountName: settings.bankDetails?.accountName || '',
+      routingNumber: settings.bankDetails?.routingNumber || '',
+      swiftCode: settings.bankDetails?.swiftCode || ''
+    });
+  }, [settings]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
@@ -24,18 +45,19 @@ export default function PayoutsTabContent() {
 
   const handleCancel = () => {
     setFormData({
-      payoutFrequency: 'Weekly (Every Friday)',
-      storeCurrency: 'US Dollar - USD',
-      bankName: 'Zagadat Bank',
-      accountNumber: '102910293839',
-      accountName: 'Timothy Tips Store'
+      payoutFrequency: settings.payoutFrequency || '',
+      payoutDay: settings.payoutDay || '',
+      storeCurrency: settings.storeCurrency || '',
+      bankName: settings.bankDetails?.bankName || '',
+      accountNumber: settings.bankDetails?.accountNumber || '',
+      accountName: settings.bankDetails?.accountName || '',
+      routingNumber: settings.bankDetails?.routingNumber || '',
+      swiftCode: settings.bankDetails?.swiftCode || ''
     });
   };
 
-  const payoutHistory = [
-    { invoice: '#890776', date: 'Nov 15, 2025', amount: '$7,900' },
-    { invoice: '#890775', date: 'Dec 15, 2025', amount: '$2,900' }
-  ];
+  // Payout history is not included in the API response
+  const payoutHistory: any[] = [];
 
   return (
     <div className="w-full bg-white dark:bg-gray-950 pb-8">
@@ -67,13 +89,47 @@ export default function PayoutsTabContent() {
                     onChange={handleChange}
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg appearance-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
                   >
-                    <option>Weekly (Every Friday)</option>
-                    <option>Bi-weekly</option>
-                    <option>Monthly</option>
+                    <option value="">Select frequency</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="bi-weekly">Bi-weekly</option>
+                    <option value="monthly">Monthly</option>
                   </select>
                   <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
                 </div>
+                {formData.payoutFrequency && formData.payoutDay && (
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Current: {formData.payoutFrequency.charAt(0).toUpperCase() + formData.payoutFrequency.slice(1)} on {formData.payoutDay.charAt(0).toUpperCase() + formData.payoutDay.slice(1)}
+                  </p>
+                )}
               </div>
+
+              {/* Payout Day (shown when frequency is weekly) */}
+              {formData.payoutFrequency === 'weekly' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Payout Day
+                  </label>
+                  <div className="relative">
+                    <select
+                      name="payoutDay"
+                      value={formData.payoutDay}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg appearance-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
+                    >
+                      <option value="">Select day</option>
+                      <option value="monday">Monday</option>
+                      <option value="tuesday">Tuesday</option>
+                      <option value="wednesday">Wednesday</option>
+                      <option value="thursday">Thursday</option>
+                      <option value="friday">Friday</option>
+                      <option value="saturday">Saturday</option>
+                      <option value="sunday">Sunday</option>
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
+                  </div>
+                </div>
+              )}
 
               {/* Store Currency */}
               <div>
@@ -87,9 +143,14 @@ export default function PayoutsTabContent() {
                     onChange={handleChange}
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg appearance-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
                   >
-                    <option>US Dollar - USD</option>
-                    <option>Euro - EUR</option>
-                    <option>British Pound - GBP</option>
+                    <option value="">Select currency</option>
+                    <option value="NGN">Nigerian Naira (NGN)</option>
+                    <option value="USD">US Dollar (USD)</option>
+                    <option value="EUR">Euro (EUR)</option>
+                    <option value="GBP">British Pound (GBP)</option>
+                    <option value="GHS">Ghanaian Cedi (GHS)</option>
+                    <option value="KES">Kenyan Shilling (KES)</option>
+                    <option value="ZAR">South African Rand (ZAR)</option>
                   </select>
                   <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
                 </div>
@@ -100,19 +161,14 @@ export default function PayoutsTabContent() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Bank Name
                 </label>
-                <div className="relative">
-                  <select
-                    name="bankName"
-                    value={formData.bankName}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg appearance-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
-                  >
-                    <option>Zagadat Bank</option>
-                    <option>First National Bank</option>
-                    <option>Commerce Bank</option>
-                  </select>
-                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
-                </div>
+                <input
+                  type="text"
+                  name="bankName"
+                  value={formData.bankName}
+                  onChange={handleChange}
+                  placeholder="Enter bank name"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
+                />
               </div>
 
               {/* Account Number */}
@@ -125,7 +181,8 @@ export default function PayoutsTabContent() {
                   name="accountNumber"
                   value={formData.accountNumber}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
+                  placeholder="Enter account number"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
                 />
               </div>
 
@@ -139,9 +196,44 @@ export default function PayoutsTabContent() {
                   name="accountName"
                   value={formData.accountName}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
+                  placeholder="Enter account name"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
                 />
               </div>
+
+              {/* Routing Number */}
+              {formData.routingNumber && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Routing Number
+                  </label>
+                  <input
+                    type="text"
+                    name="routingNumber"
+                    value={formData.routingNumber}
+                    onChange={handleChange}
+                    placeholder="Enter routing number"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
+                  />
+                </div>
+              )}
+
+              {/* Swift Code */}
+              {formData.swiftCode && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    SWIFT Code
+                  </label>
+                  <input
+                    type="text"
+                    name="swiftCode"
+                    value={formData.swiftCode}
+                    onChange={handleChange}
+                    placeholder="Enter SWIFT code"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -180,7 +272,9 @@ export default function PayoutsTabContent() {
                     Payout Period
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    Next payout on Jan 15, 2026
+                    {settings.nextPayoutDate 
+                      ? `Next payout on ${new Date(settings.nextPayoutDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
+                      : 'No upcoming payout scheduled'}
                   </div>
                 </div>
                 <button className="p-2 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer">
@@ -206,24 +300,32 @@ export default function PayoutsTabContent() {
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                    {payoutHistory.map((payout, index) => (
-                      <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">
-                          {payout.invoice}
-                        </td>
-                        <td className="px-4 py-4 text-sm text-gray-600 dark:text-gray-400">
-                          {payout.date}
-                        </td>
-                        <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">
-                          {payout.amount}
-                        </td>
-                        <td className="px-4 py-4 text-right">
-                          <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors cursor-pointer">
-                            <Download className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                          </button>
+                    {payoutHistory.length > 0 ? (
+                      payoutHistory.map((payout, index) => (
+                        <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                          <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">
+                            {payout.invoice}
+                          </td>
+                          <td className="px-4 py-4 text-sm text-gray-600 dark:text-gray-400">
+                            {payout.date}
+                          </td>
+                          <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">
+                            {payout.amount}
+                          </td>
+                          <td className="px-4 py-4 text-right">
+                            <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors cursor-pointer">
+                              <Download className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={4} className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                          No payout history available
                         </td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>

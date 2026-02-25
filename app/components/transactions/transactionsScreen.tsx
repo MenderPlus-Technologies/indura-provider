@@ -13,6 +13,10 @@ import { useGetProviderTransactionsQuery } from "@/app/store/apiSlice";
 import type { ProviderTransaction } from "@/app/store/apiSlice";
 import { TransactionDetailsSheet } from "./transaction-details-sheet";
 import { Loader2 } from "lucide-react";
+import { WalletSummary } from "./components/WalletSummary";
+import { PaymentLinksTab } from "./components/PaymentLinksTab";
+import { ManualTransactionsTab } from "./components/ManualTransactionsTab";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 export const TransactionsScreen = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -229,7 +233,9 @@ export const TransactionsScreen = () => {
       />
 
       <div className="mt-4 px-4 sm:px-6 gap-4 sm:gap-6 justify-center w-full">
-        <div className="bg-[#F9F9FB] dark:bg-gray-800/50 flex flex-col gap-2 items-center border border-[#DFE1E6] dark:border-gray-700 p-1 rounded-2xl">
+        <div className="bg-[#F9F9FB] p-3 dark:bg-gray-800/50 flex flex-col gap-2 items-center border border-[#DFE1E6] dark:border-gray-700  rounded-2xl">
+          <WalletSummary />
+
           <OverallIncomeCard 
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
@@ -243,29 +249,43 @@ export const TransactionsScreen = () => {
             isRefreshing={isFetching}
           />
 
-          <Card className="flex flex-col shadow-none gap-1 p-1 w-full">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="flex flex-col items-center gap-3">
-                  <Loader2 className="h-8 w-8 animate-spin text-[#009688]" />
-                  <span className="text-sm text-gray-500 dark:text-gray-400">Loading transactions...</span>
-                </div>
+          <Card className="flex flex-col shadow-none gap-4 p-4 w-full">
+            <Tabs defaultValue="all" className="w-full">
+              <div className="flex items-center justify-between mb-3">
+                <TabsList>
+                  <TabsTrigger value="all">All</TabsTrigger>
+                  <TabsTrigger value="payment-links">Payment Links</TabsTrigger>
+                  <TabsTrigger value="manual">Manual / Offline</TabsTrigger>
+                </TabsList>
               </div>
-            ) : isError ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="flex flex-col items-center gap-3">
-                  <span className="text-sm text-red-500 dark:text-red-400">Failed to load transactions</span>
-                  <button
-                    onClick={() => refetch()}
-                    className="text-sm text-[#009688] hover:underline"
-                  >
-                    Try again
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <>
-                <div className="overflow-x-auto">
+
+              <TabsContent value="all">
+                {isLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="flex flex-col items-center gap-3">
+                      <Loader2 className="h-8 w-8 animate-spin text-[#009688]" />
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        Loading transactions...
+                      </span>
+                    </div>
+                  </div>
+                ) : isError ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="flex flex-col items-center gap-3">
+                      <span className="text-sm text-red-500 dark:text-red-400">
+                        Failed to load transactions
+                      </span>
+                      <button
+                        onClick={() => refetch()}
+                        className="text-sm text-[#009688] hover:underline"
+                      >
+                        Try again
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="overflow-x-auto">
                       <TransactionsTable
                         transactions={filteredAndSortedTransactions}
                         onRowClick={(t) => {
@@ -275,16 +295,27 @@ export const TransactionsScreen = () => {
                           }
                         }}
                       />
-                </div>
-                    {transactionsData?.pagination && transactionsData.pagination.totalPages > 1 && (
-                  <TransactionsPagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                  />
+                    </div>
+                    {transactionsData?.pagination &&
+                      transactionsData.pagination.totalPages > 1 && (
+                        <TransactionsPagination
+                          currentPage={currentPage}
+                          totalPages={totalPages}
+                          onPageChange={handlePageChange}
+                        />
+                      )}
+                  </>
                 )}
-              </>
-            )}
+              </TabsContent>
+
+              <TabsContent value="payment-links">
+                <PaymentLinksTab />
+              </TabsContent>
+
+              <TabsContent value="manual">
+                <ManualTransactionsTab />
+              </TabsContent>
+            </Tabs>
           </Card>
         </div>
       </div>

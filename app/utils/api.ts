@@ -87,14 +87,22 @@ const getAuthHeader = (): string | null => {
 };
 
 /**
+ * Build full URL for an API endpoint
+ * Ensures consistent base URL + leading slash handling
+ */
+const buildUrl = (endpoint: string): string => {
+  const baseUrl = getBaseUrl();
+  return `${baseUrl}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+};
+
+/**
  * Make API request with error handling
  */
 export const apiRequest = async <T = unknown>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> => {
-  const baseUrl = getBaseUrl();
-  const url = `${baseUrl}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+  const url = buildUrl(endpoint);
   
   const authHeader = getAuthHeader();
   const headers: HeadersInit = {
@@ -143,6 +151,43 @@ export const apiRequest = async <T = unknown>(
       },
     };
   }
+};
+
+/**
+ * Download a file (e.g. CSV) from an API endpoint
+ * Uses the same base URL and auth handling as other API helpers
+ */
+export const apiDownloadFile = async (
+  endpoint: string,
+  filename: string
+): Promise<void> => {
+  if (typeof window === 'undefined') return;
+
+  const url = buildUrl(endpoint);
+  const authHeader = getAuthHeader();
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      ...(authHeader && { Authorization: authHeader }),
+    },
+  });
+
+  if (!response.ok) {
+    const error = await parseError(response);
+    throw new Error(error.message || 'Failed to download file.');
+  }
+
+  const blob = await response.blob();
+  const downloadUrl = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+
+  link.href = downloadUrl;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(downloadUrl);
 };
 
 /**

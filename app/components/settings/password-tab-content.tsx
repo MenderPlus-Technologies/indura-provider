@@ -1,23 +1,43 @@
 import React, { useState } from 'react';
-import { Key, Eye, EyeOff } from 'lucide-react';
+import { Key, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { useUpdateProviderPasswordSettingsMutation } from '@/app/store/apiSlice';
+import { useToast } from '@/components/ui/toast';
 
 export default function PasswordTabContent() {
-  const [currentPassword, setCurrentPassword] = useState('mypassword123');
+  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
 
-  const handleSave = () => {
+  const { showToast } = useToast();
+  const [updatePassword, { isLoading }] = useUpdateProviderPasswordSettingsMutation();
+
+  const handleSave = async () => {
     if (newPassword.length < 8) {
-      alert('New password must be at least 8 characters');
+      showToast('New password must be at least 8 characters', 'error');
       return;
     }
-    console.log('Saving password change');
-    alert('Password changed successfully!');
-    setNewPassword('');
+
+    try {
+      const response = await updatePassword({
+        currentPassword,
+        newPassword,
+      }).unwrap();
+
+      showToast(response.message || 'Password changed successfully!', 'success');
+      setCurrentPassword('');
+      setNewPassword('');
+      setShowCurrentPassword(false);
+      setShowNewPassword(false);
+    } catch (error: any) {
+      const errorMessage =
+        error?.data?.message || error?.message || 'Failed to change password';
+      showToast(errorMessage, 'error');
+    }
   };
 
   const handleCancel = () => {
+    setCurrentPassword('');
     setNewPassword('');
     setShowCurrentPassword(false);
     setShowNewPassword(false);
@@ -110,15 +130,18 @@ export default function PasswordTabContent() {
           <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-800">
             <button
               onClick={handleCancel}
-              className="px-6 py-2.5 text-gray-700 dark:text-gray-300 font-medium rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+              disabled={isLoading}
+              className="px-6 py-2.5 text-gray-700 dark:text-gray-300 font-medium rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
-              className="px-6 py-2.5 bg-teal-600 dark:bg-teal-500 text-white font-medium rounded-lg hover:bg-teal-700 dark:hover:bg-teal-600 transition-colors cursor-pointer"
+              disabled={isLoading}
+              className="px-6 py-2.5 bg-teal-600 dark:bg-teal-500 text-white font-medium rounded-lg hover:bg-teal-700 dark:hover:bg-teal-600 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              Save Change
+              {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+              {isLoading ? 'Saving...' : 'Save Change'}
             </button>
           </div>
       </div>

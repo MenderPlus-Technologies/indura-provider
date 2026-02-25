@@ -35,7 +35,12 @@ const formatTransactionDate = (date: Date): string => {
 };
 
 export const NewRequestModal = ({ isOpen, onClose, onSuccess }: NewRequestModalProps) => {
-  const { data: customersData, isLoading: isLoadingCustomers, isError: isCustomersError, refetch } = useGetProviderCustomersQuery();
+  const {
+    data: customersData,
+    isLoading: isLoadingCustomers,
+    isError: isCustomersError,
+    refetch,
+  } = useGetProviderCustomersQuery({ page: 1, limit: 100 });
   const [createPaymentRequest, { isLoading: isSubmitting }] = useCreateProviderPaymentRequestMutation();
   const { showToast } = useToast();
 
@@ -45,7 +50,7 @@ export const NewRequestModal = ({ isOpen, onClose, onSuccess }: NewRequestModalP
   const [description, setDescription] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
-  const customers: ProviderCustomer[] = customersData?.customers ?? [];
+  const customers: ProviderCustomer[] = customersData?.items ?? [];
 
   const isLoading = isLoadingCustomers || isSubmitting;
 

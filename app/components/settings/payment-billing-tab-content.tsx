@@ -1,19 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Mail, MoreVertical, Plus, Download, Bell } from 'lucide-react';
+import type { ProviderSettingsPaymentBilling } from '@/app/store/apiSlice';
 
-export default function PaymentBillingTabContent() {
+interface PaymentBillingTabContentProps {
+  settings: ProviderSettingsPaymentBilling;
+}
+
+export default function PaymentBillingTabContent({ settings }: PaymentBillingTabContentProps) {
   const [selectedCard, setSelectedCard] = useState(0);
-  const [email, setEmail] = useState('vennyvalentina@gmail.com');
+  const [email, setEmail] = useState(settings.billingEmail || '');
 
-  const paymentMethods = [
-    { type: 'VISA', last4: '1466', expiry: '10/26', selected: true },
-    { type: 'Mastercard', last4: '7450', expiry: '02/28', selected: false }
-  ];
+  useEffect(() => {
+    setEmail(settings.billingEmail || '');
+  }, [settings]);
 
-  const billingHistory = [
-    { invoice: '#890776', date: 'Aug 15, 2024', plan: 'Pro Plan', amount: '$79' },
-    { invoice: '#890775', date: 'Jul 15, 2024', plan: 'Basic Plan', amount: '$29' }
-  ];
+  const paymentMethods = settings.paymentMethods?.map((method, index) => ({
+    type: method || 'Card',
+    last4: '****',
+    expiry: '**/**',
+    selected: index === 0
+  })) || [];
+
+  const billingHistory = settings.billingHistory || [];
 
   return (
     <div className="w-full bg-white dark:bg-gray-950 pb-8">
@@ -110,7 +118,9 @@ export default function PaymentBillingTabContent() {
                     Billing Period
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    Next billing on Sept 15, 2024
+                    {settings.currentPlan.billingDate
+                      ? `Next billing on ${new Date(settings.currentPlan.billingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
+                      : 'No upcoming billing scheduled'}
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -126,14 +136,18 @@ export default function PaymentBillingTabContent() {
               {/* Current Plan */}
               <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 bg-white dark:bg-gray-800">
                 <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Pro Plan</h3>
-                  <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-full">
-                    19 days left
-                  </span>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white capitalize">{settings.currentPlan.name || 'No Plan'}</h3>
+                  {settings.currentPlan.daysRemaining > 0 && (
+                    <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-full">
+                      {settings.currentPlan.daysRemaining} days left
+                    </span>
+                  )}
                 </div>
                 <div className="mb-2">
-                  <span className="text-3xl font-bold text-gray-900 dark:text-white">$79</span>
-                  <span className="text-sm text-gray-600 dark:text-gray-400"> / month</span>
+                  <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                    {settings.currentPlan.currency} {settings.currentPlan.amount}
+                  </span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400"> / {settings.billingPeriod}</span>
                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                   Everything you need for a growing business
@@ -169,27 +183,35 @@ export default function PaymentBillingTabContent() {
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                    {billingHistory.map((bill, index) => (
-                      <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">
-                          {bill.invoice}
-                        </td>
-                        <td className="px-4 py-4 text-sm text-gray-600 dark:text-gray-400">
-                          {bill.date}
-                        </td>
-                        <td className="px-4 py-4 text-sm text-gray-600 dark:text-gray-400">
-                          {bill.plan}
-                        </td>
-                        <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">
-                          {bill.amount}
-                        </td>
-                        <td className="px-4 py-4 text-right">
-                          <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors cursor-pointer">
-                            <Download className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                          </button>
+                    {billingHistory.length > 0 ? (
+                      billingHistory.map((bill: any, index: number) => (
+                        <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                          <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">
+                            {bill.invoice || `#${index + 1}`}
+                          </td>
+                          <td className="px-4 py-4 text-sm text-gray-600 dark:text-gray-400">
+                            {bill.date ? new Date(bill.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}
+                          </td>
+                          <td className="px-4 py-4 text-sm text-gray-600 dark:text-gray-400">
+                            {bill.plan || settings.currentPlan.name}
+                          </td>
+                          <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">
+                            {bill.amount || `${settings.currentPlan.currency} ${settings.currentPlan.amount}`}
+                          </td>
+                          <td className="px-4 py-4 text-right">
+                            <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors cursor-pointer">
+                              <Download className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                          No billing history available
                         </td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>

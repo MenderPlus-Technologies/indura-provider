@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Mail, Bell, ChevronDown, MoreHorizontal, PanelLeft, Moon, Sun } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { Bell, ChevronDown, MoreHorizontal, PanelLeft, Moon, Sun } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import { ChatbotPanel } from "../chatbot/chatbot-panel";
 import { useTheme } from "@/app/contexts/theme-context";
 import Image from "next/image";
+import { useGetProviderNotificationsHistoryQuery } from "@/app/store/apiSlice";
 
 const getPageTitle = (pathname: string): string => {
   if (pathname === '/dashboard') {
@@ -21,6 +22,9 @@ const getPageTitle = (pathname: string): string => {
   if (pathname === '/dashboard/settings') {
     return 'Settings';
   }
+  if (pathname === '/dashboard/notifications') {
+    return 'Notifications';
+  }
   if (pathname === '/dashboard/help') {
     return 'Help Center';
   }
@@ -33,9 +37,17 @@ interface HeaderProps {
 
 export const Header = ({ onMenuClick }: HeaderProps = {}) => {
   const pathname = usePathname();
+  const router = useRouter();
   const title = getPageTitle(pathname);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
+
+  const { data: notificationsData } = useGetProviderNotificationsHistoryQuery({
+    page: 1,
+    limit: 10,
+  });
+  const hasNewNotifications =
+    (notificationsData?.notifications?.length ?? 0) > 0;
 
   return (
     <>
@@ -84,17 +96,13 @@ export const Header = ({ onMenuClick }: HeaderProps = {}) => {
             <Button
               variant="outline"
               size="icon"
-              className="h-8 w-8 p-2 bg-white dark:bg-gray-800 rounded-lg border border-solid border-gray-200 dark:border-gray-700 cursor-pointer"
-            >
-              <Mail className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-            </Button>
-
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8 p-2 bg-white dark:bg-gray-800 rounded-lg border border-solid border-gray-200 dark:border-gray-700 cursor-pointer"
+              onClick={() => router.push("/dashboard/notifications")}
+              className="relative h-8 w-8 p-2 bg-white dark:bg-gray-800 rounded-lg border border-solid border-gray-200 dark:border-gray-700 cursor-pointer"
             >
               <Bell className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+              {hasNewNotifications && (
+                <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-[#009688] border-2 border-white" />
+              )}
             </Button>
           </div>
 

@@ -1,13 +1,16 @@
 "use client"
 
 import * as React from "react"
-import { Store, X } from "lucide-react"
+import { Store, X, Loader2, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import type { ProviderSettingsGeneral } from "@/app/store/apiSlice"
+import { useGetCountriesQuery, useUpdateProviderGeneralSettingsMutation, useGetProviderSettingsQuery } from "@/app/store/apiSlice"
+import { useToast } from "@/components/ui/toast"
 
 interface ProviderFormData {
   facilityName: string
@@ -20,17 +23,65 @@ interface ProviderFormData {
   services: string[]
 }
 
-export default function GeneralTabContent() {
+interface GeneralTabContentProps {
+  settings: ProviderSettingsGeneral
+}
+
+export default function GeneralTabContent({ settings }: GeneralTabContentProps) {
   const [formData, setFormData] = React.useState<ProviderFormData>({
-    facilityName: "Mallvose Official Store",
-    facilityType: "Facility",
-    providerDescription: "Facility",
-    country: "United States",
-    city: "Washington",
-    address: "1111 Columbus Avenue",
-    postalCode: "14999",
-    services: ["Massage"],
+    facilityName: settings.facilityName || "",
+    facilityType: settings.facilityType || "",
+    providerDescription: settings.providerDescription || "",
+    country: settings.country || "",
+    city: settings.city || "",
+    address: settings.address || "",
+    postalCode: settings.postalCode || "",
+    services: settings.services || [],
   })
+
+  const [serviceInput, setServiceInput] = React.useState("")
+  const { showToast } = useToast()
+
+  // Fetch countries
+  const { data: countries = [], isLoading: isLoadingCountries } = useGetCountriesQuery();
+
+  // Update mutation
+  const [updateGeneralSettings, { isLoading: isUpdating }] = useUpdateProviderGeneralSettingsMutation();
+  
+  // Refetch settings after update
+  const { refetch: refetchSettings } = useGetProviderSettingsQuery();
+
+  // Update form data when settings change
+  React.useEffect(() => {
+    setFormData({
+      facilityName: settings.facilityName || "",
+      facilityType: settings.facilityType || "",
+      providerDescription: settings.providerDescription || "",
+      country: settings.country || "",
+      city: settings.city || "",
+      address: settings.address || "",
+      postalCode: settings.postalCode || "",
+      services: settings.services || [],
+    })
+  }, [settings])
+
+  const handleAddService = () => {
+    const trimmedService = serviceInput.trim()
+    if (trimmedService && !formData.services.includes(trimmedService)) {
+      setFormData(prev => ({
+        ...prev,
+        services: [...prev.services, trimmedService]
+      }))
+      setServiceInput("")
+    }
+  }
+
+  const handleServiceInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleAddService()
+    }
+  }
 
   const handleRemoveService = (serviceToRemove: string) => {
     setFormData(prev => ({
@@ -39,12 +90,40 @@ export default function GeneralTabContent() {
     }))
   }
 
-  const handleSave = () => {
-    console.log("Saving form data:", formData)
+  const handleSave = async () => {
+    try {
+      const response = await updateGeneralSettings({
+        facilityName: formData.facilityName,
+        facilityType: formData.facilityType,
+        providerDescription: formData.providerDescription,
+        country: formData.country,
+        city: formData.city,
+        address: formData.address,
+        postalCode: formData.postalCode,
+        services: formData.services,
+      }).unwrap()
+
+      showToast(response.message || 'General settings updated successfully', 'success')
+      await refetchSettings()
+    } catch (error: any) {
+      const errorMessage = error?.data?.message || error?.message || 'Failed to update general settings'
+      showToast(errorMessage, 'error')
+    }
   }
 
   const handleCancel = () => {
-    console.log("Cancelling form")
+    // Reset form to original settings
+    setFormData({
+      facilityName: settings.facilityName || "",
+      facilityType: settings.facilityType || "",
+      providerDescription: settings.providerDescription || "",
+      country: settings.country || "",
+      city: settings.city || "",
+      address: settings.address || "",
+      postalCode: settings.postalCode || "",
+      services: settings.services || [],
+    })
+    setServiceInput("")
   }
 
   return (
@@ -81,16 +160,13 @@ export default function GeneralTabContent() {
                   <Label htmlFor="facilityType" className="text-xs sm:text-sm text-gray-500 font-normal">
                     Facility type
                   </Label>
-                  <Select value={formData.facilityType} onValueChange={(value) => setFormData({ ...formData, facilityType: value })}>
-                    <SelectTrigger className="mt-2 h-[44px] sm:h-[48px] w-full text-sm border-gray-300 rounded-lg">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Facility">Facility</SelectItem>
-                      <SelectItem value="Clinic">Clinic</SelectItem>
-                      <SelectItem value="Hospital">Hospital</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Input
+                    id="facilityType"
+                    value={formData.facilityType}
+                    onChange={(e) => setFormData({ ...formData, facilityType: e.target.value })}
+                    placeholder="e.g., Clinic, Hospital, Facility, etc."
+                    className="mt-2 h-[44px] sm:h-[48px] text-sm border-gray-300 rounded-lg"
+                  />
                 </div>
 
                 <div>
@@ -125,25 +201,28 @@ export default function GeneralTabContent() {
                   <Label htmlFor="country" className="text-xs sm:text-sm text-gray-500 font-normal">
                     Country or region
                   </Label>
-                  <Select value={formData.country} onValueChange={(value) => setFormData({ ...formData, country: value })}>
+                  <Select 
+                    value={formData.country} 
+                    onValueChange={(value) => setFormData({ ...formData, country: value, city: "" })}
+                    disabled={isLoadingCountries}
+                  >
                     <SelectTrigger className="mt-2 h-[44px] sm:h-[48px] w-full text-sm border-gray-300 rounded-lg">
-                      <div className="flex items-center gap-2">
-                        <SelectValue />
-                      </div>
+                      <SelectValue placeholder={isLoadingCountries ? "Loading countries..." : "Select country"}>
+                        {formData.country || "Select country"}
+                      </SelectValue>
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="United States">
-                        <div className="flex items-center gap-2">
-                          <span>🇺🇸</span>
-                          <span>United States</span>
+                    <SelectContent className="max-h-[300px] overflow-y-auto">
+                      {isLoadingCountries ? (
+                        <div className="flex items-center justify-center p-4">
+                          <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
                         </div>
-                      </SelectItem>
-                      <SelectItem value="Canada">
-                        <div className="flex items-center gap-2">
-                          <span>🇨🇦</span>
-                          <span>Canada</span>
-                        </div>
-                      </SelectItem>
+                      ) : (
+                        countries.map((country) => (
+                          <SelectItem key={country.code} value={country.name}>
+                            {country.name}
+                          </SelectItem>
+                        ))
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
@@ -156,6 +235,7 @@ export default function GeneralTabContent() {
                     id="city"
                     value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    placeholder="Enter city name"
                     className="mt-2 h-[44px] sm:h-[48px] text-sm sm:text-[15px] border-gray-300 rounded-lg"
                   />
                 </div>
@@ -203,37 +283,57 @@ export default function GeneralTabContent() {
               <div className="flex-1 space-y-4">
                 <div>
                   <Label htmlFor="services" className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-normal">
-                    Select providers service
+                    Add provider service
                   </Label>
-                  <Select>
-                    <SelectTrigger className="mt-2 h-[44px] sm:h-[48px] w-full text-sm border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg">
-                      <SelectValue placeholder="Services" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                      <SelectItem value="Massage" className="text-gray-900 dark:text-white">Massage</SelectItem>
-                      <SelectItem value="Spa" className="text-gray-900 dark:text-white">Spa</SelectItem>
-                      <SelectItem value="Wellness" className="text-gray-900 dark:text-white">Wellness</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex gap-2 mt-2">
+                    <Input
+                      id="services"
+                      value={serviceInput}
+                      onChange={(e) => setServiceInput(e.target.value)}
+                      onKeyDown={handleServiceInputKeyDown}
+                      placeholder="Type service name and press Enter"
+                      className="h-[44px] sm:h-[48px] text-sm border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg"
+                    />
+                    <Button
+                      type="button"
+                      onClick={handleAddService}
+                      disabled={!serviceInput.trim()}
+                      className="h-[44px] sm:h-[48px] px-4 bg-teal-600 dark:bg-teal-500 text-white hover:bg-teal-700 dark:hover:bg-teal-600 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+                    Type a service name and press Enter or click the + button to add
+                  </p>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
-                  {formData.services.map((service) => (
-                    <Badge
-                      key={service}
-                      variant="secondary"
-                      className="h-[36px] rounded-md bg-gray-100 dark:bg-gray-800 px-3 text-sm font-normal text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                      {service}
-                      <button
-                        onClick={() => handleRemoveService(service)}
-                        className="ml-2 hover:text-gray-900 dark:hover:text-white cursor-pointer"
+                {formData.services.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {formData.services.map((service) => (
+                      <Badge
+                        key={service}
+                        variant="secondary"
+                        className="h-[36px] rounded-md bg-gray-100 dark:bg-gray-800 px-3 text-sm font-normal text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
-                        <X className="h-[14px] w-[14px]" />
-                      </button>
-                    </Badge>
-                  ))}
-                </div>
+                        {service}
+                        <button
+                          onClick={() => handleRemoveService(service)}
+                          className="ml-2 hover:text-gray-900 dark:hover:text-white cursor-pointer"
+                          type="button"
+                        >
+                          <X className="h-[14px] w-[14px]" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+
+                {formData.services.length === 0 && (
+                  <p className="text-xs text-gray-400 dark:text-gray-500 italic">
+                    No services added yet. Add services using the input above.
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -243,15 +343,18 @@ export default function GeneralTabContent() {
             <Button
               variant="outline"
               onClick={handleCancel}
-              className="h-[44px] w-full sm:w-auto px-6 text-sm font-medium border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer text-gray-700 dark:text-gray-300"
+              disabled={isUpdating}
+              className="h-[44px] w-full sm:w-auto px-6 text-sm font-medium border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </Button>
             <Button
               onClick={handleSave}
-              className="h-[44px] w-full sm:w-auto bg-teal-600 dark:bg-teal-500 px-6 text-sm font-medium text-white hover:bg-teal-700 dark:hover:bg-teal-600 rounded-lg cursor-pointer"
+              disabled={isUpdating}
+              className="h-[44px] w-full sm:w-auto bg-teal-600 dark:bg-teal-500 px-6 text-sm font-medium text-white hover:bg-teal-700 dark:hover:bg-teal-600 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              Save Change
+              {isUpdating && <Loader2 className="h-4 w-4 animate-spin" />}
+              {isUpdating ? 'Saving...' : 'Save Change'}
             </Button>
           </div>
         </div>

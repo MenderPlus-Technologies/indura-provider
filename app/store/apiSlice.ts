@@ -507,10 +507,16 @@ export const apiSlice = createApi({
 
     /**
      * Get provider customers
-     * GET /providers/dashboard/customers
+     * GET /providers/customers
      */
-    getProviderCustomers: builder.query<ProviderCustomersData, void>({
-      query: () => '/providers/dashboard/customers',
+    getProviderCustomers: builder.query<
+      ProviderCustomersData,
+      { page?: number; limit?: number }
+    >({
+      query: ({ page = 1, limit = 20 } = {}) => ({
+        url: '/providers/customers',
+        params: { page, limit },
+      }),
       transformResponse: (
         response: ProviderCustomersApiResponse | ProviderCustomersData
       ) => {
@@ -523,12 +529,212 @@ export const apiSlice = createApi({
     }),
 
     /**
+     * Create provider customer
+     * POST /providers/customers
+     */
+    createProviderCustomer: builder.mutation<
+      CreateProviderCustomerResponse,
+      CreateProviderCustomerRequest
+    >({
+      query: (body) => ({
+        url: '/providers/customers',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Stats'],
+    }),
+
+    /**
+     * Get provider customer by ID
+     * GET /providers/customers/:id
+     */
+    getProviderCustomer: builder.query<ProviderCustomer, string>({
+      query: (customerId) => `/providers/customers/${customerId}`,
+      transformResponse: (
+        response: ProviderCustomer | ProviderCustomerByIdApiResponse
+      ) => {
+        if (response && typeof response === 'object' && 'data' in response) {
+          return (response as ProviderCustomerByIdApiResponse).data;
+        }
+        return response as ProviderCustomer;
+      },
+      providesTags: ['Stats'],
+    }),
+
+    /**
+     * Update provider customer
+     * PATCH /providers/customers/:id
+     */
+    updateProviderCustomer: builder.mutation<
+      {
+        success: boolean;
+        message?: string;
+        data?: ProviderCustomer;
+        timestamp?: string;
+      },
+      { customerId: string; name?: string; status?: string }
+    >({
+      query: ({ customerId, ...body }) => ({
+        url: `/providers/customers/${customerId}`,
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: ['Stats'],
+    }),
+
+    /**
      * Get provider subscribers
      * GET /subscriptions/provider/subscribers
      */
     getProviderSubscribers: builder.query<ProviderSubscribersResponse, void>({
       query: () => '/subscriptions/provider/subscribers',
       providesTags: ['Stats'],
+    }),
+
+    /**
+     * Get provider notifications history
+     * GET /providers/notifications/history?page=1&limit=10
+     */
+    getProviderNotificationsHistory: builder.query<
+      ProviderNotificationsHistoryData,
+      { page?: number; limit?: number }
+    >({
+      query: ({ page = 1, limit = 10 } = {}) => ({
+        url: '/providers/notifications/history',
+        params: { page, limit },
+      }),
+      transformResponse: (
+        response:
+          | ProviderNotificationsHistoryApiResponse
+          | ProviderNotificationsHistoryData
+      ) => {
+        if (response && typeof response === 'object' && 'data' in response) {
+          return (response as ProviderNotificationsHistoryApiResponse).data;
+        }
+        return response as ProviderNotificationsHistoryData;
+      },
+      providesTags: ['Stats'],
+    }),
+
+    /**
+     * Get provider manual transactions
+     * GET /providers/transactions/manual?page=1&limit=10
+     */
+    getProviderManualTransactions: builder.query<
+      ProviderManualTransactionsData,
+      { page?: number; limit?: number }
+    >({
+      query: ({ page = 1, limit = 10 } = {}) => ({
+        url: '/providers/transactions/manual',
+        params: { page, limit },
+      }),
+      transformResponse: (
+        response:
+          | ProviderManualTransactionsApiResponse
+          | ProviderManualTransactionsData
+      ) => {
+        if (response && typeof response === 'object' && 'data' in response) {
+          return (response as ProviderManualTransactionsApiResponse).data;
+        }
+        return response as ProviderManualTransactionsData;
+      },
+      providesTags: ['Stats'],
+    }),
+
+    /**
+     * Get manual transaction by id
+     * GET /providers/transactions/manual/:id
+     */
+    getProviderManualTransaction: builder.query<
+      ProviderManualTransaction,
+      string
+    >({
+      query: (id) => `/providers/transactions/manual/${id}`,
+      transformResponse: (
+        response:
+          | ProviderManualTransaction
+          | ProviderManualTransactionByIdApiResponse
+      ) => {
+        if (response && typeof response === 'object' && 'data' in response) {
+          return (response as ProviderManualTransactionByIdApiResponse).data;
+        }
+        return response as ProviderManualTransaction;
+      },
+      providesTags: ['Stats'],
+    }),
+
+    /**
+     * Get provider payment links
+     * GET /providers/payment-links?page=1&limit=10
+     */
+    getProviderPaymentLinks: builder.query<
+      ProviderPaymentLinksData,
+      { page?: number; limit?: number }
+    >({
+      query: ({ page = 1, limit = 10 } = {}) => ({
+        url: '/providers/payment-links',
+        params: { page, limit },
+      }),
+      transformResponse: (
+        response:
+          | ProviderPaymentLinksApiResponse
+          | ProviderPaymentLinksData
+      ) => {
+        if (response && typeof response === 'object' && 'data' in response) {
+          return (response as ProviderPaymentLinksApiResponse).data;
+        }
+        return response as ProviderPaymentLinksData;
+      },
+      providesTags: ['Stats'],
+    }),
+
+    /**
+     * Create provider payment link
+     * POST /providers/payment-links
+     */
+    createProviderPaymentLink: builder.mutation<
+      CreateProviderPaymentLinkResponse,
+      CreateProviderPaymentLinkRequest
+    >({
+      query: (body) => ({
+        url: '/providers/payment-links',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Stats'],
+    }),
+
+    /**
+     * Get provider payment link by id
+     * GET /providers/payment-links/:id
+     */
+    getProviderPaymentLink: builder.query<ProviderPaymentLink, string>({
+      query: (id) => `/providers/payment-links/${id}`,
+      transformResponse: (
+        response: ProviderPaymentLink | ProviderPaymentLinkByIdApiResponse
+      ) => {
+        if (response && typeof response === 'object' && 'data' in response) {
+          return (response as ProviderPaymentLinkByIdApiResponse).data;
+        }
+        return response as ProviderPaymentLink;
+      },
+      providesTags: ['Stats'],
+    }),
+
+    /**
+     * Send provider notification
+     * POST /providers/notifications/send
+     */
+    sendProviderNotification: builder.mutation<
+      SendProviderNotificationResponse,
+      SendProviderNotificationRequest
+    >({
+      query: (body) => ({
+        url: '/providers/notifications/send',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Stats'],
     }),
 
     /**
@@ -595,6 +801,22 @@ export const apiSlice = createApi({
     }),
 
     /**
+     * Update provider payment link
+     * PATCH /providers/payment-links/:id
+     */
+    updateProviderPaymentLink: builder.mutation<
+      UpdateProviderPaymentLinkResponse,
+      UpdateProviderPaymentLinkRequest
+    >({
+      query: ({ paymentLinkId, ...body }) => ({
+        url: `/providers/payment-links/${paymentLinkId}`,
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: ['Stats'],
+    }),
+
+    /**
      * Update team member role
      * PUT /providers/team/members/:id/role
      */
@@ -631,6 +853,169 @@ export const apiSlice = createApi({
         method: 'DELETE',
       }),
       invalidatesTags: ['Stats'],
+    }),
+
+    /**
+     * Get provider settings
+     * GET /providers/settings
+     */
+    getProviderSettings: builder.query<ProviderSettingsData, void>({
+      query: () => '/providers/settings',
+      transformResponse: (
+        response: ProviderSettingsApiResponse | ProviderSettingsData
+      ) => {
+        if (response && typeof response === 'object' && 'data' in response) {
+          return (response as ProviderSettingsApiResponse).data;
+        }
+        return response as ProviderSettingsData;
+      },
+      providesTags: ['Stats'],
+    }),
+
+    /**
+     * Update provider general settings
+     * PUT /providers/settings/general
+     */
+    updateProviderGeneralSettings: builder.mutation<
+      {
+        success: boolean;
+        message?: string;
+        timestamp?: string;
+      },
+      {
+        facilityName: string;
+        facilityType: string;
+        providerDescription: string;
+        country: string;
+        city: string;
+        address: string;
+        postalCode: string;
+        services: string[];
+      }
+    >({
+      query: (body) => ({
+        url: '/providers/settings/general',
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: ['Stats'],
+    }),
+
+    /**
+     * Update provider account settings
+     * PUT /providers/settings/account
+     */
+    updateProviderAccountSettings: builder.mutation<
+      {
+        success: boolean;
+        message?: string;
+        timestamp?: string;
+      },
+      {
+        fullName: string;
+        email: string;
+        phone: string;
+      }
+    >({
+      query: (body) => ({
+        url: '/providers/settings/account',
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: ['Stats'],
+    }),
+
+    /**
+     * Update provider password
+     * PUT /providers/settings/password
+     */
+    updateProviderPasswordSettings: builder.mutation<
+      {
+        success: boolean;
+        message?: string;
+        timestamp?: string;
+      },
+      {
+        currentPassword: string;
+        newPassword: string;
+      }
+    >({
+      query: (body) => ({
+        url: '/providers/settings/password',
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: ['Stats'],
+    }),
+
+    /**
+     * Update provider time & language settings
+     * PUT /providers/settings/time-language
+     */
+    updateProviderTimeLanguageSettings: builder.mutation<
+      {
+        success: boolean;
+        message?: string;
+        timestamp?: string;
+      },
+      {
+        timezone: string;
+        language: string;
+        dateFormat: string;
+        timeFormat: string;
+      }
+    >({
+      query: (body) => ({
+        url: '/providers/settings/time-language',
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: ['Stats'],
+    }),
+
+    /**
+     * Get countries list
+     * Uses REST Countries API
+     */
+    getCountries: builder.query<Country[], void>({
+      queryFn: async () => {
+        try {
+          const response = await fetch('https://restcountries.com/v3.1/all?fields=name,cca2');
+          const data = await response.json();
+          const countries: Country[] = data.map((country: any) => ({
+            name: country.name.common,
+            code: country.cca2,
+          })).sort((a: Country, b: Country) => a.name.localeCompare(b.name));
+          return { data: countries };
+        } catch (error) {
+          return { error: { status: 'FETCH_ERROR', error: 'Failed to fetch countries' } };
+        }
+      },
+    }),
+
+    /**
+     * Get cities by country
+     * Uses Geonames API (free tier)
+     */
+    getCitiesByCountry: builder.query<City[], string>({
+      queryFn: async (countryName) => {
+        try {
+          // Using a free city API service
+          // Note: This is a placeholder - you may want to use your backend endpoint
+          const response = await fetch(
+            `https://api.geonames.org/searchJSON?country=${countryName}&maxRows=1000&username=demo&featureClass=P`
+          );
+          const data = await response.json();
+          const cities: City[] = (data.geonames || []).map((city: any) => ({
+            name: city.name,
+            country: city.countryName,
+          })).sort((a: City, b: City) => a.name.localeCompare(b.name));
+          return { data: cities };
+        } catch (error) {
+          // Fallback: return empty array if API fails
+          return { data: [] };
+        }
+      },
     }),
 
     /**
@@ -955,8 +1340,17 @@ export interface ProviderTransactionsSummary {
 
 export interface ProviderTransactionsData {
   transactions: ProviderTransaction[];
+  items?: ProviderTransaction[];
   pagination?: ProviderTransactionsPagination;
   summary?: ProviderTransactionsSummary;
+  manualReporting?: {
+    summary: {
+      recorded: { count: number; amount: number };
+      reconciled: { count: number; amount: number };
+      voided: { count: number; amount: number };
+    };
+    total: number;
+  };
 }
 
 export interface ProviderTransactionsApiResponse {
@@ -996,25 +1390,198 @@ export interface ProviderTransactionDetailApiResponse {
 
 export interface ProviderCustomer {
   _id: string;
-  totalSpent: number;
-  lastTransactionDate: string;
-  transactionCount: number;
+  providerId: string;
   name: string;
   email: string;
   phone: string;
+  source: string;
+  hasAppAccount: boolean;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  __v?: number;
+}
+
+export interface ProviderCustomersPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
 }
 
 export interface ProviderCustomersData {
-  customers: ProviderCustomer[];
-  total?: number;
-  limit?: number;
-  offset?: number;
+  items: ProviderCustomer[];
+  pagination: ProviderCustomersPagination;
 }
 
 export interface ProviderCustomersApiResponse {
   success: boolean;
   message?: string;
   data: ProviderCustomersData;
+  timestamp?: string;
+}
+
+// Manual transactions
+export interface ProviderManualTransactionReconciliation {
+  reconciledAt: string;
+  reconciledBy: string;
+  creditedTransactionId: string;
+  reconciliationReference: string;
+  note: string;
+}
+
+export interface ProviderManualTransaction {
+  _id: string;
+  providerId: string;
+  customerId: string | null;
+  recordedBy: string;
+  amount: number;
+  currency: string;
+  transactionDate: string;
+  paymentMethod: string;
+  status: string;
+  description: string;
+  reference: string;
+  reconciliation?: ProviderManualTransactionReconciliation;
+  metadata: any;
+  createdAt: string;
+  updatedAt: string;
+  __v?: number;
+}
+
+export interface ProviderManualTransactionsPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface ProviderManualTransactionsSummary {
+  recorded: { count: number; amount: number };
+  reconciled: { count: number; amount: number };
+  voided: { count: number; amount: number };
+}
+
+export interface ProviderManualTransactionsData {
+  items: ProviderManualTransaction[];
+  manualTransactions: ProviderManualTransaction[];
+  pagination: ProviderManualTransactionsPagination;
+  summary: ProviderManualTransactionsSummary;
+}
+
+export interface ProviderManualTransactionsApiResponse {
+  success: boolean;
+  message?: string;
+  data: ProviderManualTransactionsData;
+  timestamp?: string;
+}
+
+export interface ProviderManualTransactionByIdApiResponse {
+  success: boolean;
+  message?: string;
+  data: ProviderManualTransaction;
+  timestamp?: string;
+}
+
+// Payment links
+export interface ProviderPaymentLink {
+  _id: string;
+  providerId: string;
+  createdBy: string;
+  customerId: string | null;
+  title: string;
+  description: string;
+  amount: number;
+  currency: string;
+  status: string;
+  expiresAt: string;
+  publicCode: string;
+  totalPayments: number;
+  totalAmountPaid: number;
+  lastPaidAt: string | null;
+  metadata: any;
+  createdAt: string;
+  updatedAt: string;
+  __v?: number;
+  url: string;
+}
+
+export interface ProviderPaymentLinksPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface ProviderPaymentLinksData {
+  items: ProviderPaymentLink[];
+  pagination: ProviderPaymentLinksPagination;
+}
+
+export interface ProviderPaymentLinksApiResponse {
+  success: boolean;
+  message?: string;
+  data: ProviderPaymentLinksData;
+  timestamp?: string;
+}
+
+export interface ProviderPaymentLinkByIdApiResponse {
+  success: boolean;
+  message?: string;
+  data: ProviderPaymentLink;
+  timestamp?: string;
+}
+
+export interface CreateProviderPaymentLinkRequest {
+  title: string;
+  description: string;
+  amount: number;
+  currency: string;
+  expiresAt: string;
+}
+
+export interface CreateProviderPaymentLinkResponse {
+  success: boolean;
+  message?: string;
+  data?: ProviderPaymentLink;
+  timestamp?: string;
+}
+
+export interface UpdateProviderPaymentLinkRequest {
+  paymentLinkId: string;
+  title?: string;
+  description?: string;
+  amount?: number;
+  currency?: string;
+  status?: string;
+  expiresAt?: string;
+}
+
+export interface UpdateProviderPaymentLinkResponse {
+  success: boolean;
+  message?: string;
+  data?: ProviderPaymentLink;
+  timestamp?: string;
+}
+
+export interface CreateProviderCustomerRequest {
+  name: string;
+  email: string;
+  phone: string;
+  status: string;
+}
+
+export interface CreateProviderCustomerResponse {
+  success: boolean;
+  message?: string;
+  data?: ProviderCustomer;
+  timestamp?: string;
+}
+
+export interface ProviderCustomerByIdApiResponse {
+  success: boolean;
+  message?: string;
+  data: ProviderCustomer;
   timestamp?: string;
 }
 
@@ -1058,6 +1625,88 @@ export interface ProviderTeamMembersApiResponse {
   timestamp?: string;
 }
 
+export interface ProviderSettingsGeneral {
+  facilityName: string;
+  facilityType: string;
+  providerDescription: string;
+  country: string;
+  city: string;
+  address: string;
+  postalCode: string;
+  services: string[];
+}
+
+export interface ProviderSettingsAccount {
+  fullName: string;
+  email: string;
+  phone: string;
+}
+
+export interface ProviderSettingsBankDetails {
+  bankName: string;
+  accountNumber: string;
+  accountName: string;
+  routingNumber: string;
+  swiftCode: string;
+}
+
+export interface ProviderSettingsPayouts {
+  payoutFrequency: string;
+  payoutDay: string;
+  storeCurrency: string;
+  bankDetails: ProviderSettingsBankDetails;
+  nextPayoutDate: string | null;
+  minimumPayoutAmount: number;
+}
+
+export interface ProviderSettingsCurrentPlan {
+  name: string;
+  amount: number;
+  currency: string;
+  billingDate: string | null;
+  daysRemaining: number;
+}
+
+export interface ProviderSettingsPaymentBilling {
+  paymentMethods: string[];
+  billingEmail: string;
+  billingPeriod: string;
+  currentPlan: ProviderSettingsCurrentPlan;
+  billingHistory: any[];
+}
+
+export interface ProviderSettingsTimeLanguage {
+  timezone: string;
+  language: string;
+  dateFormat: string;
+  timeFormat: string;
+}
+
+export interface ProviderSettingsData {
+  general: ProviderSettingsGeneral;
+  account: ProviderSettingsAccount;
+  payouts: ProviderSettingsPayouts;
+  paymentBilling: ProviderSettingsPaymentBilling;
+  timeLanguage: ProviderSettingsTimeLanguage;
+}
+
+export interface ProviderSettingsApiResponse {
+  success: boolean;
+  message?: string;
+  data: ProviderSettingsData;
+  timestamp?: string;
+}
+
+export interface Country {
+  name: string;
+  code: string;
+}
+
+export interface City {
+  name: string;
+  country: string;
+}
+
 export interface ProviderSubscriberUser {
   _id: string;
   email: string;
@@ -1086,6 +1735,51 @@ export interface ProviderSubscriber {
 
 export interface ProviderSubscribersResponse {
   subscribers: ProviderSubscriber[];
+}
+
+// Provider notifications history
+export interface ProviderNotification {
+  _id: string;
+  title: string;
+  message: string;
+  type: string;
+  recipientCount: number;
+  sentCount: number;
+  failedCount: number;
+  status: string;
+  createdAt: string;
+}
+
+export interface ProviderNotificationsPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface ProviderNotificationsHistoryData {
+  notifications: ProviderNotification[];
+  pagination: ProviderNotificationsPagination;
+}
+
+export interface ProviderNotificationsHistoryApiResponse {
+  success: boolean;
+  message?: string;
+  data: ProviderNotificationsHistoryData;
+  timestamp?: string;
+}
+
+export interface SendProviderNotificationRequest {
+  recipients: 'all' | 'selected' | 'individual';
+  title: string;
+  message: string;
+  type: string;
+}
+
+export interface SendProviderNotificationResponse {
+  success: boolean;
+  message?: string;
+  timestamp?: string;
 }
 
 // Export hooks for usage in components
@@ -1126,4 +1820,22 @@ export const {
   useResendTeamMemberInvitationMutation,
   useUpdateTeamMemberRoleMutation,
   useDeleteTeamMemberMutation,
+  useGetProviderSettingsQuery,
+  useGetCountriesQuery,
+  useGetCitiesByCountryQuery,
+  useUpdateProviderGeneralSettingsMutation,
+  useUpdateProviderAccountSettingsMutation,
+  useUpdateProviderPasswordSettingsMutation,
+  useUpdateProviderTimeLanguageSettingsMutation,
+  useGetProviderNotificationsHistoryQuery,
+  useSendProviderNotificationMutation,
+  useCreateProviderCustomerMutation,
+  useUpdateProviderPaymentLinkMutation,
+  useGetProviderCustomerQuery,
+  useUpdateProviderCustomerMutation,
+  useGetProviderManualTransactionsQuery,
+  useGetProviderPaymentLinksQuery,
+  useGetProviderPaymentLinkQuery,
+  useGetProviderManualTransactionQuery,
+  useCreateProviderPaymentLinkMutation,
 } = apiSlice;

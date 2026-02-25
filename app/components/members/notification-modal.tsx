@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Send } from 'lucide-react';
+import { X, Send, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { type Member } from './member-utils';
+import { useSendProviderNotificationMutation } from '@/app/store/apiSlice';
+import { useToast } from '@/components/ui/toast';
 
 interface NotificationModalProps {
   isOpen: boolean;
@@ -21,37 +23,46 @@ export const NotificationModal = ({ isOpen, onClose, recipients, recipientType }
   const [link, setLink] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const { showToast } = useToast();
+  const [sendNotification, { isLoading: isSending }] = useSendProviderNotificationMutation();
+
   const handleSend = async () => {
-    if (!title.trim() || !message.trim()) {
-      console.log('Please fill in title and message');
+    const trimmedTitle = title.trim();
+    const trimmedMessage = message.trim();
+    const trimmedLink = link.trim();
+
+    if (!trimmedTitle || !trimmedMessage) {
+      showToast('Please fill in title and message', 'error');
       return;
     }
 
+    const finalMessage = trimmedLink
+      ? `${trimmedMessage}\n\n${trimmedLink}`
+      : trimmedMessage;
+
     setIsLoading(true);
 
-    // Mock API call - simulate network delay
-    setTimeout(() => {
-      const success = Math.random() > 0.1; // 90% success rate for demo
+    try {
+      const response = await sendNotification({
+        recipients: recipientType,
+        title: trimmedTitle,
+        message: finalMessage,
+        type: 'provider',
+      }).unwrap();
 
-      if (success) {
-        console.log('Notification sent successfully', {
-          title,
-          message,
-          link: link.trim() || undefined,
-          recipientCount: recipients.length,
-          recipientType,
-        });
-        // Reset form
-        setTitle('');
-        setMessage('');
-        setLink('');
-        setIsLoading(false);
-        onClose();
-      } else {
-        console.log('Failed to send notification. Please try again.');
-        setIsLoading(false);
-      }
-    }, 1500);
+      showToast(response.message || 'Notification sent successfully', 'success');
+
+      setTitle('');
+      setMessage('');
+      setLink('');
+      onClose();
+    } catch (error: any) {
+      const errorMessage =
+        error?.data?.message || error?.message || 'Failed to send notification. Please try again.';
+      showToast(errorMessage, 'error');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -157,25 +168,21 @@ export const NotificationModal = ({ isOpen, onClose, recipients, recipientType }
             <Button
               variant="outline"
               onClick={handleCancel}
-              disabled={isLoading}
+              disabled={isLoading || isSending}
               className="cursor-pointer"
             >
               Cancel
             </Button>
             <Button
               onClick={handleSend}
-              disabled={isLoading || !title.trim() || !message.trim()}
-              className="bg-[#009688] hover:bg-[#008577] text-white cursor-pointer"
+              disabled={isLoading || isSending || !title.trim() || !message.trim()}
+              className="bg-[#009688] hover:bg-[#008577] text-white cursor-pointer flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? (
+              {(isLoading || isSending) && <Loader2 className="h-4 w-4 animate-spin" />}
+              {isLoading || isSending ? 'Sending...' : (
                 <>
-                  <span className="animate-spin mr-2">⏳</span>
-                  Sending...
-                </>
-              ) : (
-                <>
-                  <Send className="h-4 w-4 mr-2" />
-                  Send Notification
+                  <Send className="h-4 w-4" />
+                  <span>Send Notification</span>
                 </>
               )}
             </Button>

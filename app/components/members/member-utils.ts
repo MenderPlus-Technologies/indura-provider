@@ -1,4 +1,5 @@
 export interface Customer {
+  id?: string;
   name: string;
   email: string;
   phone: string;
@@ -6,6 +7,10 @@ export interface Customer {
   totalOrders: number;
   totalSpent: string;
   avatar?: string;
+  status?: string;
+  source?: string;
+  hasAppAccount?: boolean;
+  createdAt?: string;
 }
 
 // Keep Member as alias for backward compatibility

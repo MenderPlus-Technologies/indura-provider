@@ -14,26 +14,29 @@ export interface Transaction {
 export const getStatusBadgeStyles = (status: string) => {
   switch (status) {
     case "Failed":
-      return "bg-additionalsky-0 border-[#fce4dd] text-additionalorange-100";
+      // Red / error
+      return "bg-[#FEF3F2] border-[#FEE4E2] text-[#B42318]";
     case "Settled":
-      return "bg-alertssuccess-0 border-[#c6ede5] text-alertssuccess-100";
+      // Green / success
+      return "bg-[#ECFDF3] border-[#ABEFC6] text-[#027A48]";
     case "Pending":
-      return "bg-alertswarning-0 border-[#fff1db] text-alertswarning-100";
+      // Amber / pending
+      return "bg-[#FFFAEB] border-[#FEDF89] text-[#B54708]";
     default:
-      return "";
+      return "bg-[#F2F4F7] border-[#E4E7EC] text-[#344054]";
   }
 };
 
 export const getStatusDotColor = (status: string) => {
   switch (status) {
     case "Failed":
-      return "bg-additionalorange-100";
+      return "bg-[#F04438]";
     case "Settled":
-      return "bg-alertssuccess-100";
+      return "bg-[#12B76A]";
     case "Pending":
-      return "bg-alertswarning-100";
+      return "bg-[#F79009]";
     default:
-      return "";
+      return "bg-[#98A2B3]";
   }
 };
 

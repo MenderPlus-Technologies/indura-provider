@@ -1,8 +1,7 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { Calendar, ChevronDown, Plus, PanelLeft } from "lucide-react";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { Plus, PanelLeft } from "lucide-react";
 
 interface TransactionsHeaderProps {
   onNewRequest?: () => void;
@@ -29,8 +28,8 @@ export const TransactionsHeader = ({
           onClick={onNewRequest}
           className="h-auto inline-flex h-10 items-center justify-center gap-2 px-2 sm:px-3 py-2 bg-[#009688] hover:bg-[#008577] rounded-[10px] shadow-shadow-xsmall cursor-pointer flex-1 sm:flex-initial"
         >
-          <Plus className="h-4 w-4 text-greyscale-0" />
-          <span className="font-semibold text-white text-xs sm:text-sm">
+          <Plus className="h-4 w-4 text-white" />
+          <span className="font-medium text-white text-xs sm:text-sm">
             New Request
           </span>
         </Button>

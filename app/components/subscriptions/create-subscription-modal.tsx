@@ -27,8 +27,9 @@ const planDurations: Record<string, number> = {
 };
 
 export const CreateSubscriptionModal = ({ isOpen, onClose, onSuccess }: CreateSubscriptionModalProps) => {
-  const { data: customersData, isLoading: isLoadingCustomers, isError: isCustomersError, refetch } = useGetProviderCustomersQuery();
-  const customers: ProviderCustomer[] = customersData?.customers ?? [];
+  const { data: customersData, isLoading: isLoadingCustomers, isError: isCustomersError, refetch } =
+    useGetProviderCustomersQuery({ page: 1, limit: 100 });
+  const customers: ProviderCustomer[] = customersData?.items ?? [];
 
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
   const [selectedPlan, setSelectedPlan] = useState<string>('');

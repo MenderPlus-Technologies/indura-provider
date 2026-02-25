@@ -3,7 +3,8 @@
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Bell } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { type Member } from "./member-utils";
 
 const getInitials = (name: string) => {
@@ -17,13 +18,14 @@ const getInitials = (name: string) => {
 
 interface MembersTableProps {
   onIndividualNotification?: (member: Member) => void;
+  onViewCustomer?: (member: Member) => void;
   selectedMembers?: Member[];
   onSelectionChange?: (members: Member[]) => void;
   customers: Member[];
   isLoading?: boolean;
 }
 
-export const MembersTable = ({ onIndividualNotification, selectedMembers = [], onSelectionChange, customers, isLoading = false }: MembersTableProps) => {
+export const MembersTable = ({ onIndividualNotification, onViewCustomer, selectedMembers = [], onSelectionChange, customers, isLoading = false }: MembersTableProps) => {
   const getSelectedIndices = () => {
     return customers
       .map((member, idx) => ({ member, idx }))
@@ -166,15 +168,31 @@ export const MembersTable = ({ onIndividualNotification, selectedMembers = [], o
               </span>
             </TableCell>
             <TableCell className="h-12 px-4 py-0">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onIndividualNotification?.(member)}
-                className="h-8 w-8 cursor-pointer text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                title="Send notification to this customer"
-              >
-                <Bell className="h-4 w-4" />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 cursor-pointer text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40 bg-white dark:bg-gray-900">
+                  <DropdownMenuItem
+                    onClick={() => onIndividualNotification?.(member)}
+                    className="text-sm text-[#344054] dark:text-gray-200 cursor-pointer"
+                  >
+                    Send notification
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => onViewCustomer?.(member)}
+                    className="text-sm text-[#344054] dark:text-gray-200 cursor-pointer"
+                  >
+                    View customer 
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </TableCell>
           </TableRow>
         ))
