@@ -51,10 +51,10 @@ export const PaymentLinksTab = () => {
     <>
       <div className="flex items-center justify-between mb-3 sm:mb-4">
         <div>
-          <h3 className="text-sm font-semibold text-[#344054]">
+          <h3 className="text-sm font-semibold text-foreground">
             Payment links
           </h3>
-          <p className="text-xs text-[#475467]">
+          <p className="text-xs text-muted-foreground">
             Manage one-time links you share with customers.
           </p>
         </div>
@@ -86,7 +86,7 @@ export const PaymentLinksTab = () => {
             </div>
           ) : links.length === 0 ? (
             <div className="flex items-center justify-center py-10">
-              <span className="text-sm text-[#475467]">
+              <span className="text-sm text-muted-foreground">
                 No payment links found
               </span>
             </div>
@@ -133,12 +133,12 @@ export const PaymentLinksTab = () => {
                     className="border-b border-solid border-[#DFE1E6] dark:border-gray-700 last:border-b-0"
                   >
                     <TableCell className="px-4 py-3">
-                      <span className="text-xs text-[#475467] line-clamp-2 max-w-xs">
+                      <span className="text-xs text-muted-foreground line-clamp-2 max-w-xs">
                         {link.description}
                       </span>
                     </TableCell>
                     <TableCell className="px-4 py-3">
-                      <span className="text-sm font-semibold text-[#344054]">
+                      <span className="text-sm font-semibold text-foreground">
                         ₦
                         {link.amount.toLocaleString("en-NG", {
                           minimumFractionDigits: 0,
@@ -163,12 +163,12 @@ export const PaymentLinksTab = () => {
                       </Badge>
                     </TableCell>
                     <TableCell className="px-4 py-3">
-                      <span className="text-xs text-[#475467]">
+                      <span className="text-xs text-muted-foreground">
                         {new Date(link.createdAt).toLocaleDateString()}
                       </span>
                     </TableCell>
                     <TableCell className="px-4 py-3">
-                      <span className="text-xs text-[#475467]">
+                      <span className="text-xs text-muted-foreground">
                         {new Date(link.expiresAt).toLocaleDateString()}
                       </span>
                     </TableCell>

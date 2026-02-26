@@ -80,9 +80,8 @@ const SheetContent = ({ side = "right", className, children, ...props }: SheetCo
       {/* Panel */}
       <div
         className={cn(
-          "fixed inset-y-0 z-50 flex flex-col bg-white dark:bg-gray-900 shadow-2xl",
-          "w-full max-w-xl sm:max-w-xl", // slightly narrower on desktop
-          side === "right" && "right-0 border-l border-gray-200 dark:border-gray-800",
+          "fixed inset-y-0 right-0 z-50 flex flex-col bg-background text-foreground shadow-2xl border-l border-border",
+          "w-full max-w-xl sm:max-w-xl",
           className
         )}
         {...props}
@@ -100,7 +99,7 @@ const SheetHeader = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "flex items-center justify-between gap-4 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur px-6 py-4 sticky top-0 z-10",
+      "flex items-center justify-between gap-4 border-b border-border bg-background/80 backdrop-blur px-6 py-4 sticky top-0 z-10",
       className
     )}
     {...props}
@@ -114,7 +113,7 @@ const SheetTitle = ({
   ...props
 }: React.HTMLAttributes<HTMLHeadingElement>) => (
   <h2
-    className={cn("text-lg font-semibold text-gray-600 dark:text-white inter", className)}
+    className={cn("text-lg font-semibold text-foreground inter", className)}
     {...props}
   />
 )
@@ -124,7 +123,7 @@ const SheetDescription = ({
   ...props
 }: React.HTMLAttributes<HTMLParagraphElement>) => (
   <p
-    className={cn("text-sm text-gray-500 dark:text-gray-400", className)}
+    className={cn("text-sm text-muted-foreground", className)}
     {...props}
   />
 )

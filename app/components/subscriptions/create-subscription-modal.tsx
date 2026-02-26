@@ -8,7 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { subscriptionPlans, type Subscription, deriveSubscriptionStatus } from './subscription-utils';
-import { useGetProviderCustomersQuery, type ProviderCustomer } from '@/app/store/apiSlice';
+import { useGetProviderCustomersQuery, useCreateProviderSubscriptionMutation, type ProviderCustomer } from '@/app/store/apiSlice';
+import { useToast } from "@/components/ui/toast";
 
 interface CreateSubscriptionModalProps {
   isOpen: boolean;
@@ -37,8 +38,12 @@ export const CreateSubscriptionModal = ({ isOpen, onClose, onSuccess }: CreateSu
   const [endDate, setEndDate] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [amount, setAmount] = useState<string>('');
+  const [autoRenew, setAutoRenew] = useState<boolean>(false);
+  const [createSubscription, { isLoading: isCreating }] = useCreateProviderSubscriptionMutation();
+  const { showToast } = useToast();
 
-  const isLoading = isSubmitting || isLoadingCustomers;
+  const isLoading = isSubmitting || isLoadingCustomers || isCreating;
 
   // Auto-suggest end date when plan or start date changes
   useEffect(() => {
@@ -61,52 +66,74 @@ export const CreateSubscriptionModal = ({ isOpen, onClose, onSuccess }: CreateSu
 
   const handleSubmit = async () => {
     if (!selectedCustomerId || !selectedPlan || !startDate || !endDate) {
-      console.log('Please fill in all required fields');
+      showToast('Please fill in all required fields', 'error');
+      return;
+    }
+
+    if (!amount) {
+      showToast('Please provide a subscription amount', 'error');
       return;
     }
 
     const customer = customers.find(c => c._id === selectedCustomerId);
     if (!customer) {
-      console.log('Selected customer not found');
+      showToast('Selected customer not found', 'error');
       return;
     }
 
     setIsSubmitting(true);
+    try {
+      const payload = {
+        customerId: selectedCustomerId,
+        planName: selectedPlan,
+        planType: 'monthly',
+        amount: Number(amount),
+        currency: 'NGN',
+        autoRenew,
+      };
 
-    // Mock API call - simulate network delay
-    setTimeout(() => {
-      const success = Math.random() > 0.1; // 90% success rate for demo
+      const response = await createSubscription(payload).unwrap();
 
-      if (success) {
-        const newSubscription: Subscription = {
-          id: `sub-${Date.now()}`,
-          memberName: customer.name,
-          memberEmail: customer.email,
-          plan: selectedPlan,
-          startDate: new Date(startDate).toISOString(),
-          endDate: new Date(endDate).toISOString(),
-          status: deriveSubscriptionStatus(
-            new Date(startDate).toISOString(),
-            new Date(endDate).toISOString()
-          ),
-        };
+      showToast(
+        (response as any)?.message || 'Subscription created successfully',
+        'success'
+      );
 
-        console.log('Subscription created successfully', newSubscription);
-        onSuccess(newSubscription);
-        
-        // Reset form
-        setSelectedCustomerId('');
-        setSelectedPlan('');
-        setStartDate('');
-        setEndDate('');
-        setNotes('');
-        setIsSubmitting(false);
-        onClose();
-      } else {
-        console.log('Failed to create subscription. Please try again.');
-        setIsSubmitting(false);
-      }
-    }, 1500);
+      const newSubscription: Subscription = {
+        id: response?.data?._id || `sub-${Date.now()}`,
+        memberName: customer.name,
+        memberEmail: customer.email,
+        plan: selectedPlan,
+        startDate: new Date(startDate).toISOString(),
+        endDate: new Date(endDate).toISOString(),
+        status: deriveSubscriptionStatus(
+          new Date(startDate).toISOString(),
+          new Date(endDate).toISOString()
+        ),
+      };
+
+      onSuccess(newSubscription);
+
+      // Reset form
+      setSelectedCustomerId('');
+      setSelectedPlan('');
+      setStartDate('');
+      setEndDate('');
+      setNotes('');
+      setAmount('');
+      setAutoRenew(false);
+      onClose();
+    } catch (error: any) {
+      console.error('Failed to create subscription', error);
+      const errorMessage =
+        error?.data?.error?.message ||
+        error?.data?.message ||
+        error?.message ||
+        'Failed to create subscription. Please try again.';
+      showToast(errorMessage, 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCancel = () => {
@@ -115,6 +142,8 @@ export const CreateSubscriptionModal = ({ isOpen, onClose, onSuccess }: CreateSu
     setStartDate('');
     setEndDate('');
     setNotes('');
+    setAmount('');
+    setAutoRenew(false);
     onClose();
   };
 
@@ -226,6 +255,36 @@ export const CreateSubscriptionModal = ({ isOpen, onClose, onSuccess }: CreateSu
                     Auto-suggested based on {planDurations[selectedPlan] || 30} day duration
                   </p>
                 )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="amount" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                  Amount (NGN) <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="amount"
+                  type="number"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="w-full"
+                  disabled={isLoading}
+                  placeholder="e.g. 2500"
+                />
+              </div>
+              <div className="flex items-center gap-2 mt-6">
+                <input
+                  id="autoRenew"
+                  type="checkbox"
+                  checked={autoRenew}
+                  onChange={(e) => setAutoRenew(e.target.checked)}
+                  disabled={isLoading}
+                  className="h-4 w-4 rounded border-gray-300 text-[#009688] focus:ring-[#009688]"
+                />
+                <Label htmlFor="autoRenew" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Enable auto-renew
+                </Label>
               </div>
             </div>
 

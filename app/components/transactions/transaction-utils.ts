@@ -15,15 +15,15 @@ export const getStatusBadgeStyles = (status: string) => {
   switch (status) {
     case "Failed":
       // Red / error
-      return "bg-[#FEF3F2] border-[#FEE4E2] text-[#B42318]";
+      return "bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-700 dark:text-red-400";
     case "Settled":
       // Green / success
-      return "bg-[#ECFDF3] border-[#ABEFC6] text-[#027A48]";
+      return "bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800 text-green-700 dark:text-green-400";
     case "Pending":
       // Amber / pending
-      return "bg-[#FFFAEB] border-[#FEDF89] text-[#B54708]";
+      return "bg-amber-50 dark:bg-amber-900/30 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400";
     default:
-      return "bg-[#F2F4F7] border-[#E4E7EC] text-[#344054]";
+      return "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300";
   }
 };
 

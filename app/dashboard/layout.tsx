@@ -55,7 +55,7 @@ export default function DashboardLayout({
 
   return (
     <ToastProvider>
-      <div className="flex h-screen w-full overflow-hidden bg-white dark:bg-gray-950">
+      <div className="flex h-screen w-full overflow-hidden bg-background">
         <Sidebar
           isCollapsed={isCollapsed}
           setIsCollapsed={setIsCollapsed}
@@ -68,7 +68,7 @@ export default function DashboardLayout({
             onMenuClick={() => setIsMobileMenuOpen(true)}
           />
 
-          <main className="flex-1 overflow-y-auto bg-white dark:bg-gray-950">
+          <main className="flex-1 overflow-y-auto bg-background">
             {children}
           </main>
         </div>

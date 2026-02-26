@@ -142,7 +142,7 @@ export const MembersScreen = () => {
   };
 
   return (
-    <div className="flex flex-col w-full items-start bg-white dark:bg-gray-950 relative">
+    <div className="flex flex-col w-full items-start bg-background relative">
       <MembersHeader 
         onSendNotification={handleSendNotification}
         hasSelectedMembers={selectedMembers.length > 0}

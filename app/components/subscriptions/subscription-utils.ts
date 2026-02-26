@@ -2,6 +2,10 @@ export type SubscriptionStatus = 'New' | 'Active' | 'Expiring Soon' | 'Expired';
 
 export interface Subscription {
   id: string;
+  /**
+   * Underlying customer ID for this subscription (used for notifications).
+   */
+  memberId?: string;
   memberName: string;
   memberEmail: string;
   plan: string;
@@ -208,9 +212,17 @@ export const mapApiSubscriberStatus = (
   apiStatus: string,
   startDate: string,
   expiryDate: string,
-  createdAt?: string
+  createdAt?: string,
+  derivedStatusLabel?: string
 ): SubscriptionStatus => {
-  // If status is not active, we might need to handle other statuses
-  // For now, derive status from dates regardless of API status
+  // Prefer backend-derived label when provided
+  if (derivedStatusLabel) {
+    const normalized = derivedStatusLabel as SubscriptionStatus;
+    if (['New', 'Active', 'Expiring Soon', 'Expired'].includes(normalized)) {
+      return normalized;
+    }
+  }
+
+  // Fallback: derive status from dates
   return deriveSubscriptionStatus(startDate, expiryDate, createdAt);
 };

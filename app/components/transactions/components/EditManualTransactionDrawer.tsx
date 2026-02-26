@@ -1,34 +1,67 @@
 'use client';
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { useCreateProviderManualTransactionMutation } from "@/app/store/apiSlice";
+import {
+  type ProviderManualTransaction,
+  useUpdateProviderManualTransactionMutation,
+} from "@/app/store/apiSlice";
 import { useToast } from "@/components/ui/toast";
 
-interface ManualPaymentDrawerProps {
+interface EditManualTransactionDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCreated?: () => void;
+  transaction: ProviderManualTransaction | null;
+  onUpdated?: () => void;
 }
 
-export const ManualPaymentDrawer = ({
+export const EditManualTransactionDrawer = ({
   open,
   onOpenChange,
-  onCreated,
-}: ManualPaymentDrawerProps) => {
+  transaction,
+  onUpdated,
+}: EditManualTransactionDrawerProps) => {
   const [amount, setAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "bank_transfer" | "pos" | "">("");
   const [transactionDate, setTransactionDate] = useState("");
   const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [createManualTransaction] = useCreateProviderManualTransactionMutation();
+
+  const [updateManualTransaction] = useUpdateProviderManualTransactionMutation();
   const { showToast } = useToast();
 
-  if (!open) return null;
+  useEffect(() => {
+    if (transaction && open) {
+      // Check if transaction is reconciled
+      if (transaction.status === "reconciled") {
+        showToast("Reconciled manual transactions cannot be edited", "error");
+        onOpenChange(false);
+        return;
+      }
+
+      setAmount(transaction.amount ? String(transaction.amount) : "");
+      setPaymentMethod(
+        (transaction.paymentMethod as "cash" | "bank_transfer" | "pos") || ""
+      );
+      setTransactionDate(
+        transaction.transactionDate
+          ? new Date(transaction.transactionDate).toISOString().split("T")[0]
+          : ""
+      );
+      setDescription(transaction.description || "");
+    }
+  }, [transaction, open, showToast, onOpenChange]);
+
+  if (!open || !transaction) return null;
+
+  // Additional check to prevent editing reconciled transactions
+  if (transaction.status === "reconciled") {
+    return null;
+  }
 
   const handleClose = () => {
     if (isSubmitting) return;
@@ -36,6 +69,14 @@ export const ManualPaymentDrawer = ({
   };
 
   const handleSubmit = async () => {
+    if (!transaction?._id) return;
+    
+    // Prevent editing reconciled transactions
+    if (transaction.status === "reconciled") {
+      showToast("Reconciled manual transactions cannot be edited", "error");
+      return;
+    }
+
     if (!amount || !paymentMethod || !transactionDate || !description) {
       showToast("Please fill in all required fields", "error");
       return;
@@ -47,32 +88,31 @@ export const ManualPaymentDrawer = ({
       const dateIso = new Date(`${transactionDate}T00:00:00.000Z`).toISOString();
 
       const payload = {
+        manualTransactionId: transaction._id,
         amount: Number(amount),
-        currency: "NGN",
+        currency: transaction.currency || "NGN",
         paymentMethod,
         transactionDate: dateIso,
         description,
       };
 
-      const response = await createManualTransaction(payload).unwrap();
+      const response = await updateManualTransaction(payload).unwrap();
 
       showToast(
-        response?.message || "Manual payment logged successfully",
+        response?.message || "Manual transaction updated successfully",
         "success"
       );
 
       onOpenChange(false);
-      setAmount("");
-      setPaymentMethod("");
-      setTransactionDate("");
-      setDescription("");
-      onCreated?.();
+      onUpdated?.();
     } catch (error: any) {
-      console.error("Failed to log manual payment", error);
+      console.error("Failed to update manual transaction", error);
+      // Handle the specific error response format
       const errorMessage =
+        error?.data?.error?.message ||
         error?.data?.message ||
         error?.message ||
-        "Failed to log manual payment. Please try again.";
+        "Failed to update manual transaction. Please try again.";
       showToast(errorMessage, "error");
     } finally {
       setIsSubmitting(false);
@@ -94,10 +134,10 @@ export const ManualPaymentDrawer = ({
           <div className="flex items-center justify-between p-6 border-b border-border">
             <div className="flex flex-col gap-1">
               <h2 className="text-lg font-semibold text-foreground dark:text-white">
-                Log manual payment
+                Edit manual transaction
               </h2>
               <p className="text-sm text-muted-foreground dark:text-gray-400">
-                Record an offline payment and reconcile it later.
+                Update details for this manual transaction.
               </p>
             </div>
           </div>
@@ -106,7 +146,7 @@ export const ManualPaymentDrawer = ({
           <div className="flex-1 px-6 py-4 space-y-4 overflow-y-auto">
             <div>
               <Label
-                htmlFor="amount"
+                htmlFor="edit-amount"
                 className="text-sm font-medium text-foreground dark:text-gray-300 mb-1.5 block"
               >
                 Amount <span className="text-red-500">*</span>
@@ -116,7 +156,7 @@ export const ManualPaymentDrawer = ({
                   ₦
                 </span>
                 <Input
-                  id="amount"
+                  id="edit-amount"
                   type="number"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
@@ -129,13 +169,13 @@ export const ManualPaymentDrawer = ({
 
             <div>
               <Label
-                htmlFor="method"
+                htmlFor="edit-method"
                 className="text-sm font-medium text-foreground dark:text-gray-300 mb-1.5 block"
               >
                 Payment method <span className="text-red-500">*</span>
               </Label>
               <select
-                id="method"
+                id="edit-method"
                 value={paymentMethod}
                 onChange={(e) =>
                   setPaymentMethod(e.target.value as "cash" | "bank_transfer" | "pos" | "")
@@ -152,13 +192,13 @@ export const ManualPaymentDrawer = ({
 
             <div>
               <Label
-                htmlFor="transactionDate"
+                htmlFor="edit-transactionDate"
                 className="text-sm font-medium text-foreground dark:text-gray-300 mb-1.5 block"
               >
                 Transaction date <span className="text-red-500">*</span>
               </Label>
               <Input
-                id="transactionDate"
+                id="edit-transactionDate"
                 type="date"
                 value={transactionDate}
                 onChange={(e) => setTransactionDate(e.target.value)}
@@ -168,13 +208,13 @@ export const ManualPaymentDrawer = ({
 
             <div>
               <Label
-                htmlFor="description"
+                htmlFor="edit-description"
                 className="text-sm font-medium text-foreground dark:text-gray-300 mb-1.5 block"
               >
                 Description <span className="text-red-500">*</span>
               </Label>
               <Textarea
-                id="description"
+                id="edit-description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 disabled={isSubmitting}
@@ -196,11 +236,11 @@ export const ManualPaymentDrawer = ({
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={isSubmitting}
+              disabled={isSubmitting || !transaction}
               className="bg-[#009688] hover:bg-[#008577] text-white cursor-pointer flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-              {isSubmitting ? "Logging..." : "Log payment"}
+              {isSubmitting ? "Saving..." : "Save changes"}
             </Button>
           </div>
         </div>
@@ -208,4 +248,3 @@ export const ManualPaymentDrawer = ({
     </>
   );
 };
-

@@ -26,13 +26,13 @@ export const SubscriptionsHeader = ({
   const statusFilters: (SubscriptionStatus | 'All')[] = ['All', 'New', 'Active', 'Expiring Soon', 'Expired'];
 
   return (
-    <header className="h-auto sm:h-[72px] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 px-4 sm:px-6 py-4 bg-greyscale-0 dark:bg-gray-900 border-b border-solid border-[#dfe1e6] dark:border-gray-800 w-full">
+    <header className="h-auto sm:h-[72px] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 px-4 sm:px-6 py-4 bg-background border-b border-solid border-border w-full">
       <Button
         variant="outline"
-        className="h-auto bg-[#F9F9FB] dark:bg-gray-800 inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-lg border border-solid border-[#dfe1e6] dark:border-gray-700 cursor-pointer"
+        className="h-auto bg-muted inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-lg border border-solid border-border cursor-pointer"
       >
-        <PanelLeft className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-        <span className="text-greyscale-900 dark:text-white text-sm">
+        <PanelLeft className="h-4 w-4 text-muted-foreground" />
+        <span className="text-foreground text-sm">
           Subscriptions
         </span>
       </Button>
@@ -47,8 +47,8 @@ export const SubscriptionsHeader = ({
               onClick={() => onStatusFilterChange(status)}
               className={`h-auto px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg cursor-pointer transition-colors ${
                 activeStatusFilter === status
-                  ? 'bg-[#009688] hover:bg-[#008577] text-white'
-                  : 'bg-greyscale-0 dark:bg-gray-800 border border-solid border-[#dfe1e6] dark:border-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
+                  ? "bg-[#009688] hover:bg-[#008577] text-white"
+                  : "bg-muted text-muted-foreground border border-solid border-border hover:bg-muted/80"
               }`}
             >
               {status}
@@ -61,10 +61,10 @@ export const SubscriptionsHeader = ({
           <Button
             variant="outline"
             onClick={onBulkReminderExpiring}
-            className="h-auto inline-flex h-10 items-center justify-center gap-2 px-2 sm:px-3 py-2 bg-greyscale-0 dark:bg-gray-800 rounded-[10px] border border-solid border-[#dfe1e6] dark:border-gray-700 shadow-shadow-xsmall cursor-pointer flex-shrink-0"
+            className="inline-flex h-10 items-center justify-center gap-2 px-2 sm:px-3 py-2 bg-card rounded-[10px] border border-solid border-border shadow-shadow-xsmall cursor-pointer shrink-0"
           >
-            <Bell className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-            <span className="font-semibold text-gray-900 dark:text-white text-xs sm:text-sm">
+            <Bell className="h-4 w-4 text-muted-foreground" />
+            <span className="font-semibold text-foreground text-xs sm:text-sm">
               Remind Expiring
             </span>
           </Button>
@@ -73,10 +73,10 @@ export const SubscriptionsHeader = ({
           <Button
             variant="outline"
             onClick={onBulkReminderExpired}
-            className="h-auto inline-flex h-10 items-center justify-center gap-2 px-2 sm:px-3 py-2 bg-greyscale-0 dark:bg-gray-800 rounded-[10px] border border-solid border-[#dfe1e6] dark:border-gray-700 shadow-shadow-xsmall cursor-pointer flex-shrink-0"
+            className="inline-flex h-10 items-center justify-center gap-2 px-2 sm:px-3 py-2 bg-card rounded-[10px] border border-solid border-border shadow-shadow-xsmall cursor-pointer shrink-0"
           >
-            <Bell className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-            <span className="font-semibold text-gray-900 dark:text-white text-xs sm:text-sm">
+            <Bell className="h-4 w-4 text-muted-foreground" />
+            <span className="font-semibold text-foreground text-xs sm:text-sm">
               Remind Expired
             </span>
           </Button>
@@ -84,7 +84,7 @@ export const SubscriptionsHeader = ({
 
         <Button
           onClick={onAddSubscription}
-          className="h-auto inline-flex h-10 items-center justify-center gap-2 px-2 sm:px-3 py-2 bg-[#009688] hover:bg-[#008577] rounded-[10px] shadow-shadow-xsmall cursor-pointer flex-shrink-0"
+          className="inline-flex h-10 items-center justify-center gap-2 px-2 sm:px-3 py-2 bg-[#009688] hover:bg-[#008577] rounded-[10px] shadow-shadow-xsmall cursor-pointer shrink-0"
         >
           <Plus className="h-4 w-4 text-white" />
           <span className="font-semibold text-white text-xs sm:text-sm">

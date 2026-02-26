@@ -4,6 +4,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Bell } from "lucide-react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import {
   type Subscription,
   getSubscriptionStatusBadgeStyles,
@@ -13,7 +14,9 @@ import {
 
 interface SubscriptionsTableProps {
   subscriptions: Subscription[];
-  onActionClick?: (subscription: Subscription) => void;
+  onView?: (subscription: Subscription) => void;
+  onEdit?: (subscription: Subscription) => void;
+  onDelete?: (subscription: Subscription) => void;
   onSendReminder?: (subscription: Subscription) => void;
 }
 
@@ -26,7 +29,7 @@ const getInitials = (name: string) => {
     .slice(0, 2);
 };
 
-export const SubscriptionsTable = ({ subscriptions, onActionClick, onSendReminder }: SubscriptionsTableProps) => {
+export const SubscriptionsTable = ({ subscriptions, onView, onEdit, onDelete, onSendReminder }: SubscriptionsTableProps) => {
   return (
     <Table>
       <TableHeader>
@@ -88,27 +91,27 @@ export const SubscriptionsTable = ({ subscriptions, onActionClick, onSendReminde
                     {getInitials(subscription.memberName)}
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-semibold text-gray-900 dark:text-white text-sm">
+                    <span className="font-semibold text-[#344054] dark:text-white text-sm">
                       {subscription.memberName}
                     </span>
-                    <span className="font-normal text-gray-500 dark:text-gray-400 text-xs">
+                    <span className="font-normal text-[#344054] dark:text-white text-xs">
                       {subscription.memberEmail}
                     </span>
                   </div>
                 </div>
               </TableCell>
               <TableCell className="h-12 px-4 py-0">
-                <span className="font-semibold text-gray-900 dark:text-white text-sm">
+                <span className="font-semibold text-[#344054] dark:text-white text-sm">
                   {subscription.plan}
                 </span>
               </TableCell>
               <TableCell className="h-12 px-4 py-0">
-                <span className="font-semibold text-gray-900 dark:text-white text-sm">
+                <span className="font-semibold text-[#344054] dark:text-white text-sm">
                   {formatDate(subscription.startDate)}
                 </span>
               </TableCell>
               <TableCell className="h-12 px-4 py-0">
-                <span className="font-semibold text-gray-900 dark:text-white text-sm">
+                <span className="font-semibold text-[#344054] dark:text-white text-sm">
                   {formatDate(subscription.endDate)}
                 </span>
               </TableCell>
@@ -137,15 +140,38 @@ export const SubscriptionsTable = ({ subscriptions, onActionClick, onSendReminde
                       <Bell className="h-4 w-4" />
                     </Button>
                   )}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onActionClick?.(subscription)}
-                    className="h-8 w-8 cursor-pointer text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                    title="More actions"
-                  >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 cursor-pointer text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        title="More actions"
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-40 bg-white dark:bg-gray-900">
+                      <DropdownMenuItem
+                        onClick={() => onView?.(subscription)}
+                        className="text-sm text-[#344054] dark:text-gray-200 cursor-pointer"
+                      >
+                        View
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => onEdit?.(subscription)}
+                        className="text-sm text-[#344054] dark:text-gray-200 cursor-pointer"
+                      >
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => onDelete?.(subscription)}
+                        className="text-sm text-red-600 dark:text-red-400 cursor-pointer"
+                      >
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </TableCell>
             </TableRow>

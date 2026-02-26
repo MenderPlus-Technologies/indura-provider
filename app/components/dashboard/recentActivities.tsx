@@ -66,6 +66,8 @@ export const RecentActivities = () => {
 
   const activeFilterCount = statusFilters.length + methodFilters.length;
 
+  const visibleRows = useMemo(() => filteredRows.slice(0, 5), [filteredRows]);
+
   return (
     <Card className="flex flex-col gap-1 p-1 bg-gray-50 dark:bg-gray-800/50 rounded-2xl overflow-hidden border border-solid border-gray-200 dark:border-gray-700 w-full">
       <CardContent className="flex gap-4 p-4 bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-solid border-gray-200 dark:border-gray-700 items-center">
@@ -199,7 +201,7 @@ export const RecentActivities = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredRows.map((row) => {
+              {visibleRows.map((row) => {
                 const amountNumber = parseAmount(row.amount);
 
                 return (
@@ -211,7 +213,7 @@ export const RecentActivities = () => {
                       <Checkbox className="w-4 h-4 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700" />
                     </td>
                     <td className="h-12 px-4 py-2">
-                      <span className="font-semibold text-[#344054] dark:text-white text-sm">
+                      <span className="font-semibold text-foreground dark:text-white text-sm">
                         {row.payer}
                       </span>
                     </td>
@@ -241,13 +243,13 @@ export const RecentActivities = () => {
                             row.status
                           )}`}
                         />
-                        <span className="font-medium text-xs text-[#344054] dark:text-white">
+                        <span className="font-medium text-xs">
                           {row.status}
                         </span>
                       </Badge>
                     </td>
                     <td className="h-12 px-4 py-2">
-                      <span className="font-semibold text-[#344054] dark:text-white text-sm">
+                      <span className="font-semibold text-foreground dark:text-white text-sm">
                         {amountNumber ? formatNaira(amountNumber) : row.amount}
                       </span>
                     </td>

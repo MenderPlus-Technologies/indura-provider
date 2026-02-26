@@ -158,7 +158,7 @@ export const TeamScreen = () => {
   };
 
   return (
-    <div className="flex flex-col w-full items-start bg-white dark:bg-gray-950 relative">
+    <div className="flex flex-col w-full items-start bg-background relative">
       <TeamHeader onInviteUser={() => setIsInviteModalOpen(true)} />
 
       <div className="mt-4 px-4 sm:px-6 gap-4 sm:gap-6 justify-center w-full">

@@ -8,7 +8,7 @@ import { TransactionsTable } from "./transactions-table";
 import { TransactionsPagination } from "./transactions-pagination";
 import { NewRequestModal } from "./new-request-modal";
 import { TransactionsFilterPanel, type FilterState } from "./transactions-filter-panel";
-import { type Transaction, mapApiStatusToUIStatus, formatTransactionDate, formatTransactionAmount, getPayerName, exportToCSV } from "./transaction-utils";
+import { type Transaction, mapApiStatusToUIStatus, formatTransactionDate, formatTransactionAmount, getPayerName } from "./transaction-utils";
 import { useGetProviderTransactionsQuery } from "@/app/store/apiSlice";
 import type { ProviderTransaction } from "@/app/store/apiSlice";
 import { TransactionDetailsSheet } from "./transaction-details-sheet";
@@ -16,7 +16,9 @@ import { Loader2 } from "lucide-react";
 import { WalletSummary } from "./components/WalletSummary";
 import { PaymentLinksTab } from "./components/PaymentLinksTab";
 import { ManualTransactionsTab } from "./components/ManualTransactionsTab";
+import { PaymentRequestsTab } from "./components/PaymentRequestsTab";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { apiDownloadFile } from "@/app/utils/api";
 
 export const TransactionsScreen = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -188,8 +190,14 @@ export const TransactionsScreen = () => {
     console.log('New transaction request created:', newTransaction);
   };
 
-  const handleDownloadCSV = () => {
-    exportToCSV(filteredAndSortedTransactions, 'transactions');
+  const handleDownloadCSV = async () => {
+    try {
+      const filename = `transactions_${new Date().toISOString().split('T')[0]}.csv`;
+      await apiDownloadFile("/providers/transactions/export?format=csv", filename);
+    } catch (error) {
+      console.error("Failed to export transactions CSV", error);
+      alert("Failed to export transactions. Please try again.");
+    }
   };
 
   const handleSortChange = (newSortBy: string) => {
@@ -227,7 +235,7 @@ export const TransactionsScreen = () => {
     (filters.dateFrom || filters.dateTo ? 1 : 0);
 
   return (
-    <div className="flex flex-col w-full items-start bg-white dark:bg-gray-950 relative">
+    <div className="flex flex-col w-full items-start bg-background relative">
       <TransactionsHeader 
         onNewRequest={() => setIsNewRequestModalOpen(true)}
       />
@@ -254,6 +262,7 @@ export const TransactionsScreen = () => {
               <div className="flex items-center justify-between mb-3">
                 <TabsList>
                   <TabsTrigger value="all">All</TabsTrigger>
+                  <TabsTrigger value="requests">Payment Requests</TabsTrigger>
                   <TabsTrigger value="payment-links">Payment Links</TabsTrigger>
                   <TabsTrigger value="manual">Manual / Offline</TabsTrigger>
                 </TabsList>
@@ -310,6 +319,10 @@ export const TransactionsScreen = () => {
 
               <TabsContent value="payment-links">
                 <PaymentLinksTab />
+              </TabsContent>
+
+              <TabsContent value="requests">
+                <PaymentRequestsTab />
               </TabsContent>
 
               <TabsContent value="manual">

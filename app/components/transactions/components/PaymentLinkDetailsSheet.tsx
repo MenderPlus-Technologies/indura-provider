@@ -83,7 +83,7 @@ export const PaymentLinkDetailsSheet = ({
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent
         side="right"
-        className="max-w-xl w-full border-l border-gray-200/80 dark:border-gray-800/80 flex flex-col p-0"
+        className="max-w-xl w-full flex flex-col p-0"
       >
         <SheetHeader className="bg-[#009688] text-white px-6 py-4">
           <div className="flex items-center justify-between w-full">
@@ -122,7 +122,7 @@ export const PaymentLinkDetailsSheet = ({
           </div>
         </SheetHeader>
 
-        <div className="flex-1 px-6 py-4 space-y-4 overflow-y-auto bg-white dark:bg-gray-950">
+        <div className="flex-1 px-6 py-4 space-y-4 overflow-y-auto bg-background">
           {isLoading && (
             <div className="flex items-center justify-center h-40">
               <Loader2 className="h-6 w-6 animate-spin text-[#009688]" />
@@ -148,34 +148,34 @@ export const PaymentLinkDetailsSheet = ({
               {/* Amount & status */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-900/40 p-4 space-y-1">
-                  <p className="text-xs font-medium text-[#475467]">
+                  <p className="text-xs font-medium text-muted-foreground">
                     Amount
                   </p>
-                  <p className="text-xl font-semibold text-[#344054]">
+                  <p className="text-xl font-semibold text-foreground">
                     {formatAmount(link.amount, link.currency)}
                   </p>
-                  <p className="text-xs text-[#475467] uppercase">
+                  <p className="text-xs text-muted-foreground uppercase">
                     {link.currency}
                   </p>
                 </div>
 
                 <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-900/40 p-4 space-y-1">
-                  <p className="text-xs font-medium text-[#475467]">
+                  <p className="text-xs font-medium text-muted-foreground">
                     Payments summary
                   </p>
-                  <p className="text-sm text-[#344054]">
+                  <p className="text-sm text-foreground">
                     Total payments:{" "}
                     <span className="font-semibold">
                       {link.totalPayments}
                     </span>
                   </p>
-                  <p className="text-sm text-[#344054]">
+                  <p className="text-sm text-foreground">
                     Amount received:{" "}
                     <span className="font-semibold">
                       {formatAmount(link.totalAmountPaid, link.currency)}
                     </span>
                   </p>
-                  <p className="text-xs text-[#475467]">
+                  <p className="text-xs text-muted-foreground">
                     Last paid:{" "}
                     {link.lastPaidAt
                       ? new Date(link.lastPaidAt).toLocaleString()
@@ -186,13 +186,13 @@ export const PaymentLinkDetailsSheet = ({
 
               {/* Title & description */}
               <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 space-y-2">
-                <p className="text-xs font-medium text-[#475467]">
+                <p className="text-xs font-medium text-muted-foreground">
                   Link information
                 </p>
-                <p className="text-sm font-semibold text-[#344054]">
+                <p className="text-sm font-semibold text-foreground">
                   {link.title}
                 </p>
-                <p className="text-sm text-[#475467]">
+                <p className="text-sm text-muted-foreground">
                   {link.description || "No description provided."}
                 </p>
               </div>
@@ -200,11 +200,11 @@ export const PaymentLinkDetailsSheet = ({
               {/* URL & codes */}
               <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 space-y-3">
                 <div className="space-y-1">
-                  <p className="text-xs font-medium text-[#475467]">
+                  <p className="text-xs font-medium text-muted-foreground">
                     Payment URL
                   </p>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-[#344054] break-all flex-1">
+                    <span className="text-xs text-foreground break-all flex-1">
                       {link.url}
                     </span>
                     <Button
@@ -219,10 +219,10 @@ export const PaymentLinkDetailsSheet = ({
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-xs font-medium text-[#475467]">
+                  <p className="text-xs font-medium text-muted-foreground">
                     Checkout endpoint
                   </p>
-                  <span className="text-xs text-[#344054] break-all">
+                  <span className="text-xs text-foreground break-all">
                     {/* checkoutEndpoint is not on list endpoint, but exists on single */}
                     {"checkoutEndpoint" in link
                       ? (link as any).checkoutEndpoint
@@ -231,11 +231,11 @@ export const PaymentLinkDetailsSheet = ({
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-xs font-medium text-[#475467]">
+                  <p className="text-xs font-medium text-muted-foreground">
                     Public code
                   </p>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-[#344054] break-all flex-1">
+                    <span className="text-xs text-foreground break-all flex-1">
                       {link.publicCode}
                     </span>
                     <Button
@@ -253,18 +253,18 @@ export const PaymentLinkDetailsSheet = ({
               {/* Dates */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 space-y-1">
-                  <p className="text-xs font-medium text-[#475467]">
+                  <p className="text-xs font-medium text-muted-foreground">
                     Created at
                   </p>
-                  <p className="text-sm text-[#344054]">
+                  <p className="text-sm text-foreground">
                     {new Date(link.createdAt).toLocaleString()}
                   </p>
                 </div>
                 <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 space-y-1">
-                  <p className="text-xs font-medium text-[#475467]">
+                  <p className="text-xs font-medium text-muted-foreground">
                     Expires at
                   </p>
-                  <p className="text-sm text-[#344054]">
+                  <p className="text-sm text-foreground">
                     {new Date(link.expiresAt).toLocaleString()}
                   </p>
                 </div>
@@ -273,7 +273,7 @@ export const PaymentLinkDetailsSheet = ({
           )}
         </div>
 
-        <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
+        <div className="flex justify-end gap-3 px-6 py-4 border-t border-border bg-background">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}

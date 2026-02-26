@@ -197,15 +197,6 @@ export const DashboardScreen = () => {
             <RefreshCw className={`h-4 w-4 text-gray-700 dark:text-gray-300 ${isLoading ? 'animate-spin' : ''}`} />
           </Button>
 
-          <Button
-            variant="outline"
-            className="h-auto inline-flex items-center justify-center gap-2 px-2 sm:px-3 py-2 bg-white dark:bg-gray-800 rounded-lg border border-solid border-gray-200 dark:border-gray-700 cursor-pointer flex-1 sm:flex-initial"
-          >
-            <Calendar className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-            <span className="font-semibold text-[#344054] dark:text-white text-xs sm:text-sm">Monthly</span>
-            <ChevronDown className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-          </Button>
-
           <Button className="h-auto inline-flex items-center justify-center gap-2 px-2 sm:px-3 py-2 bg-[#009688] hover:bg-[#008577] rounded-lg text-white cursor-pointer">
             <Download className="h-4 w-4" />
             <span className="font-semibold text-xs sm:text-sm hidden sm:inline">Download</span>

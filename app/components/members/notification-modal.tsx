@@ -40,11 +40,31 @@ export const NotificationModal = ({ isOpen, onClose, recipients, recipientType }
       ? `${trimmedMessage}\n\n${trimmedLink}`
       : trimmedMessage;
 
+    // Build recipients payload for API:
+    // - 'all' -> literal 'all'
+    // - 'selected' / 'individual' -> array of customer IDs
+    let recipientsPayload: 'all' | string[];
+
+    if (recipientType === 'all') {
+      recipientsPayload = 'all';
+    } else {
+      const ids = recipients
+        .map((r) => r.id)
+        .filter((id): id is string => Boolean(id));
+
+      if (ids.length === 0) {
+        showToast('No valid recipients selected', 'error');
+        return;
+      }
+
+      recipientsPayload = ids;
+    }
+
     setIsLoading(true);
 
     try {
       const response = await sendNotification({
-        recipients: recipientType,
+        recipients: recipientsPayload,
         title: trimmedTitle,
         message: finalMessage,
         type: 'provider',

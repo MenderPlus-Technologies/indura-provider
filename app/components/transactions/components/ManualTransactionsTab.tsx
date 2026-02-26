@@ -13,8 +13,10 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { ManualPaymentDrawer } from "./ManualPaymentDrawer";
+import { EditManualTransactionDrawer } from "./EditManualTransactionDrawer";
 import {
   useGetProviderManualTransactionsQuery,
+  useReconcileProviderManualTransactionMutation,
   type ProviderManualTransaction,
 } from "@/app/store/apiSlice";
 import { Loader2 } from "lucide-react";
@@ -25,6 +27,7 @@ import {
   mapApiStatusToUIStatus,
 } from "../transaction-utils";
 import { ManualTransactionDetailsSheet } from "./ManualTransactionDetailsSheet";
+import { useToast } from "@/components/ui/toast";
 
 type ManualStatus = "Pending Reconciliation" | "Reconciled";
 
@@ -46,27 +49,43 @@ export const ManualTransactionsTab = () => {
 
   const transactions: ProviderManualTransaction[] = data?.items ?? [];
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [localStatus, setLocalStatus] = useState<Record<string, ManualStatus>>(
-    {}
-  );
   const [selectedManualId, setSelectedManualId] = useState<string | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<ProviderManualTransaction | null>(null);
+  const [reconcilingId, setReconcilingId] = useState<string | null>(null);
+  const [reconcileManualTransaction] = useReconcileProviderManualTransactionMutation();
+  const { showToast } = useToast();
 
-  const handleReconcile = (id: string) => {
-    setLocalStatus((prev) => ({
-      ...prev,
-      [id]: "Reconciled",
-    }));
+  const handleReconcile = async (id: string) => {
+    setReconcilingId(id);
+    try {
+      const response = await reconcileManualTransaction(id).unwrap();
+      showToast(
+        response?.message || "Transaction reconciled successfully",
+        "success"
+      );
+      refetch();
+    } catch (error: any) {
+      console.error("Failed to reconcile transaction", error);
+      const errorMessage =
+        error?.data?.message ||
+        error?.message ||
+        "Failed to reconcile transaction. Please try again.";
+      showToast(errorMessage, "error");
+    } finally {
+      setReconcilingId(null);
+    }
   };
 
   return (
     <>
       <div className="flex items-center justify-between mb-3 sm:mb-4">
         <div>
-          <h3 className="text-sm font-semibold text-[#344054]">
+          <h3 className="text-sm font-semibold text-foreground">
             Manual / offline payments
           </h3>
-          <p className="text-xs text-[#475467]">
+          <p className="text-xs text-muted-foreground">
             Track cash, transfer and POS payments logged by your team.
           </p>
         </div>
@@ -98,7 +117,7 @@ export const ManualTransactionsTab = () => {
             </div>
           ) : transactions.length === 0 ? (
             <div className="flex items-center justify-center py-10">
-              <span className="text-sm text-[#475467]">
+              <span className="text-sm text-muted-foreground">
                 No manual transactions found
               </span>
             </div>
@@ -146,10 +165,11 @@ export const ManualTransactionsTab = () => {
               <TableBody>
                 {transactions.map((tx) => {
                   const currentStatus: ManualStatus =
-                    localStatus[tx._id] ||
-                    (tx.status === "reconciled"
+                    tx.status === "reconciled"
                       ? "Reconciled"
-                      : "Pending Reconciliation");
+                      : "Pending Reconciliation";
+                  
+                  const isReconciling = reconcilingId === tx._id;
 
                   const methodLabel =
                     tx.paymentMethod === "cash"
@@ -166,18 +186,18 @@ export const ManualTransactionsTab = () => {
                       className="border-b border-solid border-[#DFE1E6] dark:border-gray-700 last:border-b-0"
                     >
                       <TableCell className="px-4 py-3">
-                        <span className="text-sm font-semibold text-[#344054]">
+                        <span className="text-sm font-semibold text-foreground">
                           {/* Manual endpoint doesn't include customer details */}
                           —
                         </span>
                       </TableCell>
                       <TableCell className="px-4 py-3">
-                        <span className="text-sm font-semibold text-[#344054]">
+                        <span className="text-sm font-semibold text-foreground">
                           {formatTransactionAmount(tx.amount)}
                         </span>
                       </TableCell>
                       <TableCell className="px-4 py-3">
-                        <span className="text-xs font-medium text-[#475467]">
+                        <span className="text-xs font-medium text-muted-foreground">
                           {methodLabel}
                         </span>
                       </TableCell>
@@ -200,12 +220,12 @@ export const ManualTransactionsTab = () => {
                         </Badge>
                       </TableCell>
                       <TableCell className="px-4 py-3">
-                        <span className="text-xs text-[#475467]">
+                        <span className="text-xs text-muted-foreground">
                           {tx.recordedBy}
                         </span>
                       </TableCell>
                       <TableCell className="px-4 py-3">
-                        <span className="text-xs text-[#475467]">
+                        <span className="text-xs text-muted-foreground">
                           {new Date(tx.transactionDate).toLocaleDateString()}
                         </span>
                       </TableCell>
@@ -213,13 +233,28 @@ export const ManualTransactionsTab = () => {
                         {currentStatus === "Pending Reconciliation" ? (
                           <Button
                             size="sm"
-                            className="bg-[#009688] hover:bg-[#008577] text-white cursor-pointer text-xs"
+                            className="bg-[#009688] hover:bg-[#008577] text-white cursor-pointer text-xs flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                             onClick={() => handleReconcile(tx._id)}
+                            disabled={isReconciling}
                           >
-                            Reconcile
+                            {isReconciling && <Loader2 className="h-3 w-3 animate-spin" />}
+                            {isReconciling ? "Reconciling..." : "Reconcile"}
                           </Button>
                         ) : (
                          ''
+                        )}
+                        {currentStatus === "Pending Reconciliation" && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-xs cursor-pointer"
+                            onClick={() => {
+                              setEditingTransaction(tx);
+                              setIsEditDrawerOpen(true);
+                            }}
+                          >
+                            Edit
+                          </Button>
                         )}
                         <Button
                           variant="outline"
@@ -245,6 +280,23 @@ export const ManualTransactionsTab = () => {
       <ManualPaymentDrawer
         open={isDrawerOpen}
         onOpenChange={setIsDrawerOpen}
+        onCreated={() => {
+          refetch();
+        }}
+      />
+
+      <EditManualTransactionDrawer
+        open={isEditDrawerOpen}
+        onOpenChange={(open) => {
+          setIsEditDrawerOpen(open);
+          if (!open) {
+            setEditingTransaction(null);
+          }
+        }}
+        transaction={editingTransaction}
+        onUpdated={() => {
+          refetch();
+        }}
       />
 
       <ManualTransactionDetailsSheet

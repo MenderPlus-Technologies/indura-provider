@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Send } from 'lucide-react';
+import { X, Send, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { type Subscription } from './subscription-utils';
+import { useSendProviderNotificationMutation } from '@/app/store/apiSlice';
+import { useToast } from '@/components/ui/toast';
 
 interface SubscriptionReminderModalProps {
   isOpen: boolean;
@@ -24,6 +26,8 @@ export const SubscriptionReminderModal = ({
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { showToast } = useToast();
+  const [sendNotification, { isLoading: isSending }] = useSendProviderNotificationMutation();
 
   // Pre-fill title and message based on reminder type
   useEffect(() => {
@@ -60,33 +64,48 @@ export const SubscriptionReminderModal = ({
 
   const handleSend = async () => {
     if (!title.trim() || !message.trim()) {
-      console.log('Please fill in title and message');
+      showToast('Please fill in title and message', 'error');
+      return;
+    }
+
+    // Build recipients array from subscriptions (use underlying customer IDs)
+    const recipientIds = subscriptions
+      .map((sub) => sub.memberId)
+      .filter((id): id is string => Boolean(id));
+
+    if (recipientIds.length === 0) {
+      showToast('No valid subscription recipients found', 'error');
       return;
     }
 
     setIsLoading(true);
 
-    // Mock API call - simulate network delay
-    setTimeout(() => {
-      const success = Math.random() > 0.1; // 90% success rate for demo
+    try {
+      const response = await sendNotification({
+        recipients: recipientIds,
+        title: title.trim(),
+        message: message.trim(),
+        type: 'provider',
+      }).unwrap();
 
-      if (success) {
-        console.log('Reminder notification sent successfully', {
-          title,
-          message,
-          subscriptionCount: subscriptions.length,
-          reminderType,
-        });
-        // Reset form
-        setTitle('');
-        setMessage('');
-        setIsLoading(false);
-        onClose();
-      } else {
-        console.log('Failed to send reminder notification. Please try again.');
-        setIsLoading(false);
-      }
-    }, 1500);
+      showToast(
+        (response as any)?.message || 'Reminder notification sent successfully',
+        'success'
+      );
+
+      // Reset form
+      setTitle('');
+      setMessage('');
+      onClose();
+    } catch (error: any) {
+      const errorMessage =
+        error?.data?.message ||
+        error?.message ||
+        'Failed to send reminder notification. Please try again.';
+      showToast(errorMessage, 'error');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -174,19 +193,19 @@ export const SubscriptionReminderModal = ({
             <Button
               variant="outline"
               onClick={handleCancel}
-              disabled={isLoading}
+              disabled={isLoading || isSending}
               className="cursor-pointer"
             >
               Cancel
             </Button>
             <Button
               onClick={handleSend}
-              disabled={isLoading || !title.trim() || !message.trim()}
+              disabled={isLoading || isSending || !title.trim() || !message.trim()}
               className="bg-[#009688] hover:bg-[#008577] text-white cursor-pointer"
             >
-              {isLoading ? (
+              {isLoading || isSending ? (
                 <>
-                  <span className="animate-spin mr-2">⏳</span>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   Sending...
                 </>
               ) : (

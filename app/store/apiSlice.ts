@@ -489,6 +489,31 @@ export const apiSlice = createApi({
     }),
 
     /**
+     * Get provider payment requests
+     * GET /providers/transactions/payment-requests?page=1&limit=20
+     */
+    getProviderPaymentRequests: builder.query<
+      ProviderPaymentRequestsData,
+      { page?: number; limit?: number }
+    >({
+      query: ({ page = 1, limit = 20 } = {}) => ({
+        url: '/providers/transactions/payment-requests',
+        params: { page, limit },
+      }),
+      transformResponse: (
+        response:
+          | ProviderPaymentRequestsApiResponse
+          | ProviderPaymentRequestsData
+      ) => {
+        if (response && typeof response === 'object' && 'data' in response) {
+          return (response as ProviderPaymentRequestsApiResponse).data;
+        }
+        return response as ProviderPaymentRequestsData;
+      },
+      providesTags: ['Stats'],
+    }),
+
+    /**
      * Get single provider transaction by id
      * GET /providers/transactions/:id
      */
@@ -503,6 +528,56 @@ export const apiSlice = createApi({
         return response as ProviderTransactionDetail;
       },
       providesTags: ['Stats'],
+    }),
+
+    /**
+     * Get provider payment request by id
+     * GET /providers/transactions/payment-requests/:id
+     */
+    getProviderPaymentRequest: builder.query<ProviderPaymentRequest, string>({
+      query: (id) => `/providers/transactions/payment-requests/${id}`,
+      transformResponse: (
+        response:
+          | ProviderPaymentRequestByIdApiResponse
+          | ProviderPaymentRequest
+      ) => {
+        if (response && typeof response === 'object' && 'data' in response) {
+          return (response as ProviderPaymentRequestByIdApiResponse).data;
+        }
+        return response as ProviderPaymentRequest;
+      },
+      providesTags: ['Stats'],
+    }),
+
+    /**
+     * Update provider payment request
+     * PATCH /providers/transactions/payment-requests/:id
+     */
+    updateProviderPaymentRequest: builder.mutation<
+      UpdateProviderPaymentRequestResponse,
+      UpdateProviderPaymentRequestRequest
+    >({
+      query: ({ paymentRequestId, ...body }) => ({
+        url: `/providers/transactions/payment-requests/${paymentRequestId}`,
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: ['Stats'],
+    }),
+
+    /**
+     * Cancel provider payment request
+     * POST /providers/transactions/payment-requests/:id/cancel
+     */
+    cancelProviderPaymentRequest: builder.mutation<
+      CancelProviderPaymentRequestResponse,
+      string
+    >({
+      query: (paymentRequestId) => ({
+        url: `/providers/transactions/payment-requests/${paymentRequestId}/cancel`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['Stats'],
     }),
 
     /**
@@ -583,11 +658,112 @@ export const apiSlice = createApi({
     }),
 
     /**
-     * Get provider subscribers
-     * GET /subscriptions/provider/subscribers
+     * Get provider subscriptions/subscribers
+     * GET /providers/subscriptions?page=1&limit=10
      */
-    getProviderSubscribers: builder.query<ProviderSubscribersResponse, void>({
-      query: () => '/subscriptions/provider/subscribers',
+    getProviderSubscribers: builder.query<
+      ProviderSubscribersResponse,
+      { page?: number; limit?: number } | void
+    >({
+      query: (args = { page: 1, limit: 10 }) => {
+        const { page = 1, limit = 10 } = args || {};
+        return {
+          url: '/providers/subscriptions',
+          params: { page, limit },
+        };
+      },
+      transformResponse: (
+        response:
+          | ProviderSubscriptionsApiResponse
+          | ProviderSubscribersResponse
+      ) => {
+        // Handle wrapped API response: { success, data: { items, subscribers, ... } }
+        if (response && typeof response === 'object' && 'success' in response) {
+          const data = (response as ProviderSubscriptionsApiResponse).data;
+          return {
+            subscribers:
+              (data.subscribers && data.subscribers.length > 0
+                ? data.subscribers
+                : data.items) ?? [],
+          } as ProviderSubscribersResponse;
+        }
+
+        // Fallback for already-normalised shape
+        return response as ProviderSubscribersResponse;
+      },
+      providesTags: ['Stats'],
+    }),
+
+    /**
+     * Create provider subscription
+     * POST /providers/subscriptions
+     */
+    createProviderSubscription: builder.mutation<
+      CreateProviderSubscriptionResponse,
+      CreateProviderSubscriptionRequest
+    >({
+      query: (body) => ({
+        url: '/providers/subscriptions',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Stats'],
+    }),
+
+    /**
+     * Update provider subscription
+     * PUT /providers/subscriptions/:id
+     */
+    updateProviderSubscription: builder.mutation<
+      UpdateProviderSubscriptionResponse,
+      UpdateProviderSubscriptionRequest
+    >({
+      query: ({ subscriptionId, ...body }) => ({
+        url: `/providers/subscriptions/${subscriptionId}`,
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: ['Stats'],
+    }),
+
+    /**
+     * Delete provider subscription
+     * DELETE /providers/subscriptions/:id
+     */
+    deleteProviderSubscription: builder.mutation<
+      {
+        success: boolean;
+        message?: string;
+        timestamp?: string;
+      },
+      string
+    >({
+      query: (subscriptionId) => ({
+        url: `/providers/subscriptions/${subscriptionId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Stats'],
+    }),
+
+    /**
+     * Get provider subscription by ID
+     * GET /providers/subscriptions/:id
+     */
+    getProviderSubscription: builder.query<
+      ProviderSubscriber,
+      string
+    >({
+      query: (id) => `/providers/subscriptions/${id}`,
+      transformResponse: (
+        response:
+          | ProviderSubscriptionByIdApiResponse
+          | ProviderSubscriber
+      ) => {
+        if (response && typeof response === 'object' && 'data' in response) {
+          return (response as ProviderSubscriptionByIdApiResponse).data;
+        }
+        return response as ProviderSubscriber;
+      },
       providesTags: ['Stats'],
     }),
 
@@ -661,6 +837,75 @@ export const apiSlice = createApi({
         return response as ProviderManualTransaction;
       },
       providesTags: ['Stats'],
+    }),
+
+    /**
+     * Create provider manual transaction
+     * POST /providers/transactions/manual
+     */
+    createProviderManualTransaction: builder.mutation<
+      {
+        success: boolean;
+        message?: string;
+        data?: ProviderManualTransaction;
+        timestamp?: string;
+      },
+      { amount: number; currency: string; paymentMethod: string; transactionDate: string; description: string }
+    >({
+      query: (body) => ({
+        url: '/providers/transactions/manual',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Stats'],
+    }),
+
+    /**
+     * Reconcile provider manual transaction
+     * POST /providers/transactions/manual/:id/reconcile
+     */
+    reconcileProviderManualTransaction: builder.mutation<
+      {
+        success: boolean;
+        message?: string;
+        data?: ProviderManualTransaction;
+        timestamp?: string;
+      },
+      string
+    >({
+      query: (id) => ({
+        url: `/providers/transactions/manual/${id}/reconcile`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['Stats'],
+    }),
+
+    /**
+     * Update provider manual transaction
+     * PATCH /providers/transactions/manual/:id
+     */
+    updateProviderManualTransaction: builder.mutation<
+      {
+        success: boolean;
+        message?: string;
+        data?: ProviderManualTransaction;
+        timestamp?: string;
+      },
+      {
+        manualTransactionId: string;
+        amount?: number;
+        currency?: string;
+        paymentMethod?: string;
+        transactionDate?: string;
+        description?: string;
+      }
+    >({
+      query: ({ manualTransactionId, ...body }) => ({
+        url: `/providers/transactions/manual/${manualTransactionId}`,
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: ['Stats'],
     }),
 
     /**
@@ -1421,6 +1666,122 @@ export interface ProviderCustomersApiResponse {
   timestamp?: string;
 }
 
+// Create provider subscription
+export interface CreateProviderSubscriptionRequest {
+  customerId: string;
+  planName: string;
+  planType: string;
+  amount: number;
+  currency: string;
+  autoRenew: boolean;
+}
+
+export interface CreateProviderSubscriptionResponse {
+  success: boolean;
+  message?: string;
+  data?: ProviderSubscriber;
+  timestamp?: string;
+}
+
+// Update provider subscription (PUT /providers/subscriptions/:id)
+export interface UpdateProviderSubscriptionRequest {
+  subscriptionId: string;
+  planName?: string;
+  planType?: string;
+  amount?: number;
+  currency?: string;
+  autoRenew?: boolean;
+}
+
+export interface UpdateProviderSubscriptionResponse {
+  success: boolean;
+  message?: string;
+  data?: ProviderSubscriber;
+  timestamp?: string;
+}
+
+// Payment requests
+export interface ProviderPaymentRequestCustomer {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+}
+
+export interface ProviderPaymentRequestLinkInfo {
+  id: string;
+  code: string;
+  checkoutEndpoint: string;
+  url: string;
+}
+
+export interface ProviderPaymentRequest {
+  _id: string;
+  customerType: string;
+  customerId: string;
+  customer: ProviderPaymentRequestCustomer;
+  amount: number;
+  currency: string;
+  paymentMethod: string;
+  description: string;
+  status: string;
+  reference: string;
+  dueDate: string;
+  paymentLink: ProviderPaymentRequestLinkInfo | null;
+  transactionId: string | null;
+  paidAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProviderPaymentRequestsPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface ProviderPaymentRequestsData {
+  items: ProviderPaymentRequest[];
+  paymentRequests?: ProviderPaymentRequest[];
+  pagination: ProviderPaymentRequestsPagination;
+}
+
+export interface ProviderPaymentRequestsApiResponse {
+  success: boolean;
+  message?: string;
+  data: ProviderPaymentRequestsData;
+  timestamp?: string;
+}
+
+export interface ProviderPaymentRequestByIdApiResponse {
+  success: boolean;
+  message?: string;
+  data: ProviderPaymentRequest;
+  timestamp?: string;
+}
+
+export interface UpdateProviderPaymentRequestRequest {
+  paymentRequestId: string;
+  amount?: number;
+  paymentMethod?: string;
+  description?: string;
+  dueDate?: string;
+}
+
+export interface UpdateProviderPaymentRequestResponse {
+  success: boolean;
+  message?: string;
+  data?: ProviderPaymentRequest;
+  timestamp?: string;
+}
+
+export interface CancelProviderPaymentRequestResponse {
+  success: boolean;
+  message?: string;
+  timestamp?: string;
+}
+
 // Manual transactions
 export interface ProviderManualTransactionReconciliation {
   reconciledAt: string;
@@ -1731,10 +2092,49 @@ export interface ProviderSubscriber {
   createdAt: string;
   updatedAt: string;
   __v?: number;
+  derivedStatusKey?: string;
+  derivedStatusLabel?: string;
+  paymentHistory?: any[];
 }
 
 export interface ProviderSubscribersResponse {
   subscribers: ProviderSubscriber[];
+}
+
+// Subscriptions list (providers/subscriptions)
+export interface ProviderSubscriptionsPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface ProviderSubscriptionsSummary {
+  totalSubscriptions: number;
+  activeCount: number;
+  expiringSoonCount: number;
+  expiredCount: number;
+  availablePlans: string[];
+}
+
+export interface ProviderSubscriptionsData {
+  items: ProviderSubscriber[];
+  subscribers: ProviderSubscriber[];
+  pagination: ProviderSubscriptionsPagination;
+  summary: ProviderSubscriptionsSummary;
+}
+
+export interface ProviderSubscriptionsApiResponse {
+  success: boolean;
+  data: ProviderSubscriptionsData;
+  timestamp?: string;
+}
+
+export interface ProviderSubscriptionByIdApiResponse {
+  success: boolean;
+  message?: string;
+  data: ProviderSubscriber;
+  timestamp?: string;
 }
 
 // Provider notifications history
@@ -1770,7 +2170,11 @@ export interface ProviderNotificationsHistoryApiResponse {
 }
 
 export interface SendProviderNotificationRequest {
-  recipients: 'all' | 'selected' | 'individual';
+  /**
+   * 'all' will notify every customer.
+   * Otherwise, provide an array of customer IDs to notify specific recipients.
+   */
+  recipients: 'all' | string[];
   title: string;
   message: string;
   type: string;
@@ -1809,12 +2213,23 @@ export const {
   useWalletWebhookMutation,
   useGetProviderDashboardStatsQuery,
   useGetProviderTransactionsQuery,
+  useGetProviderPaymentRequestsQuery,
+  useGetProviderPaymentRequestQuery,
   useGetProviderCustomersQuery,
+  useCreateProviderSubscriptionMutation,
+  useUpdateProviderSubscriptionMutation,
+  useDeleteProviderSubscriptionMutation,
   useGetProviderSubscribersQuery,
+  useGetProviderSubscriptionQuery,
   useGetProviderIncomeChartQuery,
   useGetProviderRecentActivitiesQuery,
   useCreateProviderPaymentRequestMutation,
+  useCreateProviderManualTransactionMutation,
+  useReconcileProviderManualTransactionMutation,
+  useUpdateProviderManualTransactionMutation,
   useGetProviderTransactionQuery,
+  useUpdateProviderPaymentRequestMutation,
+  useCancelProviderPaymentRequestMutation,
   useGetProviderTeamMembersQuery,
   useInviteProviderTeamMemberMutation,
   useResendTeamMemberInvitationMutation,

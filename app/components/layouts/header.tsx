@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Bell, ChevronDown, MoreHorizontal, PanelLeft, Moon, Sun } from "lucide-react";
+import { Bell, PanelLeft, Moon, Sun } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { ChatbotPanel } from "../chatbot/chatbot-panel";
 import { useTheme } from "@/app/contexts/theme-context";
@@ -106,23 +106,6 @@ export const Header = ({ onMenuClick }: HeaderProps = {}) => {
             </Button>
           </div>
 
-          <div className="hidden sm:block w-px h-6.25 bg-gray-200 dark:bg-gray-700" />
-
-          <Button
-            variant="outline"
-            className="hidden md:inline-flex items-center gap-2 px-2 py-1 bg-white dark:bg-gray-800 rounded-lg border border-solid border-gray-200 dark:border-gray-700 cursor-pointer"
-          >
-            <div className="w-6 h-6 rounded-full bg-gray-300 dark:bg-gray-600" />
-            <ChevronDown className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-          </Button>
-
-          <Button
-            variant="outline"
-            size="icon"
-            className="hidden lg:flex h-8 w-8 p-2 bg-white dark:bg-gray-800 rounded-lg border border-solid border-gray-200 dark:border-gray-700 cursor-pointer"
-          >
-            <MoreHorizontal className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-          </Button>
         </div>
       </header>
 

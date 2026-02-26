@@ -8,6 +8,9 @@ import { SubscriptionsTable } from "./subscriptions-table";
 import { SubscriptionsPagination } from "./subscriptions-pagination";
 import { CreateSubscriptionModal } from "./create-subscription-modal";
 import { SubscriptionReminderModal } from "./subscription-reminder-modal";
+import { SubscriptionDetailsSheet } from "./subscription-details-sheet";
+import { EditSubscriptionModal } from "./edit-subscription-modal";
+import { ConfirmDeleteSubscriptionModal } from "./confirm-delete-subscription-modal";
 import {
   getSubscriptionsWithDerivedStatus,
   type Subscription,
@@ -17,6 +20,7 @@ import {
 } from "./subscription-utils";
 import { useGetProviderSubscribersQuery } from "@/app/store/apiSlice";
 import type { ProviderSubscriber } from "@/app/store/apiSlice";
+import { useToast } from "@/components/ui/toast";
 import { Loader2 } from "lucide-react";
 
 const ITEMS_PER_PAGE = 10;
@@ -31,6 +35,13 @@ export const SubscriptionsScreen = () => {
   const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
   const [reminderSubscriptions, setReminderSubscriptions] = useState<Subscription[]>([]);
   const [reminderType, setReminderType] = useState<'expiring' | 'expired' | 'individual'>('individual');
+  const [selectedSubscriptionId, setSelectedSubscriptionId] = useState<string | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingSubscriptionId, setEditingSubscriptionId] = useState<string | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingSubscriptionId, setDeletingSubscriptionId] = useState<string | null>(null);
+  const { showToast } = useToast();
 
   // Map API subscribers to UI format
   const allSubscriptions: Subscription[] = useMemo(() => {
@@ -39,15 +50,19 @@ export const SubscriptionsScreen = () => {
     }
 
     return subscribersData.subscribers.map((apiSubscriber: ProviderSubscriber) => {
-      // Handle userId which can be string or object
-      const userId = typeof apiSubscriber.userId === 'string' 
-        ? { _id: apiSubscriber.userId, email: '', name: '', phone: '' }
-        : apiSubscriber.userId;
+      // Handle userId which can be string, object, or null/undefined
+      const rawUser = apiSubscriber.userId;
+
+      const user =
+        typeof rawUser === 'string'
+          ? { _id: rawUser, email: '', name: '', phone: '' }
+          : rawUser || { _id: undefined, email: '', name: '', phone: '' };
 
       return {
         id: apiSubscriber._id,
-        memberName: userId.name || 'Unknown',
-        memberEmail: userId.email || '',
+        memberId: user._id, // underlying customer ID (used for notifications; may be undefined)
+        memberName: user.name || 'Unknown',
+        memberEmail: user.email || '',
         plan: apiSubscriber.planName,
         startDate: apiSubscriber.startDate,
         endDate: apiSubscriber.expiryDate,
@@ -55,7 +70,8 @@ export const SubscriptionsScreen = () => {
           apiSubscriber.status,
           apiSubscriber.startDate,
           apiSubscriber.expiryDate,
-          apiSubscriber.createdAt
+          apiSubscriber.createdAt,
+          apiSubscriber.derivedStatusLabel
         ),
       };
     });
@@ -130,9 +146,19 @@ export const SubscriptionsScreen = () => {
     return filteredSubscriptions.some(sub => sub.status === 'Expired');
   }, [filteredSubscriptions]);
 
-  const handleActionClick = (subscription: Subscription) => {
-    // Handle action (edit, view, etc.)
-    console.log('Action clicked for subscription:', subscription);
+  const handleViewSubscription = (subscription: Subscription) => {
+    setSelectedSubscriptionId(subscription.id);
+    setIsDetailsOpen(true);
+  };
+
+  const handleEditSubscription = (subscription: Subscription) => {
+    setEditingSubscriptionId(subscription.id);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteSubscription = (subscription: Subscription) => {
+    setDeletingSubscriptionId(subscription.id);
+    setIsDeleteModalOpen(true);
   };
 
   const handleAddSubscription = () => {
@@ -154,25 +180,21 @@ export const SubscriptionsScreen = () => {
   const handleBulkReminderExpiring = () => {
     const expiringSubs = filteredSubscriptions.filter(sub => sub.status === 'Expiring Soon');
     if (expiringSubs.length === 0) return;
-    
-    // Confirmation
-    if (window.confirm(`Send reminder notifications to ${expiringSubs.length} customer(s) with expiring subscriptions?`)) {
-      setReminderSubscriptions(expiringSubs);
-      setReminderType('expiring');
-      setIsReminderModalOpen(true);
-    }
+
+    // Open reminder modal directly for all expiring subscriptions
+    setReminderSubscriptions(expiringSubs);
+    setReminderType('expiring');
+    setIsReminderModalOpen(true);
   };
 
   const handleBulkReminderExpired = () => {
     const expiredSubs = filteredSubscriptions.filter(sub => sub.status === 'Expired');
     if (expiredSubs.length === 0) return;
-    
-    // Confirmation
-    if (window.confirm(`Send reminder notifications to ${expiredSubs.length} customer(s) with expired subscriptions?`)) {
-      setReminderSubscriptions(expiredSubs);
-      setReminderType('expired');
-      setIsReminderModalOpen(true);
-    }
+
+    // Open reminder modal directly for all expired subscriptions
+    setReminderSubscriptions(expiredSubs);
+    setReminderType('expired');
+    setIsReminderModalOpen(true);
   };
 
   const handleRefresh = () => {
@@ -185,7 +207,7 @@ export const SubscriptionsScreen = () => {
   };
 
   return (
-    <div className="flex flex-col w-full items-start bg-white dark:bg-gray-950 relative">
+    <div className="flex flex-col w-full items-start bg-background relative">
       <SubscriptionsHeader
         activeStatusFilter={activeStatusFilter}
         onStatusFilterChange={setActiveStatusFilter}
@@ -233,7 +255,9 @@ export const SubscriptionsScreen = () => {
                 <div className="overflow-x-auto">
                   <SubscriptionsTable
                     subscriptions={paginatedSubscriptions}
-                    onActionClick={handleActionClick}
+                    onView={handleViewSubscription}
+                    onEdit={handleEditSubscription}
+                    onDelete={handleDeleteSubscription}
                     onSendReminder={handleSendReminder}
                   />
                 </div>
@@ -263,6 +287,45 @@ export const SubscriptionsScreen = () => {
         onClose={() => setIsReminderModalOpen(false)}
         subscriptions={reminderSubscriptions}
         reminderType={reminderType}
+      />
+
+      {/* Edit Subscription Modal */}
+      <EditSubscriptionModal
+        isOpen={isEditModalOpen}
+        subscriptionId={editingSubscriptionId}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingSubscriptionId(null);
+        }}
+        onUpdated={() => {
+          refetch();
+        }}
+      />
+
+      {/* Delete Subscription Confirmation Modal */}
+      <ConfirmDeleteSubscriptionModal
+        isOpen={isDeleteModalOpen}
+        subscriptionId={deletingSubscriptionId}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDeletingSubscriptionId(null);
+        }}
+        onDeleted={() => {
+          refetch();
+          showToast("Subscription deleted successfully", "success");
+        }}
+      />
+
+      {/* Subscription details sheet */}
+      <SubscriptionDetailsSheet
+        open={isDetailsOpen}
+        subscriptionId={selectedSubscriptionId}
+        onOpenChange={(open) => {
+          setIsDetailsOpen(open);
+          if (!open) {
+            setSelectedSubscriptionId(null);
+          }
+        }}
       />
     </div>
   );

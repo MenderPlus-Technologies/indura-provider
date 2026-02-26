@@ -51,16 +51,16 @@ export const ManualTransactionDetailsSheet = ({
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent
         side="right"
-        className="max-w-xl w-full border-l border-gray-200/80 dark:border-gray-800/80 flex flex-col p-0"
+        className="max-w-xl w-full flex flex-col p-0"
       >
-        <SheetHeader className="px-6 py-4 bg-white/80 dark:bg-gray-900/80 backdrop-blur border-b border-gray-200 dark:border-gray-800">
+        <SheetHeader className="px-6 py-4">
           <div className="flex items-center justify-between gap-3">
             <div className="space-y-1">
-              <SheetTitle className="text-[#344054] dark:text-white">
+              <SheetTitle>
                 Manual transaction
               </SheetTitle>
               {tx?.reference && (
-                <SheetDescription className="text-xs text-[#475467] dark:text-gray-400">
+                <SheetDescription className="text-xs">
                   Reference:{" "}
                   <span className="font-mono break-all">{tx.reference}</span>
                 </SheetDescription>
@@ -83,7 +83,7 @@ export const ManualTransactionDetailsSheet = ({
           </div>
         </SheetHeader>
 
-        <div className="flex-1 px-6 py-4 space-y-4 overflow-y-auto bg-white dark:bg-gray-950">
+        <div className="flex-1 px-6 py-4 space-y-4 overflow-y-auto bg-background">
           {isLoading && (
             <div className="flex items-center justify-center h-40">
               <Loader2 className="h-6 w-6 animate-spin text-[#009688]" />
@@ -109,22 +109,22 @@ export const ManualTransactionDetailsSheet = ({
               {/* Amount & method */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-900/40 p-4 space-y-1">
-                  <p className="text-xs font-medium text-[#475467]">
+                  <p className="text-xs font-medium text-muted-foreground">
                     Amount
                   </p>
-                  <p className="text-xl font-semibold text-[#344054]">
+                  <p className="text-xl font-semibold text-foreground">
                     {formatTransactionAmount(tx.amount)}
                   </p>
-                  <p className="text-xs text-[#475467] uppercase">
+                  <p className="text-xs text-muted-foreground uppercase">
                     {tx.currency}
                   </p>
                 </div>
 
                 <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-900/40 p-4 space-y-1">
-                  <p className="text-xs font-medium text-[#475467]">
+                  <p className="text-xs font-medium text-muted-foreground">
                     Payment method
                   </p>
-                  <p className="text-sm text-[#344054]">
+                  <p className="text-sm text-foreground">
                     {tx.paymentMethod === "cash"
                       ? "Cash"
                       : tx.paymentMethod === "pos"
@@ -133,7 +133,7 @@ export const ManualTransactionDetailsSheet = ({
                       ? "Bank Transfer"
                       : tx.paymentMethod}
                   </p>
-                  <p className="text-xs text-[#475467]">
+                  <p className="text-xs text-muted-foreground">
                     Transaction date:{" "}
                     {new Date(tx.transactionDate).toLocaleString()}
                   </p>
@@ -141,57 +141,57 @@ export const ManualTransactionDetailsSheet = ({
               </div>
 
               {/* Description & metadata */}
-              <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 space-y-2">
-                <p className="text-xs font-medium text-[#475467]">
+              <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-card p-4 space-y-2">
+                <p className="text-xs font-medium text-muted-foreground">
                   Description
                 </p>
-                <p className="text-sm text-[#344054]">
+                <p className="text-sm text-foreground">
                   {tx.description || "No description provided."}
                 </p>
               </div>
 
               {/* Reconciliation block */}
               {tx.reconciliation && (
-                <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 space-y-3">
-                  <p className="text-xs font-medium text-[#475467]">
+                <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-card p-4 space-y-3">
+                  <p className="text-xs font-medium text-muted-foreground">
                     Reconciliation details
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <p className="text-xs text-[#475467]">Reconciled at</p>
-                      <p className="text-sm text-[#344054]">
+                      <p className="text-xs text-muted-foreground">Reconciled at</p>
+                      <p className="text-sm text-foreground">
                         {new Date(
                           tx.reconciliation.reconciledAt
                         ).toLocaleString()}
                       </p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs text-[#475467]">Reconciled by</p>
-                      <p className="text-sm text-[#344054]">
+                      <p className="text-xs text-muted-foreground">Reconciled by</p>
+                      <p className="text-sm text-foreground">
                         {tx.reconciliation.reconciledBy}
                       </p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs text-[#475467]">
+                      <p className="text-xs text-muted-foreground">
                         Credited transaction
                       </p>
-                      <p className="text-sm text-[#344054]">
+                      <p className="text-sm text-foreground">
                         {tx.reconciliation.creditedTransactionId}
                       </p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs text-[#475467]">
+                      <p className="text-xs text-muted-foreground">
                         Reconciliation reference
                       </p>
-                      <p className="text-sm text-[#344054]">
+                      <p className="text-sm text-foreground">
                         {tx.reconciliation.reconciliationReference}
                       </p>
                     </div>
                   </div>
                   {tx.reconciliation.note && (
                     <div className="space-y-1 pt-2 border-t border-gray-100 dark:border-gray-800">
-                      <p className="text-xs text-[#475467]">Note</p>
-                      <p className="text-sm text-[#344054]">
+                      <p className="text-xs text-muted-foreground">Note</p>
+                      <p className="text-sm text-foreground">
                         {tx.reconciliation.note}
                       </p>
                     </div>
@@ -201,19 +201,19 @@ export const ManualTransactionDetailsSheet = ({
 
               {/* Created / Updated */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 space-y-1">
-                  <p className="text-xs font-medium text-[#475467]">
+                <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-card p-4 space-y-1">
+                  <p className="text-xs font-medium text-muted-foreground">
                     Created at
                   </p>
-                  <p className="text-sm text-[#344054]">
+                  <p className="text-sm text-foreground">
                     {new Date(tx.createdAt).toLocaleString()}
                   </p>
                 </div>
-                <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 space-y-1">
-                  <p className="text-xs font-medium text-[#475467]">
+                <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-card p-4 space-y-1">
+                  <p className="text-xs font-medium text-muted-foreground">
                     Updated at
                   </p>
-                  <p className="text-sm text-[#344054]">
+                  <p className="text-sm text-foreground">
                     {new Date(tx.updatedAt).toLocaleString()}
                   </p>
                 </div>
@@ -222,7 +222,7 @@ export const ManualTransactionDetailsSheet = ({
           )}
         </div>
 
-        <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
+        <div className="flex justify-end gap-3 px-6 py-4 border-t border-border bg-background">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
