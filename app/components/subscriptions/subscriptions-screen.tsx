@@ -50,19 +50,25 @@ export const SubscriptionsScreen = () => {
     }
 
     return subscribersData.subscribers.map((apiSubscriber: ProviderSubscriber) => {
-      // Handle userId which can be string, object, or null/undefined
-      const rawUser = apiSubscriber.userId;
+      // The backend now returns a unified `customer` object regardless of customerType,
+      // plus optional userId / providerCustomerId references.
+      const customer = (apiSubscriber as any).customer as
+        | { _id?: string; name?: string; email?: string; phone?: string }
+        | undefined;
 
+      const rawUser = apiSubscriber.userId;
       const user =
         typeof rawUser === 'string'
           ? { _id: rawUser, email: '', name: '', phone: '' }
           : rawUser || { _id: undefined, email: '', name: '', phone: '' };
 
+      const memberId = customer?._id || user._id;
+
       return {
         id: apiSubscriber._id,
-        memberId: user._id, // underlying customer ID (used for notifications; may be undefined)
-        memberName: user.name || 'Unknown',
-        memberEmail: user.email || '',
+        memberId, // underlying customer ID (used for notifications)
+        memberName: customer?.name || user.name || 'Unknown',
+        memberEmail: customer?.email || user.email || '',
         plan: apiSubscriber.planName,
         startDate: apiSubscriber.startDate,
         endDate: apiSubscriber.expiryDate,

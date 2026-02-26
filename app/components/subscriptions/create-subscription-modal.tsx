@@ -81,16 +81,27 @@ export const CreateSubscriptionModal = ({ isOpen, onClose, onSuccess }: CreateSu
       return;
     }
 
+    // Build payload based on whether customer has an app account
+    const basePayload = {
+      planName: selectedPlan,
+      planType: 'monthly',
+      amount: Number(amount),
+      currency: 'NGN',
+      autoRenew,
+    } as const;
+
+    const payload = customer.hasAppAccount
+      ? {
+          ...basePayload,
+          customerId: selectedCustomerId,
+        }
+      : {
+          ...basePayload,
+          providerCustomerId: selectedCustomerId,
+        };
+
     setIsSubmitting(true);
     try {
-      const payload = {
-        customerId: selectedCustomerId,
-        planName: selectedPlan,
-        planType: 'monthly',
-        amount: Number(amount),
-        currency: 'NGN',
-        autoRenew,
-      };
 
       const response = await createSubscription(payload).unwrap();
 

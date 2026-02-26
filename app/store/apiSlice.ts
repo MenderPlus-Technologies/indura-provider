@@ -1668,7 +1668,13 @@ export interface ProviderCustomersApiResponse {
 
 // Create provider subscription
 export interface CreateProviderSubscriptionRequest {
-  customerId: string;
+  /**
+   * For customers that have an app account, send customerId.
+   * For provider-only customers (no app account), send providerCustomerId instead.
+   * Backend expects exactly one of these fields.
+   */
+  customerId?: string;
+  providerCustomerId?: string;
   planName: string;
   planType: string;
   amount: number;
