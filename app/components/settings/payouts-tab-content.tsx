@@ -210,8 +210,8 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
 
             {/* Right Section - Form */}
             <div className="space-y-5">
-              {/* Payout Frequency + Payout Day (flex on md+) */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Payout Frequency + Payout Day (flex on lg+) */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Payout Frequency
@@ -267,8 +267,8 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
                 </div>
               </div>
 
-              {/* Store currency & Bank details (two per row on md+) */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Store currency & Bank details (two per row on lg+) */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Store Currency */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -311,7 +311,7 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
               </div>
 
               {/* Bank & account details */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Account Number */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
