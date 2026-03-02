@@ -149,7 +149,7 @@ export const Sidebar = ({
           </div>
         </div>
 
-        <div className="flex flex-col items-start w-full mt-52 lg:mt-72">
+        <div className="flex flex-col items-start w-full mt-52 lg:mt-64">
           {bottomMenuItems.map((item, index) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;

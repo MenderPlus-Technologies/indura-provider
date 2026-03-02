@@ -466,6 +466,25 @@ export const apiSlice = createApi({
     }),
 
     /**
+     * Get provider wallet balance
+     * GET /providers/wallet/balance
+     */
+    getProviderWalletBalance: builder.query<ProviderWalletBalanceData, void>({
+      query: () => ({
+        url: '/providers/wallet/balance',
+      }),
+      transformResponse: (
+        response: ProviderWalletBalanceApiResponse | ProviderWalletBalanceData
+      ) => {
+        if (response && typeof response === 'object' && 'data' in response) {
+          return (response as ProviderWalletBalanceApiResponse).data;
+        }
+        return response as ProviderWalletBalanceData;
+      },
+      providesTags: ['Stats'],
+    }),
+
+    /**
      * Get provider transactions (paginated)
      * GET /providers/transactions?page=1&limit=10&sortBy=date&sortOrder=desc
      */
@@ -1294,6 +1313,45 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Stats'],
     }),
+
+    /**
+     * Get provider payout history
+     * GET /providers/payouts/history?page=1&limit=10
+     */
+    getProviderPayoutHistory: builder.query<
+      ProviderPayoutHistoryData,
+      { page?: number; limit?: number }
+    >({
+      query: ({ page = 1, limit = 10 } = {}) => ({
+        url: '/providers/payouts/history',
+        params: { page, limit },
+      }),
+      transformResponse: (
+        response: ProviderPayoutHistoryApiResponse | ProviderPayoutHistoryData
+      ) => {
+        if (response && typeof response === 'object' && 'data' in response) {
+          return (response as ProviderPayoutHistoryApiResponse).data;
+        }
+        return response as ProviderPayoutHistoryData;
+      },
+      providesTags: ['Stats'],
+    }),
+
+    /**
+     * Create provider payout request
+     * POST /providers/payouts/request
+     */
+    createProviderPayoutRequest: builder.mutation<
+      CreateProviderPayoutRequestResponse,
+      CreateProviderPayoutRequestPayload
+    >({
+      query: (body) => ({
+        url: '/providers/payouts/request',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Stats'],
+    }),
   }),
 });
 
@@ -1843,6 +1901,89 @@ export interface ProviderManualTransactionsApiResponse {
   timestamp?: string;
 }
 
+// Payout requests
+export interface CreateProviderPayoutRequestPayload {
+  amount: number;
+  currency: string;
+  description?: string;
+}
+
+export interface ProviderPayoutRequest {
+  payoutId: string;
+  amount: number;
+  currency: string;
+  status: string;
+  estimatedCompletionDate: string | null;
+  invoice: string;
+  createdAt: string;
+}
+
+export interface CreateProviderPayoutRequestResponse {
+  success: boolean;
+  message?: string;
+  data: ProviderPayoutRequest;
+  timestamp?: string;
+}
+
+// Payout history
+export interface ProviderPayoutHistoryItem {
+  id: string;
+  invoice: string;
+  date: string;
+  amount: number;
+  currency: string;
+  status: 'completed' | 'pending' | 'failed';
+  bankDetails: {
+    bankName: string;
+    accountNumber: string;
+    accountName: string;
+  };
+  transactionReference: string;
+  createdAt: string;
+  completedAt?: string;
+}
+
+export interface ProviderPayoutHistoryPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface ProviderPayoutHistorySummary {
+  totalPayouts: number;
+  totalAmount: number;
+  nextPayoutDate: string;
+}
+
+export interface ProviderPayoutHistoryData {
+  payouts: ProviderPayoutHistoryItem[];
+  pagination: ProviderPayoutHistoryPagination;
+  summary: ProviderPayoutHistorySummary;
+}
+
+export interface ProviderPayoutHistoryApiResponse {
+  success: boolean;
+  message?: string;
+  data: ProviderPayoutHistoryData;
+  timestamp?: string;
+}
+
+// Provider wallet balance
+export interface ProviderWalletBalanceData {
+  availableBalance: number;
+  pendingBalance: number;
+  currency: string;
+  lastUpdated: string;
+}
+
+export interface ProviderWalletBalanceApiResponse {
+  success: boolean;
+  message?: string;
+  data: ProviderWalletBalanceData;
+  timestamp?: string;
+}
+
 export interface ProviderManualTransactionByIdApiResponse {
   success: boolean;
   message?: string;
@@ -2259,4 +2400,7 @@ export const {
   useGetProviderPaymentLinkQuery,
   useGetProviderManualTransactionQuery,
   useCreateProviderPaymentLinkMutation,
+  useCreateProviderPayoutRequestMutation,
+  useGetProviderPayoutHistoryQuery,
+  useGetProviderWalletBalanceQuery,
 } = apiSlice;
