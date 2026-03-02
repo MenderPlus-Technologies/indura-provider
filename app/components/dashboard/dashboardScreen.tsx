@@ -177,7 +177,7 @@ export const DashboardScreen = () => {
 
   return (
     <div className="flex flex-col w-full">
-      <div className="h-18 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 px-4 sm:px-6 py-4 border-b border-solid border-gray-200 dark:border-gray-800 w-full shrink-0">
+      <div className="h-18 flex flex-row sm:flex-row justify-between items-start sm:items-center gap-12 sm:gap-0 px-4 sm:px-6 py-4 border-b border-solid border-gray-200 dark:border-gray-800 w-full shrink-0">
         <Button
           variant="outline"
           className="h-auto inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-solid border-gray-200 dark:border-gray-700 cursor-pointer"
