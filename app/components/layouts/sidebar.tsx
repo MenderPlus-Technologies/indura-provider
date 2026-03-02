@@ -41,7 +41,7 @@ export const Sidebar = ({
       <aside
         className={`flex flex-col ${
           isCollapsed ? "w-20" : "w-68"
-        } items-start bg-white dark:bg-gray-900 border-r border-solid border-gray-200 dark:border-gray-800 h-screen transition-all duration-300 shrink-0
+        } items-start bg-white dark:bg-gray-900 border-r border-solid border-gray-200 dark:border-gray-800 h-screen overflow-y-auto lg:overflow-visible transition-all duration-300 shrink-0
         fixed lg:static inset-y-0 left-0 z-50 lg:z-auto
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
       >
@@ -102,7 +102,7 @@ export const Sidebar = ({
         )}
       </header>
 
-      <nav className="flex flex-col items-center gap-4 p-4 flex-1 w-full overflow-hidden">
+      <nav className="flex flex-col items-center gap-4 p-4 flex-1 w-full">
         <div className="flex flex-col items-start gap-1 w-full flex-[0_0_auto]">
           {!isCollapsed && (
             <div className="flex items-center gap-2 px-3 py-1 w-full flex-[0_0_auto]">
@@ -119,6 +119,7 @@ export const Sidebar = ({
                 <Link
                   key={index}
                   href={item.href}
+                  onClick={() => setIsMobileMenuOpen?.(false)}
                   className={`flex items-center ${
                     isCollapsed ? "justify-center" : "gap-2"
                   } px-3 py-2 flex-[0_0_auto] rounded-lg w-full transition-colors ${
@@ -148,9 +149,7 @@ export const Sidebar = ({
           </div>
         </div>
 
-        <div className="flex-1" />
-
-        <div className="flex flex-col items-start w-full">
+        <div className="flex flex-col items-start w-full mt-52 lg:mt-72">
           {bottomMenuItems.map((item, index) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
@@ -158,6 +157,7 @@ export const Sidebar = ({
               <Link
                 key={index}
                 href={item.href}
+                onClick={() => setIsMobileMenuOpen?.(false)}
                 className={`flex items-center cursor-pointer ${
                   isCollapsed ? "justify-center" : "gap-2"
                 } px-3 py-2 flex-[0_0_auto] rounded-lg w-full hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${

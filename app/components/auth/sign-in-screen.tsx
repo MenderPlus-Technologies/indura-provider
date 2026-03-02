@@ -108,14 +108,14 @@ export const SignInScreen = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-md">
+      <div className="flex-1 flex items-start justify-center px-4 sm:px-6 pt-6 pb-4 sm:pt-10 sm:pb-6">
+        <div className="w-full max-w-md sm:max-w-lg md:max-w-xl">
           {/* Welcome Section */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-[#344054] dark:text-white mb-2">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#344054] dark:text-white mb-2">
               Welcome back
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 text-base">
+            <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base max-w-md mx-auto">
               Glad to see you again. Log in to your account.
             </p>
           </div>
@@ -237,15 +237,13 @@ export const SignInScreen = () => {
       <div className="px-6 py-6">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            © 2025 Indura. All right reserved.
+            © 2026 Indura. All right reserved.
           </p>
           <a
-            href="#"
+            href="https://www.indurahealth.com/"
+            target="_blank"
+            rel="noreferrer"
             className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-            onClick={(e) => {
-              e.preventDefault();
-              console.log('Get help clicked');
-            }}
           >
             <HelpCircle className="h-4 w-4" />
             Get help
