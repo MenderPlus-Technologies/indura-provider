@@ -108,7 +108,7 @@ export const SignInScreen = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex items-start justify-center px-4 sm:px-6 pt-6 pb-4 sm:pt-10 sm:pb-6">
+      <div className="flex-1 flex items-start justify-center px-4 sm:px-6 pt-6 pb-4 sm:pt-10 lg:pt-30 sm:pb-6">
         <div className="w-full max-w-md sm:max-w-lg md:max-w-xl">
           {/* Welcome Section */}
           <div className="text-center mb-8">

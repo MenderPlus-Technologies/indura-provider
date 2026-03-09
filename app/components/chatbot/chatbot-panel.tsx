@@ -157,7 +157,7 @@ export const ChatbotPanel = ({ isOpen, onClose }: ChatbotPanelProps) => {
       {/* Chat Widget */}
       <div
         className={cn(
-          'fixed inset-x-3 bottom-4 sm:inset-auto sm:bottom-6 sm:right-8 w-full sm:w-[720px] md:w-[550px] max-w-[95vw] max-h-[95vh] min-h-[680px] sm:min-h-[720px] bg-white dark:bg-gray-900 shadow-2xl rounded-2xl border border-gray-200 dark:border-gray-800 z-50 flex flex-col',
+          'fixed inset-0 sm:inset-auto sm:inset-x-3 sm:bottom-6 sm:right-8 w-full sm:w-[720px] md:w-[550px] max-w-full sm:max-w-[95vw] h-full sm:h-auto max-h-full sm:max-h-[95vh] lg:min-h-[720px] bg-white dark:bg-gray-900 shadow-2xl rounded-none sm:rounded-2xl border border-gray-200 dark:border-gray-800 z-50 flex flex-col',
           'transition-all duration-200 ease-out',
           visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-3 scale-95'
         )}
