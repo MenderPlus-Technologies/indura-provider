@@ -154,16 +154,21 @@ export const ChatbotPanel = ({ isOpen, onClose }: ChatbotPanelProps) => {
         onClick={onClose}
       />
 
-      {/* Chat Widget */}
+      {/* Chat Widget — full screen on mobile (100dvh); compact card on sm+ aligned right */}
       <div
         className={cn(
-          'fixed inset-0 sm:inset-auto sm:inset-x-3 sm:bottom-6 sm:right-8 w-full sm:w-[720px] md:w-[550px] max-w-full sm:max-w-[95vw] h-full sm:h-auto max-h-full sm:max-h-[95vh] lg:min-h-[720px] bg-white dark:bg-gray-900 shadow-2xl rounded-none sm:rounded-2xl border border-gray-200 dark:border-gray-800 z-50 flex flex-col',
+          'fixed z-50 flex flex-col bg-white dark:bg-gray-900 shadow-2xl border border-gray-200 dark:border-gray-800',
+          // Mobile: full viewport height so input stays visible; use dvh for real visible area
+          'inset-0 h-dvh max-h-dvh w-full rounded-none overflow-hidden',
+          // sm and up: card on the right, consistent width and height
+          'sm:inset-auto sm:left-auto sm:right-4 sm:bottom-4 sm:top-4 sm:w-[400px] sm:max-w-[calc(100vw-2rem)] sm:h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-2rem)] sm:rounded-2xl sm:overflow-hidden',
+          'md:right-6 md:bottom-6 md:top-auto md:h-[min(640px,calc(100vh-3rem))] md:max-h-[calc(100vh-3rem)]',
           'transition-all duration-200 ease-out',
           visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-3 scale-95'
         )}
       >
         {/* Header */}
-        <div className="flex items-center gap-3 p-4 border-b border-gray-200 dark:border-gray-800 rounded-t-2xl">
+        <div className="flex items-center gap-3 p-3 sm:p-4 border-b border-gray-200 dark:border-gray-800 shrink-0 rounded-t-2xl sm:rounded-t-2xl">
           <div className="w-10 h-10 bg-[#009688] rounded-lg flex items-center justify-center shrink-0">
             <Image
               src="/mendy-ai.svg"
@@ -189,8 +194,8 @@ export const ChatbotPanel = ({ isOpen, onClose }: ChatbotPanelProps) => {
           </Button>
         </div>
 
-        {/* Chat History */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        {/* Chat History — scrollable; min-h-0 so input stays on screen */}
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-3 sm:p-4 space-y-3 overscroll-contain">
           {messages.map((msg) => {
             const isUser = msg.role === 'user';
             return (
@@ -227,16 +232,16 @@ export const ChatbotPanel = ({ isOpen, onClose }: ChatbotPanelProps) => {
           )}
         </div>
 
-        {/* Message Input */}
-        <div className="border-t border-gray-200 dark:border-gray-800 p-4 rounded-b-2xl space-y-2">
+        {/* Message Input — always visible at bottom; safe-area for notched devices */}
+        <div className="shrink-0 min-h-[88px] border-t border-gray-200 dark:border-gray-800 p-3 sm:p-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] rounded-b-2xl space-y-2 bg-white dark:bg-gray-900">
           {/* Text area */}
-          <div className="px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg">
+          <div className="px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg min-h-[44px]">
             <textarea
               ref={textareaRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask Mendy anything..."
-              className="w-full bg-transparent border-none outline-none text-sm leading-snug text-gray-900 dark:text-white placeholder:text-xs placeholder:text-gray-500 dark:placeholder:text-gray-400 resize-none max-h-32"
+              className="w-full bg-transparent border-none outline-none text-sm leading-snug text-gray-900 dark:text-white placeholder:text-xs placeholder:text-gray-500 dark:placeholder:text-gray-400 resize-none max-h-28 min-h-[28px]"
               rows={2}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
