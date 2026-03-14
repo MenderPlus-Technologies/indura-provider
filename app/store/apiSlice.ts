@@ -2046,6 +2046,7 @@ export interface CreateProviderPaymentLinkRequest {
   amount: number;
   currency: string;
   expiresAt: string;
+  status?: string;
 }
 
 export interface CreateProviderPaymentLinkResponse {

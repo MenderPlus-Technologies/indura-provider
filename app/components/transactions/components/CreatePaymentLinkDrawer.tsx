@@ -57,6 +57,7 @@ export const CreatePaymentLinkDrawer = ({
       const payload = {
         title,
         description,
+        status: "active",
         amount: Number(amount),
         currency: "NGN",
         expiresAt: expiryIso,
