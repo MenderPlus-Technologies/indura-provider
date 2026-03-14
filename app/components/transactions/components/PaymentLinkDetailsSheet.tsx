@@ -63,7 +63,10 @@ export const PaymentLinkDetailsSheet = ({
     if (!link?.url) return;
     navigator.clipboard
       .writeText(link.url)
-      .then(() => showToast("Payment link URL copied", "success"))
+      .then(() => {
+        showToast("Payment link URL copied", "success");
+        onOpenChange(false);
+      })
       .catch(() => showToast("Failed to copy link", "error"));
   };
 
@@ -71,7 +74,10 @@ export const PaymentLinkDetailsSheet = ({
     if (!link?.publicCode) return;
     navigator.clipboard
       .writeText(link.publicCode)
-      .then(() => showToast("Payment link code copied", "success"))
+      .then(() => {
+        showToast("Payment link code copied", "success");
+        onOpenChange(false);
+      })
       .catch(() => showToast("Failed to copy code", "error"));
   };
 
