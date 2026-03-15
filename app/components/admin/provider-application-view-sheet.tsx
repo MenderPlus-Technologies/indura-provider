@@ -115,11 +115,12 @@ export const ViewApplicationModal = ({
           </Badge>
         );
       case 'pending':
+      case 'submitted':
         return (
           <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-orange-100 border-[#fff1db] text-orange-900">
             <div className="w-1 h-1 rounded-sm bg-orange-900" />
             <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
-              Pending
+              {currentStatus === 'submitted' ? 'Submitted' : 'Pending'}
             </span>
           </Badge>
         );
@@ -144,7 +145,7 @@ export const ViewApplicationModal = ({
             )}
           </div>
           <div className="flex items-center gap-2">
-            {app && status === 'pending' && (
+            {app && (status === 'pending' || status === 'submitted') && (
               <>
                 <Button
                   onClick={() => onReject(applicationId, facilityName)}

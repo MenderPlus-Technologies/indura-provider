@@ -27,6 +27,24 @@ export interface ChangePasswordResponse {
   message?: string;
 }
 
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ForgotPasswordResponse {
+  message?: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  otp: string;
+  newPassword: string;
+}
+
+export interface ResetPasswordResponse {
+  message?: string;
+}
+
 export interface ApiErrorResponse {
   message?: string;
   errors?: Record<string, string[]>;
@@ -132,6 +150,60 @@ export const apiSlice = createApi({
               ? 'Incorrect current password. Please try again.'
               : status === 400
               ? 'Invalid request. Please check your input.'
+              : status >= 500
+              ? 'Server error. Please try again later.'
+              : 'An unexpected error occurred. Please try again.'),
+          errors: (errorData as ApiErrorResponse)?.errors,
+        };
+      },
+    }),
+
+    /**
+     * Forgot password — request OTP to email
+     * POST /auth/forgot-password
+     */
+    forgotPassword: builder.mutation<ForgotPasswordResponse, ForgotPasswordRequest>({
+      query: (body) => ({
+        url: '/auth/forgot-password',
+        method: 'POST',
+        body,
+      }),
+      transformErrorResponse: (response) => {
+        const errorData = (response as { data?: ApiErrorResponse })?.data || response;
+        const status = (response as { status?: number })?.status || 500;
+        return {
+          status,
+          message:
+            (errorData as ApiErrorResponse)?.message ||
+            (status === 400
+              ? 'Invalid request. Please check your email.'
+              : status >= 500
+              ? 'Server error. Please try again later.'
+              : 'An unexpected error occurred. Please try again.'),
+          errors: (errorData as ApiErrorResponse)?.errors,
+        };
+      },
+    }),
+
+    /**
+     * Reset password with OTP
+     * POST /auth/reset-password
+     */
+    resetPassword: builder.mutation<ResetPasswordResponse, ResetPasswordRequest>({
+      query: (body) => ({
+        url: '/auth/reset-password',
+        method: 'POST',
+        body,
+      }),
+      transformErrorResponse: (response) => {
+        const errorData = (response as { data?: ApiErrorResponse })?.data || response;
+        const status = (response as { status?: number })?.status || 500;
+        return {
+          status,
+          message:
+            (errorData as ApiErrorResponse)?.message ||
+            (status === 400
+              ? 'Invalid or expired code. Please try again.'
               : status >= 500
               ? 'Server error. Please try again later.'
               : 'An unexpected error occurred. Please try again.'),
@@ -1390,7 +1462,7 @@ export interface ProviderApplication {
   // Newer backend agreement flags
   agreeToTerms?: boolean;
   consentToVerification?: boolean;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'submitted' | 'approved' | 'rejected';
   createdAt: string;
   submittedAt?: string; // Computed from createdAt for compatibility
   updatedAt: string;
@@ -2338,6 +2410,8 @@ export interface SendProviderNotificationResponse {
 export const {
   useSignInMutation,
   useChangePasswordMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
   // Admin hooks
   useGetProviderApplicationsQuery,
   useGetProviderApplicationQuery,

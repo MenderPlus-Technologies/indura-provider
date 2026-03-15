@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Mail, Key, Eye, EyeOff, HelpCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -202,16 +203,12 @@ export const SignInScreen = () => {
                   Keep me logged in
                 </Label>
               </div>
-              <a
-                href="#"
+              <Link
+                href="/auth/forgot-password"
                 className="text-sm font-medium text-[#009688] dark:text-teal-400 hover:underline"
-                onClick={(e) => {
-                  e.preventDefault();
-                  console.log('Forgot password clicked');
-                }}
               >
                 Forgot password
-              </a>
+              </Link>
             </div>
 
             {/* Sign In Button */}

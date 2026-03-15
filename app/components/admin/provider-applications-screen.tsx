@@ -81,7 +81,10 @@ export const ProviderApplicationsScreen = () => {
     const matchesSearch = providerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       facilityType.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
+    const matchesStatus =
+      statusFilter === 'all' ||
+      app.status === statusFilter ||
+      (statusFilter === 'pending' && app.status === 'submitted');
     return matchesSearch && matchesStatus;
   });
 
@@ -187,6 +190,15 @@ export const ProviderApplicationsScreen = () => {
             <div className="w-1 h-1 rounded-sm bg-orange-900" />
             <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
               Pending
+            </span>
+          </Badge>
+        );
+      case 'submitted':
+        return (
+          <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-orange-100 border-[#fff1db] text-orange-900">
+            <div className="w-1 h-1 rounded-sm bg-orange-900" />
+            <span className="font-body-small-medium font-[number:var(--body-small-medium-font-weight)] text-[length:var(--body-small-medium-font-size)] text-right tracking-[var(--body-small-medium-letter-spacing)] leading-[var(--body-small-medium-line-height)] inter [font-style:var(--body-small-medium-font-style)]">
+              Submitted
             </span>
           </Badge>
         );

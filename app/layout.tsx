@@ -5,6 +5,7 @@ import { ThemeProvider } from "./contexts/theme-context";
 import { ProviderProvider } from "./contexts/provider-context";
 import { AuthProvider } from "./contexts/auth-context";
 import { ReduxProvider } from "./store/provider";
+import { ToastProvider } from "@/components/ui/toast";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -40,9 +41,11 @@ export default function RootLayout({
         <ReduxProvider>
           <ThemeProvider>
             <AuthProvider>
-              <ProviderProvider>
-                {children}
-              </ProviderProvider>
+              <ToastProvider>
+                <ProviderProvider>
+                  {children}
+                </ProviderProvider>
+              </ToastProvider>
             </AuthProvider>
           </ThemeProvider>
         </ReduxProvider>
