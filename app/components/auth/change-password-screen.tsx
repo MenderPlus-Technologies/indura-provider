@@ -36,6 +36,7 @@ export const ChangePasswordScreen = () => {
     useAuth();
   const { showToast } = useToast();
 
+  const [email, setEmail] = useState('');
   const [temporaryPassword, setTemporaryPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -43,7 +44,7 @@ export const ChangePasswordScreen = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [touched, setTouched] = useState({ temp: false, new: false, confirm: false });
+  const [touched, setTouched] = useState({ email: false, temp: false, new: false, confirm: false });
 
   // Pre-fill temporary password from ?token= (e.g. from email link)
   useEffect(() => {
@@ -74,6 +75,9 @@ export const ChangePasswordScreen = () => {
     [newPassword]
   );
 
+  const emailError =
+    touched.email && !email.trim() ? 'Email is required' : null;
+
   const tempError =
     touched.temp && !temporaryPassword.trim()
       ? 'Temporary password is required'
@@ -92,7 +96,12 @@ export const ChangePasswordScreen = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setTouched({ temp: true, new: true, confirm: true });
+    setTouched({ email: true, temp: true, new: true, confirm: true });
+
+    if (!email.trim()) {
+      setError('Please enter your email.');
+      return;
+    }
 
     if (!temporaryPassword.trim()) {
       setError('Please enter your temporary password.');
@@ -115,7 +124,7 @@ export const ChangePasswordScreen = () => {
       return;
     }
 
-    const result = await changePassword(temporaryPassword, newPassword);
+    const result = await changePassword(email.trim(), temporaryPassword, newPassword);
 
     if (!result.success) {
       setError(result.error || 'Password change failed. Please try again.');
@@ -170,6 +179,39 @@ export const ChangePasswordScreen = () => {
                 <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
               </div>
             )}
+
+            {/* Email Field */}
+            <div>
+              <Label
+                htmlFor="email"
+                className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block"
+              >
+                Email
+              </Label>
+              <div className="relative">
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setTouched((t) => ({ ...t, email: true }));
+                  }}
+                  onBlur={() => setTouched((t) => ({ ...t, email: true }))}
+                  className={`w-full px-4 h-12 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white ${
+                    emailError ? 'border-red-500 dark:border-red-500' : ''
+                  }`}
+                  placeholder="Enter your email"
+                  disabled={isChangingPassword}
+                  required
+                />
+              </div>
+              {emailError && (
+                <p className="text-xs text-red-600 dark:text-red-400 mt-1">
+                  {emailError}
+                </p>
+              )}
+            </div>
 
             {/* Temporary Password Field */}
             <div>

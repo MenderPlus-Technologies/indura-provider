@@ -20,7 +20,7 @@ export interface AuthState {
 interface AuthContextType extends AuthState {
   signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string; user?: User }>;
   signOut: () => void;
-  changePassword: (temporaryPassword: string, newPassword: string) => Promise<{ success: boolean; error?: string }>;
+  changePassword: (email: string, temporaryPassword: string, newPassword: string) => Promise<{ success: boolean; error?: string }>;
   clearPasswordChangeRequirement: () => void;
   // RTK Query mutation states
   isSigningIn: boolean;
@@ -151,31 +151,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [signInMutation]);
 
   const changePassword = useCallback(async (
+    email: string,
     temporaryPassword: string,
     newPassword: string
   ): Promise<{ success: boolean; error?: string }> => {
     try {
-      // Get email from auth state or localStorage
-      let email = authState.user?.email;
-      if (!email && typeof window !== 'undefined') {
-        const userStr = localStorage.getItem(USER_STORAGE_KEY);
-        if (userStr) {
-          try {
-            const parsed = JSON.parse(userStr) as User;
-            email = parsed?.email;
-          } catch {
-            // ignore parse errors, will fall through to error below
-          }
-        }
-      }
-
-      if (!email) {
-        return {
-          success: false,
-          error: 'Email is required to change password. Please sign in again.',
-        };
-      }
-
       await changePasswordMutation({ email, temporaryPassword, newPassword }).unwrap();
 
       // Clear password change requirement
