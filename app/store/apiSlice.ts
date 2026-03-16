@@ -19,7 +19,8 @@ export interface SignInResponse {
 }
 
 export interface ChangePasswordRequest {
-  oldPassword: string;
+  email: string;
+  temporaryPassword: string;
   newPassword: string;
 }
 
