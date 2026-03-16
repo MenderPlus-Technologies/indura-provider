@@ -129,12 +129,12 @@ export const apiSlice = createApi({
     }),
 
     /**
-     * Change password mutation
-     * POST /auth/change-password
+     * Change password mutation for first-time login
+     * POST /auth/first-login/change-password
      */
     changePassword: builder.mutation<ChangePasswordResponse, ChangePasswordRequest>({
       query: (passwords) => ({
-        url: '/auth/change-password',
+        url: '/auth/first-login/change-password',
         method: 'POST',
         body: passwords,
       }),
