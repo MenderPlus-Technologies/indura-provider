@@ -97,7 +97,7 @@ export const apiSlice = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Auth', 'ProviderApplication', 'User', 'Forum', 'Campaign', 'Stats'],
+  tagTypes: ['Auth', 'ProviderApplication', 'User', 'Forum', 'Campaign', 'Stats', 'PayoutRequest'],
   endpoints: (builder) => ({
     /**
      * Sign in mutation
@@ -268,6 +268,43 @@ export const apiSlice = createApi({
         method: 'DELETE',
       }),
       invalidatesTags: ['ProviderApplication', 'Stats'],
+    }),
+
+    /**
+     * Get all payout requests for admin
+     * GET /api/payout-requests/admin/all
+     */
+    getAdminPayoutRequests: builder.query<AdminPayoutRequest[], void>({
+      query: () => '/api/payout-requests/admin/all',
+      transformResponse: (
+        response:
+          | AdminPayoutRequest[]
+          | { data?: AdminPayoutRequest[]; payoutRequests?: AdminPayoutRequest[] }
+      ) => {
+        if (Array.isArray(response)) return response;
+        if (response && typeof response === 'object') {
+          if (Array.isArray(response.data)) return response.data;
+          if (Array.isArray(response.payoutRequests)) return response.payoutRequests;
+        }
+        return [];
+      },
+      providesTags: ['PayoutRequest'],
+    }),
+
+    /**
+     * Review payout request
+     * PATCH /api/payout-requests/admin/:id/review
+     */
+    reviewAdminPayoutRequest: builder.mutation<
+      { success?: boolean; message?: string },
+      { id: string; action: 'approve' | 'reject' }
+    >({
+      query: ({ id, action }) => ({
+        url: `/api/payout-requests/admin/${id}/review`,
+        method: 'PATCH',
+        body: { action },
+      }),
+      invalidatesTags: ['PayoutRequest', 'Stats'],
     }),
 
     /**
@@ -555,6 +592,55 @@ export const apiSlice = createApi({
         return response as ProviderWalletBalanceData;
       },
       providesTags: ['Stats'],
+    }),
+
+    /**
+     * Get wallet banks for account setup
+     * GET /api/wallet/banks
+     */
+    getWalletBanks: builder.query<WalletBank[], void>({
+      query: () => ({
+        url: '/wallet/banks',
+      }),
+      transformResponse: (
+        response:
+          | WalletBank[]
+          | {
+              data?:
+                | WalletBank[]
+                | { data?: WalletBank[]; banks?: WalletBank[]; status?: string; message?: string };
+              banks?: WalletBank[];
+            }
+      ) => {
+        if (Array.isArray(response)) {
+          return response;
+        }
+        if (response && typeof response === 'object') {
+          if (Array.isArray(response.data)) return response.data;
+          if (response.data && typeof response.data === 'object') {
+            const nested = response.data as { data?: WalletBank[]; banks?: WalletBank[] };
+            if (Array.isArray(nested.data)) return nested.data;
+            if (Array.isArray(nested.banks)) return nested.banks;
+          }
+          if (Array.isArray(response.banks)) return response.banks;
+        }
+        return [];
+      },
+    }),
+
+    /**
+     * Resolve account number to account name
+     * POST /api/wallet/resolve-account
+     */
+    resolveWalletAccount: builder.mutation<
+      ResolveWalletAccountResponse,
+      { accountNumber: string; bankCode: string }
+    >({
+      query: (body) => ({
+        url: '/wallet/resolve-account',
+        method: 'POST',
+        body,
+      }),
     }),
 
     /**
@@ -1530,6 +1616,27 @@ export interface ProviderApplication {
   [key: string]: unknown;
 }
 
+export interface AdminPayoutRequest {
+  _id?: string;
+  id?: string;
+  providerId?: string;
+  providerName?: string;
+  provider?: {
+    _id?: string;
+    id?: string;
+    name?: string;
+    facilityName?: string;
+    email?: string;
+  };
+  amount: number;
+  currency?: string;
+  status: 'pending' | 'approved' | 'rejected' | string;
+  createdAt: string;
+  updatedAt?: string;
+  reviewedAt?: string;
+  [key: string]: unknown;
+}
+
 export interface AdminStats {
   totalUsers: number;
   activeProviders: number;
@@ -2263,6 +2370,26 @@ export interface ProviderSettingsBankDetails {
   swiftCode: string;
 }
 
+export interface WalletBank {
+  name: string;
+  code: string;
+  [key: string]: unknown;
+}
+
+export interface ResolveWalletAccountResponse {
+  success?: boolean;
+  message?: string;
+  data?: {
+    accountName?: string;
+    account_number?: string;
+    accountNameResolved?: string;
+    [key: string]: unknown;
+  };
+  accountName?: string;
+  account_number?: string;
+  [key: string]: unknown;
+}
+
 export interface ProviderSettingsPayouts {
   payoutFrequency: string;
   payoutDay: string;
@@ -2450,6 +2577,8 @@ export const {
   useApproveProviderApplicationMutation,
   useRejectProviderApplicationMutation,
   useDeleteProviderApplicationMutation,
+  useGetAdminPayoutRequestsQuery,
+  useReviewAdminPayoutRequestMutation,
   useGetAdminStatsQuery,
   useGetUsersQuery,
   useGetUserQuery,
@@ -2511,4 +2640,6 @@ export const {
   useCreateProviderPayoutRequestMutation,
   useGetProviderPayoutHistoryQuery,
   useGetProviderWalletBalanceQuery,
+  useGetWalletBanksQuery,
+  useResolveWalletAccountMutation,
 } = apiSlice;

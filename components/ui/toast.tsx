@@ -14,17 +14,38 @@ export interface Toast {
 }
 
 interface ToastContextType {
-  showToast: (message: string, type?: ToastType, duration?: number) => void;
+  showToast: (message: unknown, type?: ToastType, duration?: number) => void;
 }
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
+const normalizeToastMessage = (message: unknown): string => {
+  if (typeof message === 'string') return message;
+  if (message == null) return 'Something went wrong.';
+  if (typeof message === 'number' || typeof message === 'boolean') return String(message);
+  if (typeof message === 'object') {
+    const maybeError = message as { message?: unknown; code?: unknown };
+    if (typeof maybeError.message === 'string' && maybeError.message.trim()) {
+      return maybeError.message;
+    }
+    if (typeof maybeError.code === 'string' && maybeError.code.trim()) {
+      return maybeError.code;
+    }
+    try {
+      return JSON.stringify(message);
+    } catch {
+      return 'Something went wrong.';
+    }
+  }
+  return 'Something went wrong.';
+};
+
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const showToast = useCallback((message: string, type: ToastType = 'info', duration = 5000) => {
+  const showToast = useCallback((message: unknown, type: ToastType = 'info', duration = 5000) => {
     const id = Math.random().toString(36).substring(7);
-    const toast: Toast = { id, message, type, duration };
+    const toast: Toast = { id, message: normalizeToastMessage(message), type, duration };
     
     setToasts((prev) => [...prev, toast]);
 

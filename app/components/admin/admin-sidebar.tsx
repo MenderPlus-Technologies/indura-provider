@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, X, LogOut, LayoutDashboard, FileText, Users, MessageSquare, Megaphone, BarChart3 } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, LogOut, LayoutDashboard, FileText, Users, MessageSquare, Megaphone, BarChart3, Wallet } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -18,6 +18,7 @@ const adminMenuItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/admin-dashboard" },
   { icon: FileText, label: "Provider Applications", href: "/admin-dashboard/applications" },
   { icon: Users, label: "Users", href: "/admin-dashboard/users" },
+  { icon: Wallet, label: "Provider Payouts", href: "/admin-dashboard/payouts" },
   { icon: MessageSquare, label: "Forum", href: "/admin-dashboard/forum" },
   { icon: Megaphone, label: "Campaigns", href: "/admin-dashboard/campaigns" },
   { icon: BarChart3, label: "Stats", href: "/admin-dashboard/stats" },

@@ -1,25 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronDown, Download, Bell, RefreshCw, X } from 'lucide-react';
+import { Download, Bell, RefreshCw, X, CheckCircle2 } from 'lucide-react';
 import type {
   ProviderSettingsPayouts,
   ProviderPayoutRequest,
   ProviderPayoutHistoryItem,
 } from '@/app/store/apiSlice';
-import { useCreateProviderPayoutRequestMutation, useGetProviderPayoutHistoryQuery, useGetProviderWalletBalanceQuery, useUpdateProviderPayoutSettingsMutation } from '@/app/store/apiSlice';
+import {
+  useCreateProviderPayoutRequestMutation,
+  useGetProviderPayoutHistoryQuery,
+  useGetProviderWalletBalanceQuery,
+  useUpdateProviderPayoutSettingsMutation,
+  useGetWalletBanksQuery,
+  useResolveWalletAccountMutation,
+} from '@/app/store/apiSlice';
 import { useToast } from '@/components/ui/toast';
 import { apiDownloadFile } from '@/app/utils/api';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface PayoutsTabContentProps {
   settings: ProviderSettingsPayouts;
 }
 
 export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) {
+  const [isAccountVerified, setIsAccountVerified] = useState(false);
+  const [lastResolvedKey, setLastResolvedKey] = useState('');
   const [formData, setFormData] = useState({
     payoutFrequency: settings.payoutFrequency || '',
     payoutDay: settings.payoutDay || '',
     storeCurrency: settings.storeCurrency || '',
     bankName: settings.bankDetails?.bankName || '',
+    bankCode: '',
     accountNumber: settings.bankDetails?.accountNumber || '',
     accountName: settings.bankDetails?.accountName || '',
     routingNumber: settings.bankDetails?.routingNumber || '',
@@ -32,11 +43,14 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
       payoutDay: settings.payoutDay || '',
       storeCurrency: settings.storeCurrency || '',
       bankName: settings.bankDetails?.bankName || '',
+      bankCode: '',
       accountNumber: settings.bankDetails?.accountNumber || '',
       accountName: settings.bankDetails?.accountName || '',
       routingNumber: settings.bankDetails?.routingNumber || '',
       swiftCode: settings.bankDetails?.swiftCode || ''
     });
+    setIsAccountVerified(false);
+    setLastResolvedKey('');
   }, [settings]);
 
   const [requestAmount, setRequestAmount] = useState('');
@@ -50,7 +64,57 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
 
   const [createPayoutRequest, { isLoading: isSubmitting }] = useCreateProviderPayoutRequestMutation();
   const [updatePayoutSettings, { isLoading: isSaving }] = useUpdateProviderPayoutSettingsMutation();
+  const { data: banks = [], isLoading: isLoadingBanks } = useGetWalletBanksQuery();
+  const [resolveWalletAccount, { isLoading: isResolvingAccount }] = useResolveWalletAccountMutation();
   const { showToast } = useToast();
+
+  useEffect(() => {
+    const selectedBank = banks.find((bank) => bank.name === formData.bankName);
+    if (selectedBank?.code && selectedBank.code !== formData.bankCode) {
+      setFormData((prev) => ({ ...prev, bankCode: selectedBank.code as string }));
+    }
+  }, [banks, formData.bankName, formData.bankCode]);
+
+  const handleVerifyAccount = async () => {
+    const accountNumber = formData.accountNumber.trim();
+    const bankCode = formData.bankCode.trim();
+
+    if (!bankCode) {
+      showToast('Please select a bank first.', 'error');
+      return;
+    }
+    if (accountNumber.length < 10) {
+      showToast('Account number must be at least 10 digits.', 'error');
+      return;
+    }
+
+    try {
+      const response = await resolveWalletAccount({ accountNumber, bankCode }).unwrap();
+      const resolvedName =
+        response?.data?.accountName ||
+        response?.data?.accountNameResolved ||
+        response?.accountName ||
+        '';
+
+      if (!resolvedName) {
+        setIsAccountVerified(false);
+        showToast('Unable to resolve account name. Please verify details.', 'error');
+        return;
+      }
+
+      setFormData((prev) => ({ ...prev, accountName: resolvedName }));
+      setIsAccountVerified(true);
+      setLastResolvedKey(`${bankCode}:${accountNumber}`);
+      showToast('Account verified successfully.', 'success');
+    } catch (e: any) {
+      setIsAccountVerified(false);
+      const apiMessage =
+        (e?.data && (e.data.message || e.data.error)) ||
+        e?.message ||
+        'Failed to resolve account number.';
+      showToast(apiMessage, 'error');
+    }
+  };
 
   const handleRequestPayout = async () => {
     const cleanedAmount = requestAmount.replace(/[^0-9.]/g, '');
@@ -95,11 +159,17 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+      ...(name === 'accountNumber' ? { accountName: '' } : {}),
+    }));
+    if (name === 'accountNumber') {
+      setIsAccountVerified(false);
+      setLastResolvedKey('');
+    }
   };
 
   const handleSave = async () => {
@@ -133,6 +203,7 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
       payoutDay: settings.payoutDay || '',
       storeCurrency: settings.storeCurrency || '',
       bankName: settings.bankDetails?.bankName || '',
+      bankCode: '',
       accountNumber: settings.bankDetails?.accountNumber || '',
       accountName: settings.bankDetails?.accountName || '',
       routingNumber: settings.bankDetails?.routingNumber || '',
@@ -237,21 +308,26 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Payout Frequency
                   </label>
-                  <div className="relative">
-                    <select
-                      name="payoutFrequency"
-                      value={formData.payoutFrequency}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg appearance-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
-                    >
-                      <option value="">Select frequency</option>
-                      <option value="daily">Daily</option>
-                      <option value="weekly">Weekly</option>
-                      <option value="bi-weekly">Bi-weekly</option>
-                      <option value="monthly">Monthly</option>
-                    </select>
-                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
-                  </div>
+                  <Select
+                    value={formData.payoutFrequency || ''}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        payoutFrequency: value,
+                        payoutDay: value === 'weekly' ? prev.payoutDay : '',
+                      }))
+                    }
+                  >
+                    <SelectTrigger className="w-full h-12 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700">
+                      <SelectValue placeholder="Select frequency" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="daily">Daily</SelectItem>
+                      <SelectItem value="weekly">Weekly</SelectItem>
+                      <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
+                      <SelectItem value="monthly">Monthly</SelectItem>
+                    </SelectContent>
+                  </Select>
                   {formData.payoutFrequency && formData.payoutDay && (
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                       Current: {formData.payoutFrequency.charAt(0).toUpperCase() + formData.payoutFrequency.slice(1)} on {formData.payoutDay.charAt(0).toUpperCase() + formData.payoutDay.slice(1)}
@@ -265,24 +341,25 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Payout Day
                       </label>
-                      <div className="relative">
-                        <select
-                          name="payoutDay"
-                          value={formData.payoutDay}
-                          onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg appearance-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 focus-border-transparent outline-none"
-                        >
-                          <option value="">Select day</option>
-                          <option value="monday">Monday</option>
-                          <option value="tuesday">Tuesday</option>
-                          <option value="wednesday">Wednesday</option>
-                          <option value="thursday">Thursday</option>
-                          <option value="friday">Friday</option>
-                          <option value="saturday">Saturday</option>
-                          <option value="sunday">Sunday</option>
-                        </select>
-                        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
-                      </div>
+                      <Select
+                        value={formData.payoutDay || ''}
+                        onValueChange={(value) =>
+                          setFormData((prev) => ({ ...prev, payoutDay: value }))
+                        }
+                      >
+                        <SelectTrigger className="w-full h-12 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700">
+                          <SelectValue placeholder="Select day" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="monday">Monday</SelectItem>
+                          <SelectItem value="tuesday">Tuesday</SelectItem>
+                          <SelectItem value="wednesday">Wednesday</SelectItem>
+                          <SelectItem value="thursday">Thursday</SelectItem>
+                          <SelectItem value="friday">Friday</SelectItem>
+                          <SelectItem value="saturday">Saturday</SelectItem>
+                          <SelectItem value="sunday">Sunday</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </>
                   )}
                 </div>
@@ -295,24 +372,25 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Store currency
                   </label>
-                  <div className="relative">
-                    <select
-                      name="storeCurrency"
-                      value={formData.storeCurrency}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg appearance-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
-                    >
-                      <option value="">Select currency</option>
-                      <option value="NGN">Nigerian Naira (NGN)</option>
-                      <option value="USD">US Dollar (USD)</option>
-                      <option value="EUR">Euro (EUR)</option>
-                      <option value="GBP">British Pound (GBP)</option>
-                      <option value="GHS">Ghanaian Cedi (GHS)</option>
-                      <option value="KES">Kenyan Shilling (KES)</option>
-                      <option value="ZAR">South African Rand (ZAR)</option>
-                    </select>
-                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
-                  </div>
+                  <Select
+                    value={formData.storeCurrency || ''}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({ ...prev, storeCurrency: value }))
+                    }
+                  >
+                    <SelectTrigger className="w-full h-12 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700">
+                      <SelectValue placeholder="Select currency" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="NGN">Nigerian Naira (NGN)</SelectItem>
+                      <SelectItem value="USD">US Dollar (USD)</SelectItem>
+                      <SelectItem value="EUR">Euro (EUR)</SelectItem>
+                      <SelectItem value="GBP">British Pound (GBP)</SelectItem>
+                      <SelectItem value="GHS">Ghanaian Cedi (GHS)</SelectItem>
+                      <SelectItem value="KES">Kenyan Shilling (KES)</SelectItem>
+                      <SelectItem value="ZAR">South African Rand (ZAR)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Bank Name */}
@@ -320,14 +398,31 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Bank Name
                   </label>
-                  <input
-                    type="text"
-                    name="bankName"
-                    value={formData.bankName}
-                    onChange={handleChange}
-                    placeholder="Enter bank name"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
-                  />
+                  <Select
+                    value={formData.bankCode || ''}
+                    onValueChange={(value) => {
+                      const selectedBank = banks.find((bank) => String(bank.code) === value);
+                      setFormData((prev) => ({
+                        ...prev,
+                        bankCode: value,
+                        bankName: selectedBank ? String(selectedBank.name) : '',
+                        accountName: '',
+                      }));
+                      setIsAccountVerified(false);
+                      setLastResolvedKey('');
+                    }}
+                  >
+                    <SelectTrigger className="w-full h-12 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700">
+                      <SelectValue placeholder={isLoadingBanks ? 'Loading banks...' : 'Select bank'} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {banks.map((bank) => (
+                        <SelectItem key={String(bank.code)} value={String(bank.code)}>
+                          {String(bank.name)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
@@ -346,6 +441,34 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
                     placeholder="Enter account number"
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
                   />
+                  {isResolvingAccount && (
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                      Verifying account number...
+                    </p>
+                  )}
+                  <div className="mt-2 flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleVerifyAccount}
+                      disabled={
+                        isResolvingAccount ||
+                        !formData.bankCode ||
+                        formData.accountNumber.trim().length < 10
+                      }
+                      className="px-3 py-1.5 text-xs font-medium rounded-md border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isResolvingAccount ? 'Verifying...' : 'Verify Account'}
+                    </button>
+                    <span
+                      className={`text-xs ${
+                        isAccountVerified
+                          ? 'text-green-600 dark:text-green-400'
+                          : 'text-gray-500 dark:text-gray-400'
+                      }`}
+                    >
+                      {isAccountVerified ? 'Verified' : 'Not verified'}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Account Name */}
@@ -357,9 +480,9 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
                     type="text"
                     name="accountName"
                     value={formData.accountName}
-                    onChange={handleChange}
-                    placeholder="Enter account name"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 focus-border-transparent outline-none"
+                    readOnly
+                    placeholder="Auto-filled after account verification"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/70 text-gray-900 dark:text-white text-sm outline-none cursor-not-allowed"
                   />
                 </div>
 

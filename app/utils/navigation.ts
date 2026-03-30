@@ -1,12 +1,14 @@
 import { MenuItem } from "../types";
-import { Home, RefreshCw, User, Settings, Headphones, CreditCard, Users } from "lucide-react";
+import { Home, RefreshCw, User, Settings, Headphones, CreditCard, Users, Wallet } from "lucide-react";
 
 export const getAllMenuItems = (): MenuItem[] => [
   { icon: Home, label: "Dashboard", href: "/dashboard" },
   { icon: RefreshCw, label: "Transactions", href: "/dashboard/transactions" },
+
   { icon: User, label: "Customers", href: "/dashboard/members" },
   { icon: CreditCard, label: "Subscriptions", href: "/dashboard/subscriptions", requiresCapability: 'supportsSubscriptions' },
   { icon: Users, label: "Team Management", href: "/dashboard/team", requiresCapability: 'supportsTeamManagement' },
+  { icon: Wallet, label: "Payouts", href: "/dashboard/payouts" },
 ];
 
 export const getMainMenuItems = (supportsSubscriptions: boolean, supportsTeamManagement: boolean): MenuItem[] => {

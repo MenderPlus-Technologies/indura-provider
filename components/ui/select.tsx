@@ -55,8 +55,11 @@ function SelectContent({
   children,
   position = "item-aligned",
   align = "center",
+  header,
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Content>) {
+}: React.ComponentProps<typeof SelectPrimitive.Content> & {
+  header?: React.ReactNode
+}) {
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
@@ -72,6 +75,11 @@ function SelectContent({
         {...props}
       >
         <SelectScrollUpButton />
+        {header ? (
+          <div className="border-b border-border bg-popover p-2">
+            {header}
+          </div>
+        ) : null}
         <SelectPrimitive.Viewport
           className={cn(
             "p-1",

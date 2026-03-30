@@ -4,14 +4,13 @@ import { useState } from "react";
 import { 
   Settings as SettingsIcon, 
   User, 
-  Wallet, 
   CreditCard, 
   Package, 
   Globe, 
   Lock 
 } from "lucide-react";
 
-export type SettingsTab = 'general' | 'account' | 'payouts' | 'payment-billing' | 'plan-pricing' | 'time-language' | 'password';
+export type SettingsTab = 'general' | 'account' | 'payment-billing' | 'plan-pricing' | 'time-language' | 'password';
 
 interface SettingsTabsProps {
   activeTab: SettingsTab;
@@ -21,7 +20,6 @@ interface SettingsTabsProps {
 const tabs = [
   { id: 'general' as SettingsTab, label: 'General', icon: SettingsIcon },
   { id: 'account' as SettingsTab, label: 'Account', icon: User },
-  { id: 'payouts' as SettingsTab, label: 'Payouts', icon: Wallet },
   { id: 'payment-billing' as SettingsTab, label: 'Payment & Billing', icon: CreditCard },
   // { id: 'plan-pricing' as SettingsTab, label: 'Plan & Pricing', icon: Package },
   { id: 'time-language' as SettingsTab, label: 'Time & Language', icon: Globe },
