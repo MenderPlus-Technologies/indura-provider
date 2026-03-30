@@ -1311,6 +1311,37 @@ export const apiSlice = createApi({
     }),
 
     /**
+     * Update provider payout settings (bank details, frequency, etc.)
+     * PUT /providers/payouts/settings
+     */
+    updateProviderPayoutSettings: builder.mutation<
+      {
+        success: boolean;
+        message?: string;
+        timestamp?: string;
+      },
+      {
+        payoutFrequency: string;
+        payoutDay: string;
+        storeCurrency: string;
+        bankDetails: {
+          bankName: string;
+          accountNumber: string;
+          accountName: string;
+          routingNumber?: string;
+          swiftCode?: string;
+        };
+      }
+    >({
+      query: (body) => ({
+        url: '/providers/payouts/settings',
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: ['Stats'],
+    }),
+
+    /**
      * Get countries list
      * Uses REST Countries API
      */
@@ -2465,6 +2496,7 @@ export const {
   useUpdateProviderAccountSettingsMutation,
   useUpdateProviderPasswordSettingsMutation,
   useUpdateProviderTimeLanguageSettingsMutation,
+  useUpdateProviderPayoutSettingsMutation,
   useGetProviderNotificationsHistoryQuery,
   useSendProviderNotificationMutation,
   useCreateProviderCustomerMutation,

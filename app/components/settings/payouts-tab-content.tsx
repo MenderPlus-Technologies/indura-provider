@@ -6,7 +6,7 @@ import type {
   ProviderPayoutRequest,
   ProviderPayoutHistoryItem,
 } from '@/app/store/apiSlice';
-import { useCreateProviderPayoutRequestMutation, useGetProviderPayoutHistoryQuery, useGetProviderWalletBalanceQuery } from '@/app/store/apiSlice';
+import { useCreateProviderPayoutRequestMutation, useGetProviderPayoutHistoryQuery, useGetProviderWalletBalanceQuery, useUpdateProviderPayoutSettingsMutation } from '@/app/store/apiSlice';
 import { useToast } from '@/components/ui/toast';
 import { apiDownloadFile } from '@/app/utils/api';
 
@@ -49,6 +49,7 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
   const [selectedPayout, setSelectedPayout] = useState<ProviderPayoutHistoryItem | null>(null);
 
   const [createPayoutRequest, { isLoading: isSubmitting }] = useCreateProviderPayoutRequestMutation();
+  const [updatePayoutSettings, { isLoading: isSaving }] = useUpdateProviderPayoutSettingsMutation();
   const { showToast } = useToast();
 
   const handleRequestPayout = async () => {
@@ -101,9 +102,29 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
     });
   };
 
-  const handleSave = () => {
-    console.log('Saving changes:', formData);
-    alert('Changes saved successfully!');
+  const handleSave = async () => {
+    try {
+      const response = await updatePayoutSettings({
+        payoutFrequency: formData.payoutFrequency,
+        payoutDay: formData.payoutDay,
+        storeCurrency: formData.storeCurrency,
+        bankDetails: {
+          bankName: formData.bankName,
+          accountNumber: formData.accountNumber,
+          accountName: formData.accountName,
+          routingNumber: formData.routingNumber || undefined,
+          swiftCode: formData.swiftCode || undefined,
+        },
+      }).unwrap();
+
+      showToast(response?.message || 'Payout settings updated successfully', 'success');
+    } catch (e: any) {
+      const apiMessage =
+        (e?.data && (e.data.message || e.data.error)) ||
+        e?.message ||
+        'Failed to update payout settings. Please try again.';
+      showToast(apiMessage, 'error');
+    }
   };
 
   const handleCancel = () => {
@@ -383,15 +404,17 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
           <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-800">
             <button
               onClick={handleCancel}
+              disabled={isSaving}
               className="px-6 py-2.5 text-gray-700 dark:text-gray-300 font-medium rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
-              className="px-6 py-2.5 bg-teal-600 dark:bg-teal-500 text-white font-medium rounded-lg hover:bg-teal-700 dark:hover:bg-teal-600 transition-colors cursor-pointer"
+              disabled={isSaving}
+              className="px-6 py-2.5 bg-teal-600 dark:bg-teal-500 text-white font-medium rounded-lg hover:bg-teal-700 dark:hover:bg-teal-600 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Save Change
+              {isSaving ? 'Saving...' : 'Save Change'}
             </button>
           </div>
         </div>
