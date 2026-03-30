@@ -275,15 +275,30 @@ export const apiSlice = createApi({
      * GET /api/payout-requests/admin/all
      */
     getAdminPayoutRequests: builder.query<AdminPayoutRequest[], void>({
-      query: () => '/api/payout-requests/admin/all',
+      query: () => '/payout-requests/admin/all',
       transformResponse: (
         response:
           | AdminPayoutRequest[]
-          | { data?: AdminPayoutRequest[]; payoutRequests?: AdminPayoutRequest[] }
+          | {
+              data?:
+                | AdminPayoutRequest[]
+                | { requests?: AdminPayoutRequest[]; payoutRequests?: AdminPayoutRequest[] };
+              requests?: AdminPayoutRequest[];
+              payoutRequests?: AdminPayoutRequest[];
+            }
       ) => {
         if (Array.isArray(response)) return response;
         if (response && typeof response === 'object') {
           if (Array.isArray(response.data)) return response.data;
+          if (response.data && typeof response.data === 'object') {
+            const nested = response.data as {
+              requests?: AdminPayoutRequest[];
+              payoutRequests?: AdminPayoutRequest[];
+            };
+            if (Array.isArray(nested.requests)) return nested.requests;
+            if (Array.isArray(nested.payoutRequests)) return nested.payoutRequests;
+          }
+          if (Array.isArray(response.requests)) return response.requests;
           if (Array.isArray(response.payoutRequests)) return response.payoutRequests;
         }
         return [];
@@ -297,12 +312,12 @@ export const apiSlice = createApi({
      */
     reviewAdminPayoutRequest: builder.mutation<
       { success?: boolean; message?: string },
-      { id: string; action: 'approve' | 'reject' }
+      { id: string; action: 'approve' | 'reject'; reason?: string }
     >({
-      query: ({ id, action }) => ({
-        url: `/api/payout-requests/admin/${id}/review`,
+      query: ({ id, action, reason }) => ({
+        url: `payout-requests/admin/${id}/review`,
         method: 'PATCH',
-        body: { action },
+        body: action === 'reject' ? { action, reason } : { action },
       }),
       invalidatesTags: ['PayoutRequest', 'Stats'],
     }),
@@ -1621,6 +1636,11 @@ export interface AdminPayoutRequest {
   id?: string;
   providerId?: string;
   providerName?: string;
+  requestedBy?: {
+    _id?: string;
+    email?: string;
+    name?: string;
+  } | null;
   provider?: {
     _id?: string;
     id?: string;
@@ -1628,9 +1648,18 @@ export interface AdminPayoutRequest {
     facilityName?: string;
     email?: string;
   };
+  bankAccountSnapshot?: {
+    bankCode?: string;
+    bankName?: string;
+    accountNumber?: string;
+    accountName?: string;
+  };
+  invoiceNumber?: string;
+  note?: string;
+  balanceAtRequest?: number;
   amount: number;
   currency?: string;
-  status: 'pending' | 'approved' | 'rejected' | string;
+  status: 'pending' | 'approved' | 'rejected' | 'cancelled' | string;
   createdAt: string;
   updatedAt?: string;
   reviewedAt?: string;

@@ -12,11 +12,17 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useToast } from '@/components/ui/toast';
-import { Loader2, RefreshCw, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Loader2, RefreshCw, Search, ChevronLeft, ChevronRight, MoreVertical } from 'lucide-react';
 import { ProviderPayoutReviewModal } from '@/app/components/admin/provider-payout-review-modal';
 
-type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected';
+type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected' | 'cancelled';
 const ITEMS_PER_PAGE = 10;
 
 export const ProviderPayoutsScreen = () => {
@@ -47,12 +53,17 @@ export const ProviderPayoutsScreen = () => {
       const id = item._id || item.id || '';
       const providerName =
         item.providerName ||
+        item.requestedBy?.name ||
         item.provider?.name ||
         item.provider?.facilityName ||
         'Unknown provider';
       const amount = Number(item.amount || 0);
       const currency = item.currency || 'NGN';
       const status = (item.status || 'pending').toLowerCase();
+      const requesterEmail = item.requestedBy?.email || item.provider?.email || '';
+      const invoiceNumber = item.invoiceNumber || '—';
+      const bankName = item.bankAccountSnapshot?.bankName || '—';
+      const note = item.note || '—';
 
       return {
         ...item,
@@ -61,12 +72,20 @@ export const ProviderPayoutsScreen = () => {
         amount,
         currency,
         status,
+        requesterEmail,
+        invoiceNumber,
+        bankName,
+        note,
       } as AdminPayoutRequest & {
         id: string;
         providerName: string;
         amount: number;
         currency: string;
         status: string;
+        requesterEmail: string;
+        invoiceNumber: string;
+        bankName: string;
+        note: string;
       };
     });
   }, [data]);
@@ -75,7 +94,9 @@ export const ProviderPayoutsScreen = () => {
     return payoutRequests.filter((request) => {
       const matchesSearch =
         request.providerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        request.id.toLowerCase().includes(searchTerm.toLowerCase());
+        request.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        request.requesterEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        request.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = statusFilter === 'all' || request.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
@@ -102,6 +123,13 @@ export const ProviderPayoutsScreen = () => {
           <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-red-200 border-[#f9d2d9] text-red-700">
             <div className="w-1 h-1 rounded-sm bg-red-700" />
             <span>Rejected</span>
+          </Badge>
+        );
+      case 'cancelled':
+        return (
+          <Badge className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-[100px] border border-solid bg-gray-200 border-gray-300 text-gray-700">
+            <div className="w-1 h-1 rounded-sm bg-gray-700" />
+            <span>Cancelled</span>
           </Badge>
         );
       default:
@@ -140,10 +168,14 @@ export const ProviderPayoutsScreen = () => {
     });
   };
 
-  const handleReview = async () => {
+  const handleReview = async (reason?: string) => {
     if (!modalState.requestId) return;
     try {
-      await reviewPayout({ id: modalState.requestId, action: modalState.action }).unwrap();
+      await reviewPayout({
+        id: modalState.requestId,
+        action: modalState.action,
+        reason,
+      }).unwrap();
       showToast(
         modalState.action === 'approve'
           ? 'Payout request approved successfully'
@@ -178,7 +210,12 @@ export const ProviderPayoutsScreen = () => {
   return (
     <div className="flex flex-col w-full items-start bg-white dark:bg-gray-950 relative">
       <header className="h-auto sm:h-[72px] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 px-4 sm:px-6 py-4 bg-greyscale-0 dark:bg-gray-900 border-b border-solid border-[#dfe1e6] dark:border-gray-800 w-full">
-        <h1 className="text-gray-600 dark:text-white text-xl font-semibold">Provider Payouts</h1>
+        <div>
+          <h1 className="text-gray-600 dark:text-white text-xl font-semibold">Provider Payouts</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Manage provider payout requests
+          </p>
+        </div>
         <Button
           variant="outline"
           size="icon"
@@ -222,6 +259,7 @@ export const ProviderPayoutsScreen = () => {
                     <SelectItem value="pending">Pending</SelectItem>
                     <SelectItem value="approved">Approved</SelectItem>
                     <SelectItem value="rejected">Rejected</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -238,7 +276,9 @@ export const ProviderPayoutsScreen = () => {
                         <TableHeader>
                           <TableRow className="border-b border-solid border-[#dfe1e6] dark:border-gray-700">
                             <TableHead className="px-4">Provider</TableHead>
+                            <TableHead className="px-4">Invoice</TableHead>
                             <TableHead className="px-4">Amount</TableHead>
+                            <TableHead className="px-4">Bank</TableHead>
                             <TableHead className="px-4">Status</TableHead>
                             <TableHead className="px-4">Date</TableHead>
                             <TableHead className="px-4">Actions</TableHead>
@@ -248,10 +288,23 @@ export const ProviderPayoutsScreen = () => {
                           {paginatedRequests.map((request) => (
                             <TableRow key={request.id}>
                               <TableCell className="px-4 font-medium text-gray-700 dark:text-gray-200">
-                                {request.providerName}
+                                <div className="flex flex-col">
+                                  <span>{request.providerName}</span>
+                                  {request.requesterEmail ? (
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                                      {request.requesterEmail}
+                                    </span>
+                                  ) : null}
+                                </div>
+                              </TableCell>
+                              <TableCell className="px-4 text-gray-700 dark:text-gray-200">
+                                {request.invoiceNumber}
                               </TableCell>
                               <TableCell className="px-4 text-gray-700 dark:text-gray-200">
                                 {request.currency} {request.amount.toLocaleString()}
+                              </TableCell>
+                              <TableCell className="px-4 text-gray-700 dark:text-gray-200">
+                                {request.bankName}
                               </TableCell>
                               <TableCell className="px-4">{getStatusBadge(request.status)}</TableCell>
                               <TableCell className="px-4 text-gray-700 dark:text-gray-200">
@@ -259,39 +312,46 @@ export const ProviderPayoutsScreen = () => {
                               </TableCell>
                               <TableCell className="px-4">
                                 {request.status === 'pending' ? (
-                                  <div className="flex items-center gap-2">
-                                    <Button
-                                      size="sm"
-                                      onClick={() =>
-                                        openModal(
-                                          request.id,
-                                          'approve',
-                                          request.providerName,
-                                          request.amount,
-                                          request.currency
-                                        )
-                                      }
-                                      className="h-8 px-3 bg-green-600 hover:bg-green-700 text-white rounded-lg cursor-pointer"
-                                    >
-                                      Approve
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() =>
-                                        openModal(
-                                          request.id,
-                                          'reject',
-                                          request.providerName,
-                                          request.amount,
-                                          request.currency
-                                        )
-                                      }
-                                      className="h-8 px-3 border-red-200 text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950 cursor-pointer"
-                                    >
-                                      Reject
-                                    </Button>
-                                  </div>
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 cursor-pointer text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                      >
+                                        <MoreVertical className="h-4 w-4" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                      <DropdownMenuItem
+                                        onClick={() =>
+                                          openModal(
+                                            request.id,
+                                            'approve',
+                                            request.providerName,
+                                            request.amount,
+                                            request.currency
+                                          )
+                                        }
+                                      >
+                                        Approve
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem
+                                        variant="destructive"
+                                        onClick={() =>
+                                          openModal(
+                                            request.id,
+                                            'reject',
+                                            request.providerName,
+                                            request.amount,
+                                            request.currency
+                                          )
+                                        }
+                                      >
+                                        Reject
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
                                 ) : (
                                   <span className="text-xs text-gray-500 dark:text-gray-400">Reviewed</span>
                                 )}

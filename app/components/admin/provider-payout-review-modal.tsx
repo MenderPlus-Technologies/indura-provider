@@ -1,12 +1,14 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { AlertTriangle, CheckCircle, Loader2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 
 export interface ProviderPayoutReviewModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: (reason?: string) => void;
   action: 'approve' | 'reject';
   providerName: string;
   amountLabel: string;
@@ -22,6 +24,16 @@ export const ProviderPayoutReviewModal = ({
   amountLabel,
   isLoading = false,
 }: ProviderPayoutReviewModalProps) => {
+  const [reason, setReason] = useState('');
+  const [reasonError, setReasonError] = useState('');
+
+  useEffect(() => {
+    if (!isOpen) {
+      setReason('');
+      setReasonError('');
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const isApprove = action === 'approve';
@@ -29,6 +41,15 @@ export const ProviderPayoutReviewModal = ({
   const message = isApprove
     ? `Are you sure you want to approve ${amountLabel} for ${providerName}?`
     : `Are you sure you want to reject ${amountLabel} for ${providerName}?`;
+
+  const handleConfirm = () => {
+    if (!isApprove && !reason.trim()) {
+      setReasonError('Reason is required when rejecting a request.');
+      return;
+    }
+    setReasonError('');
+    onConfirm(isApprove ? undefined : reason.trim());
+  };
 
   return (
     <>
@@ -65,9 +86,27 @@ export const ProviderPayoutReviewModal = ({
           <div className="flex-1 p-6">
             <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">{message}</p>
             {!isApprove && (
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                This request will be marked as rejected.
-              </p>
+              <div className="space-y-2">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  This request will be marked as rejected.
+                </p>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block">
+                  Rejection reason <span className="text-red-500">*</span>
+                </label>
+                <Textarea
+                  value={reason}
+                  onChange={(e) => {
+                    setReason(e.target.value);
+                    if (reasonError) setReasonError('');
+                  }}
+                  placeholder="Enter reason for rejection"
+                  className={reasonError ? 'border-red-500 dark:border-red-500' : ''}
+                  disabled={isLoading}
+                />
+                {reasonError ? (
+                  <p className="text-xs text-red-600 dark:text-red-400">{reasonError}</p>
+                ) : null}
+              </div>
             )}
           </div>
 
@@ -76,7 +115,7 @@ export const ProviderPayoutReviewModal = ({
               Cancel
             </Button>
             <Button
-              onClick={onConfirm}
+              onClick={handleConfirm}
               disabled={isLoading}
               className={`cursor-pointer ${
                 isApprove ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white'
