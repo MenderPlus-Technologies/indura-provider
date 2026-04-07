@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import Image from 'next/image';
-import { useAuth } from '@/app/contexts/auth-context';
+import { useAuth, isAdminRole } from '@/app/contexts/auth-context';
 
 export const SignInScreen = () => {
   const router = useRouter();
@@ -59,7 +59,7 @@ export const SignInScreen = () => {
             if (requiresPasswordChange) {
               // Redirect to change password screen
               router.push('/auth/change-password');
-            } else if (userRole === 'admin') {
+            } else if (isAdminRole(userRole)) {
               // Admin users → redirect to admin dashboard
               router.push('/admin-dashboard');
             } else {
@@ -83,7 +83,7 @@ export const SignInScreen = () => {
     if (requiresPasswordChange) {
       // Redirect to change password screen
       router.push('/auth/change-password');
-    } else if (user.role === 'admin') {
+    } else if (isAdminRole(user.role)) {
       // Admin users → redirect to admin dashboard
       router.push('/admin-dashboard');
     } else {

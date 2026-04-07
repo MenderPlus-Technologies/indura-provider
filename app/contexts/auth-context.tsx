@@ -34,6 +34,11 @@ const USER_STORAGE_KEY = 'authUser';
 const PASSWORD_CHANGE_KEY = 'requiresPasswordChange';
 const LAST_ACTIVITY_AT_KEY = 'indura:lastActivityAt';
 
+/** API may return role with different casing */
+export function isAdminRole(role: string | undefined | null): boolean {
+  return typeof role === 'string' && role.toLowerCase() === 'admin';
+}
+
 /**
  * Load auth state from localStorage
  */

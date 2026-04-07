@@ -34,7 +34,7 @@ export default function ProviderPayoutsModuleContent({ settings }: ProviderPayou
     payoutDay: settings.payoutDay || '',
     storeCurrency: settings.storeCurrency || 'NGN',
     bankName: settings.bankDetails?.bankName || '',
-    bankCode: '',
+    bankCode: settings.bankDetails?.bankCode || '',
     accountNumber: settings.bankDetails?.accountNumber || '',
     accountName: settings.bankDetails?.accountName || '',
   });
@@ -61,7 +61,7 @@ export default function ProviderPayoutsModuleContent({ settings }: ProviderPayou
       payoutDay: settings.payoutDay || '',
       storeCurrency: settings.storeCurrency || 'NGN',
       bankName: settings.bankDetails?.bankName || '',
-      bankCode: '',
+      bankCode: settings.bankDetails?.bankCode || '',
       accountNumber: settings.bankDetails?.accountNumber || '',
       accountName: settings.bankDetails?.accountName || '',
     });
@@ -183,9 +183,18 @@ export default function ProviderPayoutsModuleContent({ settings }: ProviderPayou
     }
   };
 
+  const resolveBankCodeForSave = (): string => {
+    const raw = formData.bankCode.trim();
+    if (raw) return raw;
+    const target = formData.bankName.trim().toLowerCase();
+    const match = banks.find((b) => String(b.name).trim().toLowerCase() === target);
+    return match?.code ? String(match.code) : '';
+  };
+
   const handleSavePayoutSettings = async () => {
-    if (!formData.bankCode || !formData.accountNumber || !formData.accountName) {
-      showToast('Complete bank details and verify account number before saving.', 'error');
+    const bankCode = resolveBankCodeForSave();
+    if (!bankCode || !formData.accountNumber?.trim() || !formData.accountName?.trim()) {
+      showToast('Select a bank from the list, verify account number, then save.', 'error');
       return;
     }
     try {
@@ -195,6 +204,7 @@ export default function ProviderPayoutsModuleContent({ settings }: ProviderPayou
         storeCurrency: formData.storeCurrency,
         bankDetails: {
           bankName: formData.bankName,
+          bankCode,
           accountNumber: formData.accountNumber,
           accountName: formData.accountName,
         },
@@ -379,8 +389,11 @@ export default function ProviderPayoutsModuleContent({ settings }: ProviderPayou
                       Fetching banks...
                     </div>
                   ) : filteredBanks.length > 0 ? (
-                    filteredBanks.map((bank) => (
-                      <SelectItem key={String(bank.code)} value={String(bank.code)}>
+                    filteredBanks.map((bank, index) => (
+                      <SelectItem
+                        key={`${String(bank.code)}-${String(bank.name)}-${index}`}
+                        value={String(bank.code)}
+                      >
                         {String(bank.name)}
                       </SelectItem>
                     ))

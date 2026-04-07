@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Loader2, Users, UserCheck, FileText, Megaphone, LogIn, CheckCircle, XCircle, ChevronLeft, ChevronRight, MessageSquare, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/app/contexts/auth-context';
+import { useAuth, isAdminRole } from '@/app/contexts/auth-context';
 
 interface Activity {
   id: string;
@@ -74,7 +74,7 @@ export const AdminDashboardScreen = () => {
 
   // Track admin login on mount
   useEffect(() => {
-    if (user?.role === 'admin' && user?.email) {
+    if (isAdminRole(user?.role) && user?.email) {
       // Only track if this is a fresh login (check if last login was more than 1 minute ago)
       const lastLogin = localStorage.getItem('lastAdminLoginTime');
       const now = Date.now();

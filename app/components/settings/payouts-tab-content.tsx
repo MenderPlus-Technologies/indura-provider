@@ -30,7 +30,7 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
     payoutDay: settings.payoutDay || '',
     storeCurrency: settings.storeCurrency || '',
     bankName: settings.bankDetails?.bankName || '',
-    bankCode: '',
+    bankCode: settings.bankDetails?.bankCode || '',
     accountNumber: settings.bankDetails?.accountNumber || '',
     accountName: settings.bankDetails?.accountName || '',
     routingNumber: settings.bankDetails?.routingNumber || '',
@@ -43,7 +43,7 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
       payoutDay: settings.payoutDay || '',
       storeCurrency: settings.storeCurrency || '',
       bankName: settings.bankDetails?.bankName || '',
-      bankCode: '',
+      bankCode: settings.bankDetails?.bankCode || '',
       accountNumber: settings.bankDetails?.accountNumber || '',
       accountName: settings.bankDetails?.accountName || '',
       routingNumber: settings.bankDetails?.routingNumber || '',
@@ -69,11 +69,14 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
   const { showToast } = useToast();
 
   useEffect(() => {
-    const selectedBank = banks.find((bank) => bank.name === formData.bankName);
-    if (selectedBank?.code && selectedBank.code !== formData.bankCode) {
-      setFormData((prev) => ({ ...prev, bankCode: selectedBank.code as string }));
+    if (formData.bankCode.trim()) return;
+    const selectedBank = banks.find(
+      (bank) => String(bank.name).trim().toLowerCase() === formData.bankName.trim().toLowerCase()
+    );
+    if (selectedBank?.code) {
+      setFormData((prev) => ({ ...prev, bankCode: String(selectedBank.code) }));
     }
-  }, [banks, formData.bankName, formData.bankCode]);
+  }, [banks, formData.bankCode, formData.bankName]);
 
   const handleVerifyAccount = async () => {
     const accountNumber = formData.accountNumber.trim();
@@ -172,7 +175,20 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
     }
   };
 
+  const resolveBankCodeForSave = (): string => {
+    const raw = formData.bankCode.trim();
+    if (raw) return raw;
+    const target = formData.bankName.trim().toLowerCase();
+    const match = banks.find((b) => String(b.name).trim().toLowerCase() === target);
+    return match?.code ? String(match.code) : '';
+  };
+
   const handleSave = async () => {
+    const bankCode = resolveBankCodeForSave();
+    if (!bankCode || !formData.accountNumber?.trim() || !formData.accountName?.trim()) {
+      showToast('Select a bank from the list and complete verified account details before saving.', 'error');
+      return;
+    }
     try {
       const response = await updatePayoutSettings({
         payoutFrequency: formData.payoutFrequency,
@@ -180,6 +196,7 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
         storeCurrency: formData.storeCurrency,
         bankDetails: {
           bankName: formData.bankName,
+          bankCode,
           accountNumber: formData.accountNumber,
           accountName: formData.accountName,
           routingNumber: formData.routingNumber || undefined,
@@ -203,7 +220,7 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
       payoutDay: settings.payoutDay || '',
       storeCurrency: settings.storeCurrency || '',
       bankName: settings.bankDetails?.bankName || '',
-      bankCode: '',
+      bankCode: settings.bankDetails?.bankCode || '',
       accountNumber: settings.bankDetails?.accountNumber || '',
       accountName: settings.bankDetails?.accountName || '',
       routingNumber: settings.bankDetails?.routingNumber || '',
@@ -416,8 +433,11 @@ export default function PayoutsTabContent({ settings }: PayoutsTabContentProps) 
                       <SelectValue placeholder={isLoadingBanks ? 'Loading banks...' : 'Select bank'} />
                     </SelectTrigger>
                     <SelectContent>
-                      {banks.map((bank) => (
-                        <SelectItem key={String(bank.code)} value={String(bank.code)}>
+                      {banks.map((bank, index) => (
+                        <SelectItem
+                          key={`${String(bank.code)}-${String(bank.name)}-${index}`}
+                          value={String(bank.code)}
+                        >
                           {String(bank.name)}
                         </SelectItem>
                       ))}

@@ -1,12 +1,24 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useLayoutEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AdminHeader } from "../components/admin/admin-header";
 import { AdminSidebar } from "../components/admin/admin-sidebar";
-import { useAuth } from "../contexts/auth-context";
+import { useAuth, isAdminRole } from "../contexts/auth-context";
 import { ToastProvider } from "@/components/ui/toast";
 import { useInactivityLogout } from "../hooks/use-inactivity-logout";
+
+function readStoredUserRole(): string | undefined {
+  if (typeof window === 'undefined') return undefined;
+  try {
+    const raw = localStorage.getItem('authUser');
+    if (!raw) return undefined;
+    const data = JSON.parse(raw) as { role?: string };
+    return data.role;
+  } catch {
+    return undefined;
+  }
+}
 
 export default function AdminDashboardLayout({
   children,
@@ -18,6 +30,10 @@ export default function AdminDashboardLayout({
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  const effectiveRole =
+    typeof window !== 'undefined' ? user?.role ?? readStoredUserRole() : user?.role;
+  const isAdminUser = isAdminRole(effectiveRole);
+
   // Handle inactivity logout after 5 minutes
   useInactivityLogout(
     () => {
@@ -27,45 +43,29 @@ export default function AdminDashboardLayout({
     { timeoutMs: 5 * 60 * 1000 } // 5 minutes
   );
 
-  useEffect(() => {
-    // Check authentication and admin role
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('authToken');
-      const userStr = localStorage.getItem('authUser');
-      
-      // Redirect to sign-in if no auth token
-      if (!token) {
-        router.replace('/');
-        return;
-      }
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return;
 
-      // Check if user has admin role
-      let userData: { role?: string } | null = null;
-      if (userStr) {
-        try {
-          userData = JSON.parse(userStr);
-        } catch (error) {
-          console.error('Failed to parse user data:', error);
-        }
-      }
+    const token = localStorage.getItem('authToken');
+    const role = user?.role ?? readStoredUserRole();
 
-      const userRole = user?.role || userData?.role;
-      if (userRole !== 'admin') {
-        // Redirect non-admin users to provider dashboard
-        router.replace('/dashboard');
-        return;
-      }
-
-      // Redirect to change password if required
-      if (requiresPasswordChange) {
-        router.replace('/auth/change-password');
-        return;
-      }
+    if (!token) {
+      router.replace('/');
+      return;
     }
-  }, [router, isAuthenticated, user, requiresPasswordChange]);
+    if (!isAdminRole(role)) {
+      router.replace('/dashboard');
+      return;
+    }
+    if (requiresPasswordChange) {
+      router.replace('/auth/change-password');
+    }
+  }, [router, user?.role, requiresPasswordChange]);
 
-  // Show loading state while checking auth
-  if (typeof window !== 'undefined' && (!isAuthenticated || user?.role !== 'admin')) {
+  const mayShowAdminShell =
+    isAuthenticated && isAdminUser && !requiresPasswordChange;
+
+  if (typeof window !== 'undefined' && !mayShowAdminShell) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">

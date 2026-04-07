@@ -1,4 +1,10 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import {
+  createApi,
+  fetchBaseQuery,
+  type BaseQueryFn,
+  type FetchArgs,
+  type FetchBaseQueryError,
+} from '@reduxjs/toolkit/query/react';
 
 // Types for auth API
 export interface SignInRequest {
@@ -78,25 +84,35 @@ const getAuthToken = (): string | null => {
 };
 
 /**
- * RTK Query API slice with baseQuery configuration
+ * Resolve base URL on each request so client-side calls always use
+ * NEXT_PUBLIC_API_BASE_URL (the URL was previously fixed at module load,
+ * which could be wrong or empty during SSR / first evaluation).
  */
-export const apiSlice = createApi({
-  reducerPath: 'api',
-  baseQuery: fetchBaseQuery({
+const baseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
+  args,
+  api,
+  extraOptions
+) => {
+  const inner = fetchBaseQuery({
     baseUrl: getBaseUrl(),
     prepareHeaders: (headers) => {
-      // Set Content-Type header
       headers.set('Content-Type', 'application/json');
-      
-      // Add Authorization header if token exists
       const token = getAuthToken();
       if (token) {
         headers.set('Authorization', `Bearer ${token}`);
       }
-      
       return headers;
     },
-  }),
+  });
+  return inner(args, api, extraOptions);
+};
+
+/**
+ * RTK Query API slice with baseQuery configuration
+ */
+export const apiSlice = createApi({
+  reducerPath: 'api',
+  baseQuery,
   tagTypes: ['Auth', 'ProviderApplication', 'User', 'Forum', 'Campaign', 'Stats', 'PayoutRequest'],
   endpoints: (builder) => ({
     /**
@@ -610,34 +626,61 @@ export const apiSlice = createApi({
     }),
 
     /**
-     * Get wallet banks for account setup
-     * GET /api/wallet/banks
+     * Banks for payout settings (codes must match PUT /providers/payouts/settings validation).
+     * GET /providers/payouts/banks?country=NG
      */
     getWalletBanks: builder.query<WalletBank[], void>({
       query: () => ({
-        url: '/wallet/banks',
+        url: '/providers/payouts/banks',
+        params: { country: 'NG' },
       }),
       transformResponse: (
         response:
           | WalletBank[]
+          | Record<string, unknown>[]
           | {
               data?:
                 | WalletBank[]
-                | { data?: WalletBank[]; banks?: WalletBank[]; status?: string; message?: string };
-              banks?: WalletBank[];
+                | Record<string, unknown>[]
+                | { data?: WalletBank[] | Record<string, unknown>[]; banks?: WalletBank[] };
+              banks?: WalletBank[] | Record<string, unknown>[];
             }
       ) => {
+        const normalizeRow = (row: unknown): WalletBank | null => {
+          if (!row || typeof row !== 'object') return null;
+          const r = row as Record<string, unknown>;
+          const name = r.name ?? r.bankName ?? r.label;
+          const code = r.code ?? r.bankCode;
+          if (name != null && code != null) {
+            return { name: String(name), code: String(code) };
+          }
+          return null;
+        };
+
+        const normalizeList = (list: unknown): WalletBank[] => {
+          if (!Array.isArray(list)) return [];
+          const seenCodes = new Set<string>();
+          const out: WalletBank[] = [];
+          for (const item of list) {
+            const b = normalizeRow(item);
+            if (!b || seenCodes.has(b.code)) continue;
+            seenCodes.add(b.code);
+            out.push(b);
+          }
+          return out;
+        };
+
         if (Array.isArray(response)) {
-          return response;
+          return normalizeList(response);
         }
         if (response && typeof response === 'object') {
-          if (Array.isArray(response.data)) return response.data;
+          if (Array.isArray(response.data)) return normalizeList(response.data);
           if (response.data && typeof response.data === 'object') {
-            const nested = response.data as { data?: WalletBank[]; banks?: WalletBank[] };
-            if (Array.isArray(nested.data)) return nested.data;
-            if (Array.isArray(nested.banks)) return nested.banks;
+            const nested = response.data as { data?: unknown; banks?: unknown };
+            if (Array.isArray(nested.data)) return normalizeList(nested.data);
+            if (Array.isArray(nested.banks)) return normalizeList(nested.banks);
           }
-          if (Array.isArray(response.banks)) return response.banks;
+          if (Array.isArray(response.banks)) return normalizeList(response.banks);
         }
         return [];
       },
@@ -1427,6 +1470,7 @@ export const apiSlice = createApi({
         storeCurrency: string;
         bankDetails: {
           bankName: string;
+          bankCode: string;
           accountNumber: string;
           accountName: string;
           routingNumber?: string;
@@ -2393,6 +2437,7 @@ export interface ProviderSettingsAccount {
 
 export interface ProviderSettingsBankDetails {
   bankName: string;
+  bankCode?: string;
   accountNumber: string;
   accountName: string;
   routingNumber: string;

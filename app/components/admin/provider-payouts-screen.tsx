@@ -171,22 +171,29 @@ export const ProviderPayoutsScreen = () => {
   const handleReview = async (reason?: string) => {
     if (!modalState.requestId) return;
     try {
-      await reviewPayout({
+      const result = await reviewPayout({
         id: modalState.requestId,
         action: modalState.action,
         reason,
       }).unwrap();
-      showToast(
-        modalState.action === 'approve'
-          ? 'Payout request approved successfully'
-          : 'Payout request rejected successfully',
-        'success'
-      );
+      const apiMessage =
+        typeof result?.message === 'string' && result.message.trim().length > 0
+          ? result.message.trim()
+          : modalState.action === 'approve'
+            ? 'Payout request approved successfully'
+            : 'Payout request rejected successfully';
+      showToast(apiMessage, 'success');
       closeModal();
       refetch();
     } catch (e) {
-      const message = (e as { data?: { message?: string } })?.data?.message;
-      showToast(message || 'Failed to review payout request', 'error');
+      const err = e as {
+        data?: { message?: string; error?: { message?: string } };
+      };
+      const message =
+        err?.data?.message ||
+        err?.data?.error?.message ||
+        'Failed to review payout request';
+      showToast(message, 'error');
     }
   };
 

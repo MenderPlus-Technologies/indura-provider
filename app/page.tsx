@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { SignInScreen } from './components/auth/sign-in-screen';
-import { useAuth } from './contexts/auth-context';
+import { useAuth, isAdminRole } from './contexts/auth-context';
 
 export default function HomePage() {
   const router = useRouter();
@@ -38,7 +38,7 @@ export default function HomePage() {
           }
 
           // Role-based redirect
-          if (userRole === 'admin') {
+          if (isAdminRole(userRole)) {
             router.replace('/admin-dashboard');
           } else {
             router.replace('/dashboard');
