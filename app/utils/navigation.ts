@@ -1,9 +1,10 @@
 import { MenuItem } from "../types";
-import { Home, RefreshCw, User, Settings, Headphones, CreditCard, Users, Wallet } from "lucide-react";
+import { Home, RefreshCw, User, Settings, Headphones, CreditCard, Users, Wallet, Link2 } from "lucide-react";
 
 export const getAllMenuItems = (): MenuItem[] => [
   { icon: Home, label: "Dashboard", href: "/dashboard" },
   { icon: RefreshCw, label: "Transactions", href: "/dashboard/transactions" },
+  { icon: Link2, label: "Payment Links", href: "/dashboard/payment-links" },
 
   { icon: User, label: "Customers", href: "/dashboard/members" },
   { icon: CreditCard, label: "Subscriptions", href: "/dashboard/subscriptions", requiresCapability: 'supportsSubscriptions' },

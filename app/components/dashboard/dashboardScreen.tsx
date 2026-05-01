@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   RefreshCw,
@@ -8,10 +9,13 @@ import {
   Download,
   ChevronDown,
   ArrowUp,
+  ArrowRight,
   PanelLeft,
   Coins,
   BarChart3,
   ShoppingBag,
+  Link2,
+  Send,
 } from "lucide-react";
 import { RecentActivities } from "./recentActivities";
 import { IncomeChart } from "./income-chart";
@@ -24,7 +28,7 @@ import { MetricCard } from "./metric-card";
 
 
 export const DashboardScreen = () => {
-  const { data: statsData, isLoading, isError, refetch } = useGetProviderDashboardStatsQuery();
+  const { data: statsData, isLoading, refetch } = useGetProviderDashboardStatsQuery();
   const [chartPeriod, setChartPeriod] = useState<"daily" | "weekly" | "monthly">("monthly");
 
   // Map API data to metric cards format with dummy data fallbacks
@@ -77,7 +81,6 @@ export const DashboardScreen = () => {
       transactionsSummary,
       periodComparison,
       walletBalance,
-      pendingPayouts,
       failedRefundedCount,
       failedRefundedAmount,
     } = statsData ?? {};
@@ -210,6 +213,54 @@ export const DashboardScreen = () => {
             <MetricCard key={index} data={card} />
           ))}
         </div>
+
+        <Card className="w-full overflow-hidden border border-solid border-[#dfe1e6] dark:border-gray-700 bg-[#F9F9FB] dark:bg-gray-800/50 rounded-2xl shadow-none">
+          <CardContent className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 p-5 sm:p-6">
+            <div className="flex flex-col sm:flex-row items-start gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#009688]/10">
+                <Link2 className="h-6 w-6 text-[#009688]" />
+              </div>
+              <div className="space-y-2">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[#009688]">
+                    Payment Links
+                  </p>
+                  <h2 className="text-xl font-semibold text-[#344054] dark:text-white">
+                    Collect payments with a shareable link
+                  </h2>
+                </div>
+                <p className="max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+                  Create a link for any amount, send it to your customer, and track
+                  payment status from one dedicated module.
+                </p>
+                <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                  <span className="inline-flex items-center gap-1.5">
+                    <Link2 className="h-3.5 w-3.5 text-[#009688]" />
+                    Create link
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <Send className="h-3.5 w-3.5 text-[#009688]" />
+                    Share with customer
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <Coins className="h-3.5 w-3.5 text-[#009688]" />
+                    Track payments
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <Button
+              asChild
+              className="h-auto px-4 py-2 bg-[#009688] hover:bg-[#008577] rounded-lg text-white cursor-pointer"
+            >
+              <Link href="/dashboard/payment-links">
+                Open Payment Links
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
         
         <Card className="flex-1 flex flex-col gap-1 p-1 bg-greyscale-25 dark:bg-gray-800/50 rounded-2xl overflow-hidden border border-solid border-[#dfe1e6] dark:border-gray-700 shadow-[0px_2px_4px_-1px_#0d0d120f] w-full">
           <CardContent className="flex flex-col items-start justify-center w-full rounded-xl overflow-hidden border border-solid border-[#dfe1e6] dark:border-gray-700 bg-greyscale-0 dark:bg-gray-800 p-0">
@@ -237,7 +288,7 @@ export const DashboardScreen = () => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
-                    className="h-auto inline-flex h-10 items-center justify-center gap-2 px-3 py-2 bg-greyscale-0 dark:bg-gray-700 rounded-[10px] border border-solid border-[#dfe1e6] dark:border-gray-600 shadow-shadow-xsmall cursor-pointer"
+                    className="inline-flex h-10 items-center justify-center gap-2 px-3 py-2 bg-greyscale-0 dark:bg-gray-700 rounded-[10px] border border-solid border-[#dfe1e6] dark:border-gray-600 shadow-shadow-xsmall cursor-pointer"
                   >
                     <Calendar className="h-4 w-4 text-gray-700 dark:text-gray-300" />
                     <span className="font-semibold text-[#344054] dark:text-white text-sm capitalize">
@@ -259,7 +310,7 @@ export const DashboardScreen = () => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
-                    className="h-auto inline-flex h-10 items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-[10px] overflow-hidden bg-greyscale-0 dark:bg-gray-700 border border-solid border-[#dfe1e6] dark:border-gray-600 cursor-pointer"
+                    className="inline-flex h-10 items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-[10px] overflow-hidden bg-greyscale-0 dark:bg-gray-700 border border-solid border-[#dfe1e6] dark:border-gray-600 cursor-pointer"
                   >
                         <span className="font-semibold text-[#344054] dark:text-white text-xs sm:text-sm">
                       All Service

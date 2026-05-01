@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Card } from "@/components/ui/card";
 import { TransactionsHeader } from "./transactions-header";
 import { OverallIncomeCard } from "./overall-income-card";
@@ -14,7 +14,6 @@ import type { ProviderTransaction } from "@/app/store/apiSlice";
 import { TransactionDetailsSheet } from "./transaction-details-sheet";
 import { Loader2 } from "lucide-react";
 import { WalletSummary } from "./components/WalletSummary";
-import { PaymentLinksTab } from "./components/PaymentLinksTab";
 import { ManualTransactionsTab } from "./components/ManualTransactionsTab";
 import { PaymentRequestsTab } from "./components/PaymentRequestsTab";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -59,6 +58,7 @@ export const TransactionsScreen = () => {
         apiTransaction.userId && typeof apiTransaction.userId === "object"
           ? (apiTransaction.userId as { name?: string })
           : null;
+      const metadataDescription = apiTransaction.metadata?.description;
 
       return {
         id: apiTransaction._id,
@@ -77,7 +77,7 @@ export const TransactionsScreen = () => {
         reference: apiTransaction.reference,
         category: apiTransaction.category,
         description:
-          (apiTransaction.metadata as any)?.description ||
+          (typeof metadataDescription === "string" && metadataDescription) ||
           (apiTransaction.category === "provider_payment"
             ? "Provider payment"
             : apiTransaction.category === "payment_received"
@@ -137,29 +137,23 @@ export const TransactionsScreen = () => {
 
     // Apply sorting
     result.sort((a, b) => {
-      let aValue: any;
-      let bValue: any;
-
+      const getSortValue = (transaction: Transaction): string | number => {
       switch (sortBy) {
         case 'date':
-          aValue = (a as Transaction & { rawDate?: Date }).rawDate || new Date();
-          bValue = (b as Transaction & { rawDate?: Date }).rawDate || new Date();
-          break;
+          return ((transaction as Transaction & { rawDate?: Date }).rawDate || new Date()).getTime();
         case 'amount':
-          aValue = (a as Transaction & { rawAmount?: number }).rawAmount || 0;
-          bValue = (b as Transaction & { rawAmount?: number }).rawAmount || 0;
-          break;
+          return (transaction as Transaction & { rawAmount?: number }).rawAmount || 0;
         case 'payer':
-          aValue = a.payer.toLowerCase();
-          bValue = b.payer.toLowerCase();
-          break;
+          return transaction.payer.toLowerCase();
         case 'status':
-          aValue = a.status;
-          bValue = b.status;
-          break;
+          return transaction.status;
         default:
-          return 0;
+          return "";
       }
+      };
+
+      const aValue = getSortValue(a);
+      const bValue = getSortValue(b);
 
       if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
       if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
@@ -170,13 +164,6 @@ export const TransactionsScreen = () => {
   }, [allTransactions, searchQuery, filters, sortBy, sortOrder]);
 
   const totalPages = transactionsData?.pagination?.totalPages ?? 1;
-
-  // Reset to page 1 if current page is out of bounds or when data changes
-  useEffect(() => {
-    if (currentPage > totalPages && totalPages > 0) {
-      setCurrentPage(1);
-    }
-  }, [currentPage, totalPages, filteredAndSortedTransactions.length]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -263,7 +250,6 @@ export const TransactionsScreen = () => {
                 <TabsList>
                   <TabsTrigger value="all">All</TabsTrigger>
                   <TabsTrigger value="requests">Payment Requests</TabsTrigger>
-                  <TabsTrigger value="payment-links">Payment Links</TabsTrigger>
                   <TabsTrigger value="manual">Manual / Offline</TabsTrigger>
                 </TabsList>
               </div>
@@ -315,10 +301,6 @@ export const TransactionsScreen = () => {
                       )}
                   </>
                 )}
-              </TabsContent>
-
-              <TabsContent value="payment-links">
-                <PaymentLinksTab />
               </TabsContent>
 
               <TabsContent value="requests">
